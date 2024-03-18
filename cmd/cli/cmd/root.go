@@ -16,7 +16,7 @@ import (
 )
 
 const (
-	appName         = "template"
+	appName         = "geodetic"
 	defaultRootHost = "http://localhost:1337/"
 	graphEndpoint   = "query"
 )

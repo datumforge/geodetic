@@ -11,5 +11,5 @@ server:
 db: 
   debug: true
   driver_name: libsql
-  primary_db_source: "file:template.db"
+  primary_db_source: "file:geodetic.db"
   multi_write: false

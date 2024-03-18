@@ -1,7 +1,7 @@
 package main
 
 import (
-	template "github.com/datumforge/geodetic/cmd/cli/cmd"
+	geodetic "github.com/datumforge/geodetic/cmd/cli/cmd"
 
 	// since the cmds are no longer part of the same package
 	// they must all be imported in main
@@ -9,5 +9,5 @@ import (
 )
 
 func main() {
-	template.Execute()
+	geodetic.Execute()
 }

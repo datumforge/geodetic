@@ -7,7 +7,7 @@ import (
 	"go.uber.org/zap"
 )
 
-const appName = "template"
+const appName = "geodetic"
 
 var (
 	logger *zap.SugaredLogger
@@ -16,7 +16,7 @@ var (
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
 	Use:   appName,
-	Short: "A template repo for graph apis",
+	Short: "A server for scheduling geographically distributed databases",
 }
 
 // Execute adds all child commands to the root command and sets flags appropriately.

@@ -3,35 +3,35 @@ version: "3"
 tasks:
   build:
     dir: ..
-    desc: builds the template docker image
+    desc: builds the geodetic docker image
     cmds:
-      - "docker build -f docker/Dockerfile . -t template:dev"
+      - "docker build -f docker/Dockerfile . -t geodetic:dev"
 
-  template:
+  geodetic:
     dir: ..
-    desc: brings up the compose environment for the template server configured with auth
+    desc: brings up the compose environment for the geodetic server configured with auth
     deps: [build]
     cmds:
-      - "docker compose -f ./docker/docker-compose-redis.yml  -f ./docker/docker-compose.yml -f ./docker/docker-compose-fga.yml -p template up -d"
+      - "docker compose -f ./docker/docker-compose-redis.yml  -f ./docker/docker-compose.yml -f ./docker/docker-compose-fga.yml -p geodetic up -d"
 
   datum:down:
     dir: ..
-    desc: brings the template compose environment down
+    desc: brings the geodetic compose environment down
     cmds:
-      - "docker compose -p template down"
+      - "docker compose -p geodetic down"
 
   all:up:
     dir: ..
-    desc: brings up the full docker compose development environment including template server, fga, and rover
+    desc: brings up the full docker compose development environment including geodetic server, fga, and rover
     cmds:
-      - task: template
+      - task: geodetic
       - task: rover
 
   all:down: 
     dir: ..
-    desc: brings down both fga and template server compose environments 
+    desc: brings down both fga and geodetic server compose environments 
     cmds:
-      - task: template:down
+      - task: geodetic:down
       
   redis:
     dir: ..
@@ -76,4 +76,4 @@ tasks:
     desc: launches an interactive browser to navigate the configured graph schema
     cmds:
       - 'open "http://localhost:4000"'
-      - rover dev --skip-update-check --skip-update -u http://localhost:1337/query -s schema.graphql -n template --elv2-license=accept
+      - rover dev --skip-update-check --skip-update -u http://localhost:1337/query -s schema.graphql -n geodetic --elv2-license=accept

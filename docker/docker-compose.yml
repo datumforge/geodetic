@@ -2,7 +2,7 @@ version: "3.9"
 
 services:
   api:
-    image: template:dev
+    image: geodetic:dev
     depends_on:
       - openfga
     command:

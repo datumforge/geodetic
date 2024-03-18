@@ -5,15 +5,15 @@ import (
 
 	"github.com/datumforge/datum/pkg/utils/cli/useragent"
 
-	template "github.com/datumforge/geodetic/cmd/cli/cmd"
+	geodetic "github.com/datumforge/geodetic/cmd/cli/cmd"
 	"github.com/datumforge/geodetic/internal/constants"
 )
 
 // VersionCmd is the version command
 var versionCmd = &cobra.Command{
 	Use:   "version",
-	Short: "Print template CLI version",
-	Long:  `The template version command prints the version of the template CLI`,
+	Short: "Print geodetic CLI version",
+	Long:  `The version command prints the version of the geodetic CLI`,
 	Run: func(cmd *cobra.Command, _ []string) {
 		cmd.Println(constants.VerboseCLIVersion)
 		cmd.Printf("User Agent: %s\n", useragent.GetUserAgent())
@@ -21,5 +21,5 @@ var versionCmd = &cobra.Command{
 }
 
 func init() {
-	template.RootCmd.AddCommand(versionCmd)
+	geodetic.RootCmd.AddCommand(versionCmd)
 }

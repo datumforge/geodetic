@@ -25,7 +25,7 @@ tasks:
   migrate:
     desc: pushes the generated migration files to atlas cloud
     cmds:
-      - atlas migrate push template --dev-url "sqlite://dev?mode=memory&_fk=1" --dir "file://migrations"
+      - atlas migrate push geodetic --dev-url "sqlite://dev?mode=memory&_fk=1" --dir "file://migrations"
 
   resethash:
     desc: re-sets the checksum created by the atlas package so that a complete migration can be re-created if deleted
@@ -33,12 +33,12 @@ tasks:
       - atlas migrate hash --dir="file://migrations"
 
   console:
-    desc: launches an interactive terminal to the local template db with some tasty options
+    desc: launches an interactive terminal to the local geodetic db with some tasty options
     cmds:
-      -  sqlite3 -column -header -box ../template.db
+      -  sqlite3 -column -header -box ../geodetic.db
 
   newschema:
-    desc: generate a new ent schema from template
+    desc: generate a new ent schema for geodetic
     silent: true
     cmds:
-      - go run -mod=mod entgo.io/ent/cmd/ent new --template ../internal/ent/base/entinit.tmpl --target ../internal/ent/schema {{.CLI_ARGS}}
+      - go run -mod=mod entgo.io/ent/cmd/ent new --geodetic ../internal/ent/base/entinit.tmpl --target ../internal/ent/schema {{.CLI_ARGS}}
