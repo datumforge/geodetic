@@ -1,0 +1,79 @@
+version: "3"
+
+tasks:
+  build:
+    dir: ..
+    desc: builds the geodetic docker image
+    cmds:
+      - "docker build -f docker/Dockerfile . -t geodetic:dev"
+
+  geodetic:
+    dir: ..
+    desc: brings up the compose environment for the geodetic server configured with auth
+    deps: [build]
+    cmds:
+      - "docker compose -f ./docker/docker-compose-redis.yml  -f ./docker/docker-compose.yml -f ./docker/docker-compose-fga.yml -p geodetic up -d"
+
+  datum:down:
+    dir: ..
+    desc: brings the geodetic compose environment down
+    cmds:
+      - "docker compose -p geodetic down"
+
+  all:up:
+    dir: ..
+    desc: brings up the full docker compose development environment including geodetic server, fga, and rover
+    cmds:
+      - task: geodetic
+      - task: rover
+
+  all:down: 
+    dir: ..
+    desc: brings down both fga and geodetic server compose environments 
+    cmds:
+      - task: geodetic:down
+      
+  redis:
+    dir: ..
+    desc: brings up the compose environment for redis
+    cmds:
+      - "docker compose -f ./docker/docker-compose-redis.yml -p redis up -d"
+
+  redis:down:
+    dir: ..
+    desc: brings up the compose environment for redis
+    cmds:
+      - "docker compose -p redis down"
+
+  fga:
+    dir: ..
+    desc: brings up the compose environment for openfga development
+    cmds:
+      - "docker compose -f ./docker/docker-compose-fga.yml -p fga up -d"
+
+  fga:down:
+    dir: ..
+    desc: brings the fga compose environment down
+    cmds: 
+      - docker compose -p fga down
+
+  fga:open:
+    dir: ..
+    desc: opens the fga playground in a browser
+    cmds: 
+      - 'open "http://localhost:3000/playground"'
+
+  fga:up:
+    dir: ..
+    desc: brings the fga compose environment up and opens the fga playground
+    aliases: [fgaup]
+    cmds:
+      - task: fga
+      - task: fga:open
+
+  rover:
+    dir: ..
+    desc: launches an interactive browser to navigate the configured graph schema
+    cmds:
+      - 'open "http://localhost:4000"'
+      - rover dev --skip-update-check --skip-update -u http://localhost:1337/query -s schema.graphql -n geodetic --elv2-license=accept
