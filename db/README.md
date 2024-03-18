@@ -18,25 +18,25 @@
 
 #### Libsql
 
-1. This will write to a local file `template.db`, already included in `.gitignore`
+1. This will write to a local file `geodetic.db`, already included in `.gitignore`
 
 ```yaml
 db: 
   debug: true
   driver_name: "libsql"
-  primary_db_source: "file:template.db"
+  primary_db_source: "file:geodetic.db"
   run_migrations: true
 ```
 
 #### Sqlite
 
-1. This will write to a local file `template.db`, already included in `.gitignore`
+1. This will write to a local file `geodetic.db`, already included in `.gitignore`
 
 ```yaml
 db: 
   debug: true
   driver_name: sqlite3
-  primary_db_source: "template.db"
+  primary_db_source: "geodetic.db"
   run_migrations: true
 ```
 

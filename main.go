@@ -3,7 +3,7 @@ package main
 
 import (
 	"github.com/datumforge/geodetic/cmd"
-	// _ "github.com/datumforge/geodetic/internal/ent/generated/runtime"
+	_ "github.com/datumforge/geodetic/internal/ent/generated/runtime"
 )
 
 func main() {

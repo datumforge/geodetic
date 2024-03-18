@@ -134,9 +134,9 @@ func Load(cfgFile *string) (*Config, error) {
 	}
 
 	// load env vars
-	if err := k.Load(env.Provider("TEMPLATE_", ".", func(s string) string {
+	if err := k.Load(env.Provider("GEODETIC_", ".", func(s string) string {
 		return strings.ReplaceAll(strings.ToLower(
-			strings.TrimPrefix(s, "TEMPLATE_")), "_", ".")
+			strings.TrimPrefix(s, "GEODETIC_")), "_", ".")
 	}), nil); err != nil {
 		panic(err)
 	}
