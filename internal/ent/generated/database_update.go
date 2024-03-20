@@ -11,6 +11,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/datumforge/geodetic/internal/ent/enums"
 	"github.com/datumforge/geodetic/internal/ent/generated/database"
 	"github.com/datumforge/geodetic/internal/ent/generated/predicate"
 
@@ -164,6 +165,48 @@ func (du *DatabaseUpdate) SetNillableDsn(s *string) *DatabaseUpdate {
 	return du
 }
 
+// SetToken sets the "token" field.
+func (du *DatabaseUpdate) SetToken(s string) *DatabaseUpdate {
+	du.mutation.SetToken(s)
+	return du
+}
+
+// SetNillableToken sets the "token" field if the given value is not nil.
+func (du *DatabaseUpdate) SetNillableToken(s *string) *DatabaseUpdate {
+	if s != nil {
+		du.SetToken(*s)
+	}
+	return du
+}
+
+// SetStatus sets the "status" field.
+func (du *DatabaseUpdate) SetStatus(es enums.DatabaseStatus) *DatabaseUpdate {
+	du.mutation.SetStatus(es)
+	return du
+}
+
+// SetNillableStatus sets the "status" field if the given value is not nil.
+func (du *DatabaseUpdate) SetNillableStatus(es *enums.DatabaseStatus) *DatabaseUpdate {
+	if es != nil {
+		du.SetStatus(*es)
+	}
+	return du
+}
+
+// SetProvider sets the "provider" field.
+func (du *DatabaseUpdate) SetProvider(ep enums.DatabaseProvider) *DatabaseUpdate {
+	du.mutation.SetProvider(ep)
+	return du
+}
+
+// SetNillableProvider sets the "provider" field if the given value is not nil.
+func (du *DatabaseUpdate) SetNillableProvider(ep *enums.DatabaseProvider) *DatabaseUpdate {
+	if ep != nil {
+		du.SetProvider(*ep)
+	}
+	return du
+}
+
 // Mutation returns the DatabaseMutation object of the builder.
 func (du *DatabaseUpdate) Mutation() *DatabaseMutation {
 	return du.mutation
@@ -228,6 +271,21 @@ func (du *DatabaseUpdate) check() error {
 			return &ValidationError{Name: "dsn", err: fmt.Errorf(`generated: validator failed for field "Database.dsn": %w`, err)}
 		}
 	}
+	if v, ok := du.mutation.Token(); ok {
+		if err := database.TokenValidator(v); err != nil {
+			return &ValidationError{Name: "token", err: fmt.Errorf(`generated: validator failed for field "Database.token": %w`, err)}
+		}
+	}
+	if v, ok := du.mutation.Status(); ok {
+		if err := database.StatusValidator(v); err != nil {
+			return &ValidationError{Name: "status", err: fmt.Errorf(`generated: validator failed for field "Database.status": %w`, err)}
+		}
+	}
+	if v, ok := du.mutation.Provider(); ok {
+		if err := database.ProviderValidator(v); err != nil {
+			return &ValidationError{Name: "provider", err: fmt.Errorf(`generated: validator failed for field "Database.provider": %w`, err)}
+		}
+	}
 	return nil
 }
 
@@ -287,6 +345,15 @@ func (du *DatabaseUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if value, ok := du.mutation.Dsn(); ok {
 		_spec.SetField(database.FieldDsn, field.TypeString, value)
+	}
+	if value, ok := du.mutation.Token(); ok {
+		_spec.SetField(database.FieldToken, field.TypeString, value)
+	}
+	if value, ok := du.mutation.Status(); ok {
+		_spec.SetField(database.FieldStatus, field.TypeEnum, value)
+	}
+	if value, ok := du.mutation.Provider(); ok {
+		_spec.SetField(database.FieldProvider, field.TypeEnum, value)
 	}
 	_spec.Node.Schema = du.schemaConfig.Database
 	ctx = internal.NewSchemaConfigContext(ctx, du.schemaConfig)
@@ -444,6 +511,48 @@ func (duo *DatabaseUpdateOne) SetNillableDsn(s *string) *DatabaseUpdateOne {
 	return duo
 }
 
+// SetToken sets the "token" field.
+func (duo *DatabaseUpdateOne) SetToken(s string) *DatabaseUpdateOne {
+	duo.mutation.SetToken(s)
+	return duo
+}
+
+// SetNillableToken sets the "token" field if the given value is not nil.
+func (duo *DatabaseUpdateOne) SetNillableToken(s *string) *DatabaseUpdateOne {
+	if s != nil {
+		duo.SetToken(*s)
+	}
+	return duo
+}
+
+// SetStatus sets the "status" field.
+func (duo *DatabaseUpdateOne) SetStatus(es enums.DatabaseStatus) *DatabaseUpdateOne {
+	duo.mutation.SetStatus(es)
+	return duo
+}
+
+// SetNillableStatus sets the "status" field if the given value is not nil.
+func (duo *DatabaseUpdateOne) SetNillableStatus(es *enums.DatabaseStatus) *DatabaseUpdateOne {
+	if es != nil {
+		duo.SetStatus(*es)
+	}
+	return duo
+}
+
+// SetProvider sets the "provider" field.
+func (duo *DatabaseUpdateOne) SetProvider(ep enums.DatabaseProvider) *DatabaseUpdateOne {
+	duo.mutation.SetProvider(ep)
+	return duo
+}
+
+// SetNillableProvider sets the "provider" field if the given value is not nil.
+func (duo *DatabaseUpdateOne) SetNillableProvider(ep *enums.DatabaseProvider) *DatabaseUpdateOne {
+	if ep != nil {
+		duo.SetProvider(*ep)
+	}
+	return duo
+}
+
 // Mutation returns the DatabaseMutation object of the builder.
 func (duo *DatabaseUpdateOne) Mutation() *DatabaseMutation {
 	return duo.mutation
@@ -519,6 +628,21 @@ func (duo *DatabaseUpdateOne) check() error {
 	if v, ok := duo.mutation.Dsn(); ok {
 		if err := database.DsnValidator(v); err != nil {
 			return &ValidationError{Name: "dsn", err: fmt.Errorf(`generated: validator failed for field "Database.dsn": %w`, err)}
+		}
+	}
+	if v, ok := duo.mutation.Token(); ok {
+		if err := database.TokenValidator(v); err != nil {
+			return &ValidationError{Name: "token", err: fmt.Errorf(`generated: validator failed for field "Database.token": %w`, err)}
+		}
+	}
+	if v, ok := duo.mutation.Status(); ok {
+		if err := database.StatusValidator(v); err != nil {
+			return &ValidationError{Name: "status", err: fmt.Errorf(`generated: validator failed for field "Database.status": %w`, err)}
+		}
+	}
+	if v, ok := duo.mutation.Provider(); ok {
+		if err := database.ProviderValidator(v); err != nil {
+			return &ValidationError{Name: "provider", err: fmt.Errorf(`generated: validator failed for field "Database.provider": %w`, err)}
 		}
 	}
 	return nil
@@ -597,6 +721,15 @@ func (duo *DatabaseUpdateOne) sqlSave(ctx context.Context) (_node *Database, err
 	}
 	if value, ok := duo.mutation.Dsn(); ok {
 		_spec.SetField(database.FieldDsn, field.TypeString, value)
+	}
+	if value, ok := duo.mutation.Token(); ok {
+		_spec.SetField(database.FieldToken, field.TypeString, value)
+	}
+	if value, ok := duo.mutation.Status(); ok {
+		_spec.SetField(database.FieldStatus, field.TypeEnum, value)
+	}
+	if value, ok := duo.mutation.Provider(); ok {
+		_spec.SetField(database.FieldProvider, field.TypeEnum, value)
 	}
 	_spec.Node.Schema = duo.schemaConfig.Database
 	ctx = internal.NewSchemaConfigContext(ctx, duo.schemaConfig)

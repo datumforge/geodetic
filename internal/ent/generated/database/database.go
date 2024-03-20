@@ -3,10 +3,13 @@
 package database
 
 import (
+	"fmt"
 	"time"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
+	"github.com/99designs/gqlgen/graphql"
+	"github.com/datumforge/geodetic/internal/ent/enums"
 )
 
 const (
@@ -34,6 +37,12 @@ const (
 	FieldGeo = "geo"
 	// FieldDsn holds the string denoting the dsn field in the database.
 	FieldDsn = "dsn"
+	// FieldToken holds the string denoting the token field in the database.
+	FieldToken = "token"
+	// FieldStatus holds the string denoting the status field in the database.
+	FieldStatus = "status"
+	// FieldProvider holds the string denoting the provider field in the database.
+	FieldProvider = "provider"
 	// Table holds the table name of the database in the database.
 	Table = "databases"
 )
@@ -51,6 +60,9 @@ var Columns = []string{
 	FieldName,
 	FieldGeo,
 	FieldDsn,
+	FieldToken,
+	FieldStatus,
+	FieldProvider,
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -69,7 +81,7 @@ func ValidColumn(column string) bool {
 //
 //	import _ "github.com/datumforge/geodetic/internal/ent/generated/runtime"
 var (
-	Hooks [1]ent.Hook
+	Hooks [2]ent.Hook
 	// DefaultCreatedAt holds the default value on creation for the "created_at" field.
 	DefaultCreatedAt func() time.Time
 	// DefaultUpdatedAt holds the default value on creation for the "updated_at" field.
@@ -82,9 +94,35 @@ var (
 	NameValidator func(string) error
 	// DsnValidator is a validator for the "dsn" field. It is called by the builders before save.
 	DsnValidator func(string) error
+	// TokenValidator is a validator for the "token" field. It is called by the builders before save.
+	TokenValidator func(string) error
 	// DefaultID holds the default value on creation for the "id" field.
 	DefaultID func() string
 )
+
+const DefaultStatus enums.DatabaseStatus = "CREATING"
+
+// StatusValidator is a validator for the "status" field enum values. It is called by the builders before save.
+func StatusValidator(s enums.DatabaseStatus) error {
+	switch s.String() {
+	case "ACTIVE", "CREATING", "DELETING", "DELETED":
+		return nil
+	default:
+		return fmt.Errorf("database: invalid enum value for status field: %q", s)
+	}
+}
+
+const DefaultProvider enums.DatabaseProvider = "LOCAL"
+
+// ProviderValidator is a validator for the "provider" field enum values. It is called by the builders before save.
+func ProviderValidator(pr enums.DatabaseProvider) error {
+	switch pr.String() {
+	case "LOCAL", "TURSO":
+		return nil
+	default:
+		return fmt.Errorf("database: invalid enum value for provider field: %q", pr)
+	}
+}
 
 // OrderOption defines the ordering options for the Database queries.
 type OrderOption func(*sql.Selector)
@@ -143,3 +181,32 @@ func ByGeo(opts ...sql.OrderTermOption) OrderOption {
 func ByDsn(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldDsn, opts...).ToFunc()
 }
+
+// ByToken orders the results by the token field.
+func ByToken(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldToken, opts...).ToFunc()
+}
+
+// ByStatus orders the results by the status field.
+func ByStatus(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldStatus, opts...).ToFunc()
+}
+
+// ByProvider orders the results by the provider field.
+func ByProvider(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldProvider, opts...).ToFunc()
+}
+
+var (
+	// enums.DatabaseStatus must implement graphql.Marshaler.
+	_ graphql.Marshaler = (*enums.DatabaseStatus)(nil)
+	// enums.DatabaseStatus must implement graphql.Unmarshaler.
+	_ graphql.Unmarshaler = (*enums.DatabaseStatus)(nil)
+)
+
+var (
+	// enums.DatabaseProvider must implement graphql.Marshaler.
+	_ graphql.Marshaler = (*enums.DatabaseProvider)(nil)
+	// enums.DatabaseProvider must implement graphql.Unmarshaler.
+	_ graphql.Unmarshaler = (*enums.DatabaseProvider)(nil)
+)

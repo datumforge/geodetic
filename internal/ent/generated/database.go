@@ -9,6 +9,7 @@ import (
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
+	"github.com/datumforge/geodetic/internal/ent/enums"
 	"github.com/datumforge/geodetic/internal/ent/generated/database"
 )
 
@@ -36,7 +37,13 @@ type Database struct {
 	// the geo location of the database
 	Geo string `json:"geo,omitempty"`
 	// the DSN to the database
-	Dsn          string `json:"dsn,omitempty"`
+	Dsn string `json:"dsn,omitempty"`
+	// the auth token used to connect to the database
+	Token string `json:"-"`
+	// status of the database
+	Status enums.DatabaseStatus `json:"status,omitempty"`
+	// provider of the database
+	Provider     enums.DatabaseProvider `json:"provider,omitempty"`
 	selectValues sql.SelectValues
 }
 
@@ -45,7 +52,7 @@ func (*Database) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case database.FieldID, database.FieldCreatedBy, database.FieldUpdatedBy, database.FieldDeletedBy, database.FieldOrganizationID, database.FieldName, database.FieldGeo, database.FieldDsn:
+		case database.FieldID, database.FieldCreatedBy, database.FieldUpdatedBy, database.FieldDeletedBy, database.FieldOrganizationID, database.FieldName, database.FieldGeo, database.FieldDsn, database.FieldToken, database.FieldStatus, database.FieldProvider:
 			values[i] = new(sql.NullString)
 		case database.FieldCreatedAt, database.FieldUpdatedAt, database.FieldDeletedAt:
 			values[i] = new(sql.NullTime)
@@ -130,6 +137,24 @@ func (d *Database) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				d.Dsn = value.String
 			}
+		case database.FieldToken:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field token", values[i])
+			} else if value.Valid {
+				d.Token = value.String
+			}
+		case database.FieldStatus:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field status", values[i])
+			} else if value.Valid {
+				d.Status = enums.DatabaseStatus(value.String)
+			}
+		case database.FieldProvider:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field provider", values[i])
+			} else if value.Valid {
+				d.Provider = enums.DatabaseProvider(value.String)
+			}
 		default:
 			d.selectValues.Set(columns[i], values[i])
 		}
@@ -195,6 +220,14 @@ func (d *Database) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("dsn=")
 	builder.WriteString(d.Dsn)
+	builder.WriteString(", ")
+	builder.WriteString("token=<sensitive>")
+	builder.WriteString(", ")
+	builder.WriteString("status=")
+	builder.WriteString(fmt.Sprintf("%v", d.Status))
+	builder.WriteString(", ")
+	builder.WriteString("provider=")
+	builder.WriteString(fmt.Sprintf("%v", d.Provider))
 	builder.WriteByte(')')
 	return builder.String()
 }

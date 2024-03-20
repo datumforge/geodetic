@@ -10,6 +10,7 @@ Config contains the configuration for the datum server
 |**refresh\_interval**|`integer`|RefreshInterval determines how often to reload the config<br/>||
 |[**server**](#server)|`object`|Server settings for the echo server<br/>|yes|
 |[**db**](#db)|`object`||yes|
+|[**turso**](#turso)|`object`||yes|
 |[**redis**](#redis)|`object`|||
 |[**tracer**](#tracer)|`object`|||
 |[**sessions**](#sessions)|`object`|||
@@ -176,6 +177,18 @@ TLS settings for the server for secure connections
 |**secondaryDbSource**|`string`|dsn of the secondary database if multi-write is enabled<br/>|no|
 |**cacheTTL**|`integer`|cache results for subsequent requests<br/>|no|
 |**runMigrations**|`boolean`|run migrations on startup<br/>|no|
+
+**Additional Properties:** not allowed  
+<a name="turso"></a>
+## turso: object
+
+**Properties**
+
+|Name|Type|Description|Required|
+|----|----|-----------|--------|
+|**token**|`string`||yes|
+|**base\_url**|`string`||yes|
+|**org\_name**|`string`||yes|
 
 **Additional Properties:** not allowed  
 <a name="redis"></a>

@@ -13,7 +13,14 @@ import (
 
 // CreateDatabase is the resolver for the createDatabase field.
 func (r *mutationResolver) CreateDatabase(ctx context.Context, input generated.CreateDatabaseInput) (*DatabaseCreatePayload, error) {
-	panic(fmt.Errorf("not implemented: CreateDatabase - createDatabase"))
+	db, err := withTransactionalMutation(ctx).Database.Create().SetInput(input).Save(ctx)
+	if err != nil {
+		r.logger.Errorw("failed to create database", "error", err)
+
+		return nil, err
+	}
+
+	return &DatabaseCreatePayload{Database: db}, err
 }
 
 // UpdateDatabase is the resolver for the updateDatabase field.

@@ -86,3 +86,7 @@ tracer:
     stdout:
         disableTimestamp: false
         pretty: false
+turso:
+    base_url: ""
+    org_name: ""
+    token: ""

@@ -10,6 +10,8 @@ import (
 
 	emixin "github.com/datumforge/entx/mixin"
 
+	"github.com/datumforge/geodetic/internal/ent/enums"
+	"github.com/datumforge/geodetic/internal/ent/hooks"
 	"github.com/datumforge/geodetic/internal/ent/mixin"
 )
 
@@ -33,6 +35,18 @@ func (Database) Fields() []ent.Field {
 		field.String("dsn").
 			Comment("the DSN to the database").
 			NotEmpty(),
+		field.String("token").
+			Sensitive().
+			Comment("the auth token used to connect to the database").
+			NotEmpty(),
+		field.Enum("status").
+			GoType(enums.DatabaseStatus("")).
+			Comment("status of the database").
+			Default(string(enums.Creating)),
+		field.Enum("provider").
+			GoType(enums.DatabaseProvider("")).
+			Comment("provider of the database").
+			Default(string(enums.Local)),
 	}
 }
 
@@ -57,5 +71,11 @@ func (Database) Mixin() []ent.Mixin {
 func (Database) Annotations() []schema.Annotation {
 	return []schema.Annotation{
 		entgql.Mutations(entgql.MutationCreate(), entgql.MutationUpdate()),
+	}
+}
+
+func (Database) Hooks() []ent.Hook {
+	return []ent.Hook{
+		hooks.HookDatabase(),
 	}
 }

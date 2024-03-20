@@ -8,6 +8,7 @@ import "context"
 // that can be passed at runtime.
 type SchemaConfig struct {
 	Database string // Database table.
+	Group    string // Group table.
 }
 
 type schemaCtxKey struct{}

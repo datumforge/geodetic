@@ -9,6 +9,7 @@ import (
 	"entgo.io/contrib/entgql"
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/datumforge/geodetic/internal/ent/generated/database"
+	"github.com/datumforge/geodetic/internal/ent/generated/group"
 	"github.com/hashicorp/go-multierror"
 )
 
@@ -19,6 +20,9 @@ type Noder interface {
 
 // IsNode implements the Node interface check for GQLGen.
 func (n *Database) IsNode() {}
+
+// IsNode implements the Node interface check for GQLGen.
+func (n *Group) IsNode() {}
 
 var errNodeInvalidID = &NotFoundError{"node"}
 
@@ -82,6 +86,18 @@ func (c *Client) noder(ctx context.Context, table string, id string) (Noder, err
 		query := c.Database.Query().
 			Where(database.ID(id))
 		query, err := query.CollectFields(ctx, "Database")
+		if err != nil {
+			return nil, err
+		}
+		n, err := query.Only(ctx)
+		if err != nil {
+			return nil, err
+		}
+		return n, nil
+	case group.Table:
+		query := c.Group.Query().
+			Where(group.ID(id))
+		query, err := query.CollectFields(ctx, "Group")
 		if err != nil {
 			return nil, err
 		}
@@ -167,6 +183,22 @@ func (c *Client) noders(ctx context.Context, table string, ids []string) ([]Node
 		query := c.Database.Query().
 			Where(database.IDIn(ids...))
 		query, err := query.CollectFields(ctx, "Database")
+		if err != nil {
+			return nil, err
+		}
+		nodes, err := query.All(ctx)
+		if err != nil {
+			return nil, err
+		}
+		for _, node := range nodes {
+			for _, noder := range idmap[node.ID] {
+				*noder = node
+			}
+		}
+	case group.Table:
+		query := c.Group.Query().
+			Where(group.IDIn(ids...))
+		query, err := query.CollectFields(ctx, "Group")
 		if err != nil {
 			return nil, err
 		}

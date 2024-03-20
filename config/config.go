@@ -12,6 +12,8 @@ import (
 	"github.com/knadh/koanf/v2"
 	"github.com/mcuadros/go-defaults"
 
+	turso "github.com/datumforge/go-turso"
+
 	"github.com/datumforge/datum/pkg/cache"
 	"github.com/datumforge/datum/pkg/middleware/cachecontrol"
 	"github.com/datumforge/datum/pkg/middleware/cors"
@@ -37,6 +39,9 @@ type Config struct {
 
 	// DB contains the database configuration for the ent client
 	DB entx.Config `json:"db" koanf:"db"`
+
+	// Turso contains the configuration for the turso client
+	Turso turso.Config `json:"turso" koanf:"turso"`
 
 	// Redis contains the redis configuration for the key-value store
 	Redis cache.Config `json:"redis" koanf:"redis"`

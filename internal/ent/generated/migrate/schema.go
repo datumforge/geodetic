@@ -22,6 +22,9 @@ var (
 		{Name: "name", Type: field.TypeString},
 		{Name: "geo", Type: field.TypeString, Nullable: true},
 		{Name: "dsn", Type: field.TypeString},
+		{Name: "token", Type: field.TypeString},
+		{Name: "status", Type: field.TypeEnum, Enums: []string{"ACTIVE", "CREATING", "DELETING", "DELETED"}, Default: "CREATING"},
+		{Name: "provider", Type: field.TypeEnum, Enums: []string{"LOCAL", "TURSO"}, Default: "LOCAL"},
 	}
 	// DatabasesTable holds the schema information for the "databases" table.
 	DatabasesTable = &schema.Table{
@@ -39,9 +42,32 @@ var (
 			},
 		},
 	}
+	// GroupsColumns holds the columns for the "groups" table.
+	GroupsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeString},
+		{Name: "created_at", Type: field.TypeTime, Nullable: true},
+		{Name: "updated_at", Type: field.TypeTime, Nullable: true},
+		{Name: "created_by", Type: field.TypeString, Nullable: true},
+		{Name: "updated_by", Type: field.TypeString, Nullable: true},
+		{Name: "deleted_at", Type: field.TypeTime, Nullable: true},
+		{Name: "deleted_by", Type: field.TypeString, Nullable: true},
+		{Name: "name", Type: field.TypeString},
+		{Name: "description", Type: field.TypeString, Nullable: true},
+		{Name: "primary_location", Type: field.TypeString, Nullable: true},
+		{Name: "locations", Type: field.TypeJSON, Nullable: true},
+		{Name: "token", Type: field.TypeString},
+		{Name: "region", Type: field.TypeEnum, Enums: []string{"AMER", "EMEA", "APAC"}, Default: "AMER"},
+	}
+	// GroupsTable holds the schema information for the "groups" table.
+	GroupsTable = &schema.Table{
+		Name:       "groups",
+		Columns:    GroupsColumns,
+		PrimaryKey: []*schema.Column{GroupsColumns[0]},
+	}
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
 		DatabasesTable,
+		GroupsTable,
 	}
 )
 

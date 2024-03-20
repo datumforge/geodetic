@@ -15,6 +15,7 @@ import (
 	"entgo.io/contrib/entgql"
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/99designs/gqlgen/graphql/introspection"
+	"github.com/datumforge/geodetic/internal/ent/enums"
 	"github.com/datumforge/geodetic/internal/ent/generated"
 	gqlparser "github.com/vektah/gqlparser/v2"
 	"github.com/vektah/gqlparser/v2/ast"
@@ -58,6 +59,8 @@ type ComplexityRoot struct {
 		ID             func(childComplexity int) int
 		Name           func(childComplexity int) int
 		OrganizationID func(childComplexity int) int
+		Provider       func(childComplexity int) int
+		Status         func(childComplexity int) int
 		UpdatedAt      func(childComplexity int) int
 		UpdatedBy      func(childComplexity int) int
 	}
@@ -74,10 +77,51 @@ type ComplexityRoot struct {
 		Database func(childComplexity int) int
 	}
 
+	Group struct {
+		CreatedAt       func(childComplexity int) int
+		CreatedBy       func(childComplexity int) int
+		DeletedAt       func(childComplexity int) int
+		DeletedBy       func(childComplexity int) int
+		Description     func(childComplexity int) int
+		ID              func(childComplexity int) int
+		Locations       func(childComplexity int) int
+		Name            func(childComplexity int) int
+		PrimaryLocation func(childComplexity int) int
+		Region          func(childComplexity int) int
+		UpdatedAt       func(childComplexity int) int
+		UpdatedBy       func(childComplexity int) int
+	}
+
+	GroupConnection struct {
+		Edges      func(childComplexity int) int
+		PageInfo   func(childComplexity int) int
+		TotalCount func(childComplexity int) int
+	}
+
+	GroupCreatePayload struct {
+		Group func(childComplexity int) int
+	}
+
+	GroupDeletePayload struct {
+		DeletedID func(childComplexity int) int
+	}
+
+	GroupEdge struct {
+		Cursor func(childComplexity int) int
+		Node   func(childComplexity int) int
+	}
+
+	GroupUpdatePayload struct {
+		Group func(childComplexity int) int
+	}
+
 	Mutation struct {
 		CreateDatabase func(childComplexity int, input generated.CreateDatabaseInput) int
+		CreateGroup    func(childComplexity int, input generated.CreateGroupInput) int
 		DeleteDatabase func(childComplexity int, id string) int
+		DeleteGroup    func(childComplexity int, id string) int
 		UpdateDatabase func(childComplexity int, id string, input generated.UpdateDatabaseInput) int
+		UpdateGroup    func(childComplexity int, id string, input generated.UpdateGroupInput) int
 	}
 
 	PageInfo struct {
@@ -89,6 +133,8 @@ type ComplexityRoot struct {
 
 	Query struct {
 		Database func(childComplexity int, id string) int
+		Group    func(childComplexity int, id string) int
+		Groups   func(childComplexity int, after *entgql.Cursor[string], first *int, before *entgql.Cursor[string], last *int, where *generated.GroupWhereInput) int
 		Node     func(childComplexity int, id string) int
 		Nodes    func(childComplexity int, ids []string) int
 	}
@@ -98,11 +144,16 @@ type MutationResolver interface {
 	CreateDatabase(ctx context.Context, input generated.CreateDatabaseInput) (*DatabaseCreatePayload, error)
 	UpdateDatabase(ctx context.Context, id string, input generated.UpdateDatabaseInput) (*DatabaseUpdatePayload, error)
 	DeleteDatabase(ctx context.Context, id string) (*DatabaseDeletePayload, error)
+	CreateGroup(ctx context.Context, input generated.CreateGroupInput) (*GroupCreatePayload, error)
+	UpdateGroup(ctx context.Context, id string, input generated.UpdateGroupInput) (*GroupUpdatePayload, error)
+	DeleteGroup(ctx context.Context, id string) (*GroupDeletePayload, error)
 }
 type QueryResolver interface {
 	Node(ctx context.Context, id string) (generated.Noder, error)
 	Nodes(ctx context.Context, ids []string) ([]generated.Noder, error)
+	Groups(ctx context.Context, after *entgql.Cursor[string], first *int, before *entgql.Cursor[string], last *int, where *generated.GroupWhereInput) (*generated.GroupConnection, error)
 	Database(ctx context.Context, id string) (*generated.Database, error)
+	Group(ctx context.Context, id string) (*generated.Group, error)
 }
 
 type executableSchema struct {
@@ -187,6 +238,20 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Database.OrganizationID(childComplexity), true
 
+	case "Database.provider":
+		if e.complexity.Database.Provider == nil {
+			break
+		}
+
+		return e.complexity.Database.Provider(childComplexity), true
+
+	case "Database.status":
+		if e.complexity.Database.Status == nil {
+			break
+		}
+
+		return e.complexity.Database.Status(childComplexity), true
+
 	case "Database.updatedAt":
 		if e.complexity.Database.UpdatedAt == nil {
 			break
@@ -222,6 +287,146 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.DatabaseUpdatePayload.Database(childComplexity), true
 
+	case "Group.createdAt":
+		if e.complexity.Group.CreatedAt == nil {
+			break
+		}
+
+		return e.complexity.Group.CreatedAt(childComplexity), true
+
+	case "Group.createdBy":
+		if e.complexity.Group.CreatedBy == nil {
+			break
+		}
+
+		return e.complexity.Group.CreatedBy(childComplexity), true
+
+	case "Group.deletedAt":
+		if e.complexity.Group.DeletedAt == nil {
+			break
+		}
+
+		return e.complexity.Group.DeletedAt(childComplexity), true
+
+	case "Group.deletedBy":
+		if e.complexity.Group.DeletedBy == nil {
+			break
+		}
+
+		return e.complexity.Group.DeletedBy(childComplexity), true
+
+	case "Group.description":
+		if e.complexity.Group.Description == nil {
+			break
+		}
+
+		return e.complexity.Group.Description(childComplexity), true
+
+	case "Group.id":
+		if e.complexity.Group.ID == nil {
+			break
+		}
+
+		return e.complexity.Group.ID(childComplexity), true
+
+	case "Group.locations":
+		if e.complexity.Group.Locations == nil {
+			break
+		}
+
+		return e.complexity.Group.Locations(childComplexity), true
+
+	case "Group.name":
+		if e.complexity.Group.Name == nil {
+			break
+		}
+
+		return e.complexity.Group.Name(childComplexity), true
+
+	case "Group.primaryLocation":
+		if e.complexity.Group.PrimaryLocation == nil {
+			break
+		}
+
+		return e.complexity.Group.PrimaryLocation(childComplexity), true
+
+	case "Group.region":
+		if e.complexity.Group.Region == nil {
+			break
+		}
+
+		return e.complexity.Group.Region(childComplexity), true
+
+	case "Group.updatedAt":
+		if e.complexity.Group.UpdatedAt == nil {
+			break
+		}
+
+		return e.complexity.Group.UpdatedAt(childComplexity), true
+
+	case "Group.updatedBy":
+		if e.complexity.Group.UpdatedBy == nil {
+			break
+		}
+
+		return e.complexity.Group.UpdatedBy(childComplexity), true
+
+	case "GroupConnection.edges":
+		if e.complexity.GroupConnection.Edges == nil {
+			break
+		}
+
+		return e.complexity.GroupConnection.Edges(childComplexity), true
+
+	case "GroupConnection.pageInfo":
+		if e.complexity.GroupConnection.PageInfo == nil {
+			break
+		}
+
+		return e.complexity.GroupConnection.PageInfo(childComplexity), true
+
+	case "GroupConnection.totalCount":
+		if e.complexity.GroupConnection.TotalCount == nil {
+			break
+		}
+
+		return e.complexity.GroupConnection.TotalCount(childComplexity), true
+
+	case "GroupCreatePayload.group":
+		if e.complexity.GroupCreatePayload.Group == nil {
+			break
+		}
+
+		return e.complexity.GroupCreatePayload.Group(childComplexity), true
+
+	case "GroupDeletePayload.deletedID":
+		if e.complexity.GroupDeletePayload.DeletedID == nil {
+			break
+		}
+
+		return e.complexity.GroupDeletePayload.DeletedID(childComplexity), true
+
+	case "GroupEdge.cursor":
+		if e.complexity.GroupEdge.Cursor == nil {
+			break
+		}
+
+		return e.complexity.GroupEdge.Cursor(childComplexity), true
+
+	case "GroupEdge.node":
+		if e.complexity.GroupEdge.Node == nil {
+			break
+		}
+
+		return e.complexity.GroupEdge.Node(childComplexity), true
+
+	case "GroupUpdatePayload.group":
+		if e.complexity.GroupUpdatePayload.Group == nil {
+			break
+		}
+
+		return e.complexity.GroupUpdatePayload.Group(childComplexity), true
+
 	case "Mutation.createDatabase":
 		if e.complexity.Mutation.CreateDatabase == nil {
 			break
@@ -233,6 +438,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.CreateDatabase(childComplexity, args["input"].(generated.CreateDatabaseInput)), true
+
+	case "Mutation.createGroup":
+		if e.complexity.Mutation.CreateGroup == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_createGroup_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.CreateGroup(childComplexity, args["input"].(generated.CreateGroupInput)), true
 
 	case "Mutation.deleteDatabase":
 		if e.complexity.Mutation.DeleteDatabase == nil {
@@ -246,6 +463,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.DeleteDatabase(childComplexity, args["id"].(string)), true
 
+	case "Mutation.deleteGroup":
+		if e.complexity.Mutation.DeleteGroup == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_deleteGroup_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.DeleteGroup(childComplexity, args["id"].(string)), true
+
 	case "Mutation.updateDatabase":
 		if e.complexity.Mutation.UpdateDatabase == nil {
 			break
@@ -257,6 +486,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.UpdateDatabase(childComplexity, args["id"].(string), args["input"].(generated.UpdateDatabaseInput)), true
+
+	case "Mutation.updateGroup":
+		if e.complexity.Mutation.UpdateGroup == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_updateGroup_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.UpdateGroup(childComplexity, args["id"].(string), args["input"].(generated.UpdateGroupInput)), true
 
 	case "PageInfo.endCursor":
 		if e.complexity.PageInfo.EndCursor == nil {
@@ -298,6 +539,30 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Query.Database(childComplexity, args["id"].(string)), true
 
+	case "Query.group":
+		if e.complexity.Query.Group == nil {
+			break
+		}
+
+		args, err := ec.field_Query_group_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.Group(childComplexity, args["id"].(string)), true
+
+	case "Query.groups":
+		if e.complexity.Query.Groups == nil {
+			break
+		}
+
+		args, err := ec.field_Query_groups_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.Groups(childComplexity, args["after"].(*entgql.Cursor[string]), args["first"].(*int), args["before"].(*entgql.Cursor[string]), args["last"].(*int), args["where"].(*generated.GroupWhereInput)), true
+
 	case "Query.node":
 		if e.complexity.Query.Node == nil {
 			break
@@ -331,8 +596,11 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 	ec := executionContext{rc, e, 0, 0, make(chan graphql.DeferredResult)}
 	inputUnmarshalMap := graphql.BuildUnmarshalerMap(
 		ec.unmarshalInputCreateDatabaseInput,
+		ec.unmarshalInputCreateGroupInput,
 		ec.unmarshalInputDatabaseWhereInput,
+		ec.unmarshalInputGroupWhereInput,
 		ec.unmarshalInputUpdateDatabaseInput,
+		ec.unmarshalInputUpdateGroupInput,
 	)
 	first := true
 
@@ -532,6 +800,52 @@ input CreateDatabaseInput {
   the DSN to the database
   """
   dsn: String!
+  """
+  the auth token used to connect to the database
+  """
+  token: String!
+  """
+  status of the database
+  """
+  status: DatabaseDatabaseStatus
+  """
+  provider of the database
+  """
+  provider: DatabaseDatabaseProvider
+}
+"""
+CreateGroupInput is used for create Group object.
+Input was generated by ent.
+"""
+input CreateGroupInput {
+  createdAt: Time
+  updatedAt: Time
+  createdBy: String
+  updatedBy: String
+  """
+  the name of the group in turso
+  """
+  name: String!
+  """
+  the description of the group
+  """
+  description: String
+  """
+  the primary of the group
+  """
+  primaryLocation: String
+  """
+  the replica locations of the group
+  """
+  locations: [String!]
+  """
+  the auth token used to connect to the group
+  """
+  token: String!
+  """
+  region the group
+  """
+  region: GroupRegion
 }
 """
 Define a Relay Cursor type:
@@ -562,6 +876,30 @@ type Database implements Node {
   the DSN to the database
   """
   dsn: String!
+  """
+  status of the database
+  """
+  status: DatabaseDatabaseStatus!
+  """
+  provider of the database
+  """
+  provider: DatabaseDatabaseProvider!
+}
+"""
+DatabaseDatabaseProvider is enum for the field provider
+"""
+enum DatabaseDatabaseProvider @goModel(model: "github.com/datumforge/geodetic/internal/ent/enums.DatabaseProvider") {
+  LOCAL
+  TURSO
+}
+"""
+DatabaseDatabaseStatus is enum for the field status
+"""
+enum DatabaseDatabaseStatus @goModel(model: "github.com/datumforge/geodetic/internal/ent/enums.DatabaseStatus") {
+  ACTIVE
+  CREATING
+  DELETING
+  DELETED
 }
 """
 DatabaseWhereInput is used for filtering Database objects.
@@ -743,6 +1081,261 @@ input DatabaseWhereInput {
   dsnHasSuffix: String
   dsnEqualFold: String
   dsnContainsFold: String
+  """
+  status field predicates
+  """
+  status: DatabaseDatabaseStatus
+  statusNEQ: DatabaseDatabaseStatus
+  statusIn: [DatabaseDatabaseStatus!]
+  statusNotIn: [DatabaseDatabaseStatus!]
+  """
+  provider field predicates
+  """
+  provider: DatabaseDatabaseProvider
+  providerNEQ: DatabaseDatabaseProvider
+  providerIn: [DatabaseDatabaseProvider!]
+  providerNotIn: [DatabaseDatabaseProvider!]
+}
+type Group implements Node {
+  id: ID!
+  createdAt: Time
+  updatedAt: Time
+  createdBy: String
+  updatedBy: String
+  deletedAt: Time
+  deletedBy: String
+  """
+  the name of the group in turso
+  """
+  name: String!
+  """
+  the description of the group
+  """
+  description: String
+  """
+  the primary of the group
+  """
+  primaryLocation: String
+  """
+  the replica locations of the group
+  """
+  locations: [String!]
+  """
+  region the group
+  """
+  region: GroupRegion!
+}
+"""
+A connection to a list of items.
+"""
+type GroupConnection {
+  """
+  A list of edges.
+  """
+  edges: [GroupEdge]
+  """
+  Information to aid in pagination.
+  """
+  pageInfo: PageInfo!
+  """
+  Identifies the total count of items in the connection.
+  """
+  totalCount: Int!
+}
+"""
+An edge in a connection.
+"""
+type GroupEdge {
+  """
+  The item at the end of the edge.
+  """
+  node: Group
+  """
+  A cursor for use in pagination.
+  """
+  cursor: Cursor!
+}
+"""
+GroupRegion is enum for the field region
+"""
+enum GroupRegion @goModel(model: "github.com/datumforge/geodetic/internal/ent/enums.Region") {
+  AMER
+  EMEA
+  APAC
+}
+"""
+GroupWhereInput is used for filtering Group objects.
+Input was generated by ent.
+"""
+input GroupWhereInput {
+  not: GroupWhereInput
+  and: [GroupWhereInput!]
+  or: [GroupWhereInput!]
+  """
+  id field predicates
+  """
+  id: ID
+  idNEQ: ID
+  idIn: [ID!]
+  idNotIn: [ID!]
+  idGT: ID
+  idGTE: ID
+  idLT: ID
+  idLTE: ID
+  idEqualFold: ID
+  idContainsFold: ID
+  """
+  created_at field predicates
+  """
+  createdAt: Time
+  createdAtNEQ: Time
+  createdAtIn: [Time!]
+  createdAtNotIn: [Time!]
+  createdAtGT: Time
+  createdAtGTE: Time
+  createdAtLT: Time
+  createdAtLTE: Time
+  createdAtIsNil: Boolean
+  createdAtNotNil: Boolean
+  """
+  updated_at field predicates
+  """
+  updatedAt: Time
+  updatedAtNEQ: Time
+  updatedAtIn: [Time!]
+  updatedAtNotIn: [Time!]
+  updatedAtGT: Time
+  updatedAtGTE: Time
+  updatedAtLT: Time
+  updatedAtLTE: Time
+  updatedAtIsNil: Boolean
+  updatedAtNotNil: Boolean
+  """
+  created_by field predicates
+  """
+  createdBy: String
+  createdByNEQ: String
+  createdByIn: [String!]
+  createdByNotIn: [String!]
+  createdByGT: String
+  createdByGTE: String
+  createdByLT: String
+  createdByLTE: String
+  createdByContains: String
+  createdByHasPrefix: String
+  createdByHasSuffix: String
+  createdByIsNil: Boolean
+  createdByNotNil: Boolean
+  createdByEqualFold: String
+  createdByContainsFold: String
+  """
+  updated_by field predicates
+  """
+  updatedBy: String
+  updatedByNEQ: String
+  updatedByIn: [String!]
+  updatedByNotIn: [String!]
+  updatedByGT: String
+  updatedByGTE: String
+  updatedByLT: String
+  updatedByLTE: String
+  updatedByContains: String
+  updatedByHasPrefix: String
+  updatedByHasSuffix: String
+  updatedByIsNil: Boolean
+  updatedByNotNil: Boolean
+  updatedByEqualFold: String
+  updatedByContainsFold: String
+  """
+  deleted_at field predicates
+  """
+  deletedAt: Time
+  deletedAtNEQ: Time
+  deletedAtIn: [Time!]
+  deletedAtNotIn: [Time!]
+  deletedAtGT: Time
+  deletedAtGTE: Time
+  deletedAtLT: Time
+  deletedAtLTE: Time
+  deletedAtIsNil: Boolean
+  deletedAtNotNil: Boolean
+  """
+  deleted_by field predicates
+  """
+  deletedBy: String
+  deletedByNEQ: String
+  deletedByIn: [String!]
+  deletedByNotIn: [String!]
+  deletedByGT: String
+  deletedByGTE: String
+  deletedByLT: String
+  deletedByLTE: String
+  deletedByContains: String
+  deletedByHasPrefix: String
+  deletedByHasSuffix: String
+  deletedByIsNil: Boolean
+  deletedByNotNil: Boolean
+  deletedByEqualFold: String
+  deletedByContainsFold: String
+  """
+  name field predicates
+  """
+  name: String
+  nameNEQ: String
+  nameIn: [String!]
+  nameNotIn: [String!]
+  nameGT: String
+  nameGTE: String
+  nameLT: String
+  nameLTE: String
+  nameContains: String
+  nameHasPrefix: String
+  nameHasSuffix: String
+  nameEqualFold: String
+  nameContainsFold: String
+  """
+  description field predicates
+  """
+  description: String
+  descriptionNEQ: String
+  descriptionIn: [String!]
+  descriptionNotIn: [String!]
+  descriptionGT: String
+  descriptionGTE: String
+  descriptionLT: String
+  descriptionLTE: String
+  descriptionContains: String
+  descriptionHasPrefix: String
+  descriptionHasSuffix: String
+  descriptionIsNil: Boolean
+  descriptionNotNil: Boolean
+  descriptionEqualFold: String
+  descriptionContainsFold: String
+  """
+  primary_location field predicates
+  """
+  primaryLocation: String
+  primaryLocationNEQ: String
+  primaryLocationIn: [String!]
+  primaryLocationNotIn: [String!]
+  primaryLocationGT: String
+  primaryLocationGTE: String
+  primaryLocationLT: String
+  primaryLocationLTE: String
+  primaryLocationContains: String
+  primaryLocationHasPrefix: String
+  primaryLocationHasSuffix: String
+  primaryLocationIsNil: Boolean
+  primaryLocationNotNil: Boolean
+  primaryLocationEqualFold: String
+  primaryLocationContainsFold: String
+  """
+  region field predicates
+  """
+  region: GroupRegion
+  regionNEQ: GroupRegion
+  regionIn: [GroupRegion!]
+  regionNotIn: [GroupRegion!]
 }
 """
 A valid JSON string.
@@ -812,6 +1405,32 @@ type Query {
     """
     ids: [ID!]!
   ): [Node]!
+  groups(
+    """
+    Returns the elements in the list that come after the specified cursor.
+    """
+    after: Cursor
+
+    """
+    Returns the first _n_ elements from the list.
+    """
+    first: Int
+
+    """
+    Returns the elements in the list that come before the specified cursor.
+    """
+    before: Cursor
+
+    """
+    Returns the last _n_ elements from the list.
+    """
+    last: Int
+
+    """
+    Filtering options for Groups returned from the connection.
+    """
+    where: GroupWhereInput
+  ): GroupConnection!
 }
 """
 The builtin Time type
@@ -843,8 +1462,133 @@ input UpdateDatabaseInput {
   the DSN to the database
   """
   dsn: String
+  """
+  the auth token used to connect to the database
+  """
+  token: String
+  """
+  status of the database
+  """
+  status: DatabaseDatabaseStatus
+  """
+  provider of the database
+  """
+  provider: DatabaseDatabaseProvider
+}
+"""
+UpdateGroupInput is used for update Group object.
+Input was generated by ent.
+"""
+input UpdateGroupInput {
+  updatedAt: Time
+  clearUpdatedAt: Boolean
+  updatedBy: String
+  clearUpdatedBy: Boolean
+  """
+  the name of the group in turso
+  """
+  name: String
+  """
+  the description of the group
+  """
+  description: String
+  clearDescription: Boolean
+  """
+  the primary of the group
+  """
+  primaryLocation: String
+  clearPrimaryLocation: Boolean
+  """
+  the replica locations of the group
+  """
+  locations: [String!]
+  appendLocations: [String!]
+  clearLocations: Boolean
+  """
+  the auth token used to connect to the group
+  """
+  token: String
+  """
+  region the group
+  """
+  region: GroupRegion
 }
 `, BuiltIn: false},
+	{Name: "../../schema/group.graphql", Input: `extend type Query {
+    """
+    Look up group by ID
+    """
+     group(
+        """
+        ID of the group
+        """
+        id: ID!
+    ):  Group!
+}
+
+extend type Mutation{
+    """
+    Create a new group
+    """
+    createGroup(
+        """
+        values of the group
+        """
+        input: CreateGroupInput!
+    ): GroupCreatePayload!
+    """
+    Update an existing group
+    """
+    updateGroup(
+        """
+        ID of the group
+        """
+        id: ID!
+        """
+        New values for the group
+        """
+        input: UpdateGroupInput!
+    ): GroupUpdatePayload!
+    """
+    Delete an existing group
+    """
+    deleteGroup(
+        """
+        ID of the group
+        """
+        id: ID!
+    ): GroupDeletePayload!
+}
+
+"""
+Return response for createGroup mutation
+"""
+type GroupCreatePayload {
+    """
+    Created group
+    """
+    group: Group!
+}
+
+"""
+Return response for updateGroup mutation
+"""
+type GroupUpdatePayload {
+    """
+    Updated group
+    """
+    group: Group!
+}
+
+"""
+Return response for deleteGroup mutation
+"""
+type GroupDeletePayload {
+    """
+    Deleted group ID
+    """
+    deletedID: ID!
+}`, BuiltIn: false},
 }
 var parsedSchema = gqlparser.MustLoadSchema(sources...)
 
@@ -867,7 +1611,37 @@ func (ec *executionContext) field_Mutation_createDatabase_args(ctx context.Conte
 	return args, nil
 }
 
+func (ec *executionContext) field_Mutation_createGroup_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 generated.CreateGroupInput
+	if tmp, ok := rawArgs["input"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+		arg0, err = ec.unmarshalNCreateGroupInput2githubᚗcomᚋdatumforgeᚋgeodeticᚋinternalᚋentᚋgeneratedᚐCreateGroupInput(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg0
+	return args, nil
+}
+
 func (ec *executionContext) field_Mutation_deleteDatabase_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["id"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+		arg0, err = ec.unmarshalNID2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["id"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_deleteGroup_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
 	var arg0 string
@@ -906,6 +1680,30 @@ func (ec *executionContext) field_Mutation_updateDatabase_args(ctx context.Conte
 	return args, nil
 }
 
+func (ec *executionContext) field_Mutation_updateGroup_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["id"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+		arg0, err = ec.unmarshalNID2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["id"] = arg0
+	var arg1 generated.UpdateGroupInput
+	if tmp, ok := rawArgs["input"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+		arg1, err = ec.unmarshalNUpdateGroupInput2githubᚗcomᚋdatumforgeᚋgeodeticᚋinternalᚋentᚋgeneratedᚐUpdateGroupInput(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg1
+	return args, nil
+}
+
 func (ec *executionContext) field_Query___type_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -933,6 +1731,72 @@ func (ec *executionContext) field_Query_database_args(ctx context.Context, rawAr
 		}
 	}
 	args["id"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_group_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["id"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+		arg0, err = ec.unmarshalNID2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["id"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_groups_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *entgql.Cursor[string]
+	if tmp, ok := rawArgs["after"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("after"))
+		arg0, err = ec.unmarshalOCursor2ᚖentgoᚗioᚋcontribᚋentgqlᚐCursor(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["after"] = arg0
+	var arg1 *int
+	if tmp, ok := rawArgs["first"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("first"))
+		arg1, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["first"] = arg1
+	var arg2 *entgql.Cursor[string]
+	if tmp, ok := rawArgs["before"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("before"))
+		arg2, err = ec.unmarshalOCursor2ᚖentgoᚗioᚋcontribᚋentgqlᚐCursor(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["before"] = arg2
+	var arg3 *int
+	if tmp, ok := rawArgs["last"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("last"))
+		arg3, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["last"] = arg3
+	var arg4 *generated.GroupWhereInput
+	if tmp, ok := rawArgs["where"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("where"))
+		arg4, err = ec.unmarshalOGroupWhereInput2ᚖgithubᚗcomᚋdatumforgeᚋgeodeticᚋinternalᚋentᚋgeneratedᚐGroupWhereInput(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["where"] = arg4
 	return args, nil
 }
 
@@ -1467,6 +2331,94 @@ func (ec *executionContext) fieldContext_Database_dsn(ctx context.Context, field
 	return fc, nil
 }
 
+func (ec *executionContext) _Database_status(ctx context.Context, field graphql.CollectedField, obj *generated.Database) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Database_status(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Status, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(enums.DatabaseStatus)
+	fc.Result = res
+	return ec.marshalNDatabaseDatabaseStatus2githubᚗcomᚋdatumforgeᚋgeodeticᚋinternalᚋentᚋenumsᚐDatabaseStatus(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Database_status(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Database",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type DatabaseDatabaseStatus does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Database_provider(ctx context.Context, field graphql.CollectedField, obj *generated.Database) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Database_provider(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Provider, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(enums.DatabaseProvider)
+	fc.Result = res
+	return ec.marshalNDatabaseDatabaseProvider2githubᚗcomᚋdatumforgeᚋgeodeticᚋinternalᚋentᚋenumsᚐDatabaseProvider(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Database_provider(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Database",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type DatabaseDatabaseProvider does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _DatabaseCreatePayload_database(ctx context.Context, field graphql.CollectedField, obj *DatabaseCreatePayload) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_DatabaseCreatePayload_database(ctx, field)
 	if err != nil {
@@ -1528,6 +2480,10 @@ func (ec *executionContext) fieldContext_DatabaseCreatePayload_database(ctx cont
 				return ec.fieldContext_Database_geo(ctx, field)
 			case "dsn":
 				return ec.fieldContext_Database_dsn(ctx, field)
+			case "status":
+				return ec.fieldContext_Database_status(ctx, field)
+			case "provider":
+				return ec.fieldContext_Database_provider(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Database", field.Name)
 		},
@@ -1640,8 +2596,953 @@ func (ec *executionContext) fieldContext_DatabaseUpdatePayload_database(ctx cont
 				return ec.fieldContext_Database_geo(ctx, field)
 			case "dsn":
 				return ec.fieldContext_Database_dsn(ctx, field)
+			case "status":
+				return ec.fieldContext_Database_status(ctx, field)
+			case "provider":
+				return ec.fieldContext_Database_provider(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Database", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Group_id(ctx context.Context, field graphql.CollectedField, obj *generated.Group) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Group_id(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNID2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Group_id(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Group",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type ID does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Group_createdAt(ctx context.Context, field graphql.CollectedField, obj *generated.Group) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Group_createdAt(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.CreatedAt, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(time.Time)
+	fc.Result = res
+	return ec.marshalOTime2timeᚐTime(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Group_createdAt(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Group",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Time does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Group_updatedAt(ctx context.Context, field graphql.CollectedField, obj *generated.Group) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Group_updatedAt(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.UpdatedAt, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(time.Time)
+	fc.Result = res
+	return ec.marshalOTime2timeᚐTime(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Group_updatedAt(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Group",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Time does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Group_createdBy(ctx context.Context, field graphql.CollectedField, obj *generated.Group) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Group_createdBy(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.CreatedBy, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalOString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Group_createdBy(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Group",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Group_updatedBy(ctx context.Context, field graphql.CollectedField, obj *generated.Group) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Group_updatedBy(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.UpdatedBy, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalOString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Group_updatedBy(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Group",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Group_deletedAt(ctx context.Context, field graphql.CollectedField, obj *generated.Group) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Group_deletedAt(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.DeletedAt, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(time.Time)
+	fc.Result = res
+	return ec.marshalOTime2timeᚐTime(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Group_deletedAt(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Group",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Time does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Group_deletedBy(ctx context.Context, field graphql.CollectedField, obj *generated.Group) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Group_deletedBy(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.DeletedBy, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalOString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Group_deletedBy(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Group",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Group_name(ctx context.Context, field graphql.CollectedField, obj *generated.Group) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Group_name(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Name, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Group_name(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Group",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Group_description(ctx context.Context, field graphql.CollectedField, obj *generated.Group) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Group_description(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Description, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalOString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Group_description(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Group",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Group_primaryLocation(ctx context.Context, field graphql.CollectedField, obj *generated.Group) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Group_primaryLocation(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.PrimaryLocation, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalOString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Group_primaryLocation(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Group",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Group_locations(ctx context.Context, field graphql.CollectedField, obj *generated.Group) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Group_locations(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Locations, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]string)
+	fc.Result = res
+	return ec.marshalOString2ᚕstringᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Group_locations(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Group",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Group_region(ctx context.Context, field graphql.CollectedField, obj *generated.Group) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Group_region(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Region, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(enums.Region)
+	fc.Result = res
+	return ec.marshalNGroupRegion2githubᚗcomᚋdatumforgeᚋgeodeticᚋinternalᚋentᚋenumsᚐRegion(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Group_region(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Group",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type GroupRegion does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _GroupConnection_edges(ctx context.Context, field graphql.CollectedField, obj *generated.GroupConnection) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_GroupConnection_edges(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Edges, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*generated.GroupEdge)
+	fc.Result = res
+	return ec.marshalOGroupEdge2ᚕᚖgithubᚗcomᚋdatumforgeᚋgeodeticᚋinternalᚋentᚋgeneratedᚐGroupEdge(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_GroupConnection_edges(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "GroupConnection",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "node":
+				return ec.fieldContext_GroupEdge_node(ctx, field)
+			case "cursor":
+				return ec.fieldContext_GroupEdge_cursor(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type GroupEdge", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _GroupConnection_pageInfo(ctx context.Context, field graphql.CollectedField, obj *generated.GroupConnection) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_GroupConnection_pageInfo(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.PageInfo, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(entgql.PageInfo[string])
+	fc.Result = res
+	return ec.marshalNPageInfo2entgoᚗioᚋcontribᚋentgqlᚐPageInfo(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_GroupConnection_pageInfo(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "GroupConnection",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "hasNextPage":
+				return ec.fieldContext_PageInfo_hasNextPage(ctx, field)
+			case "hasPreviousPage":
+				return ec.fieldContext_PageInfo_hasPreviousPage(ctx, field)
+			case "startCursor":
+				return ec.fieldContext_PageInfo_startCursor(ctx, field)
+			case "endCursor":
+				return ec.fieldContext_PageInfo_endCursor(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type PageInfo", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _GroupConnection_totalCount(ctx context.Context, field graphql.CollectedField, obj *generated.GroupConnection) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_GroupConnection_totalCount(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.TotalCount, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_GroupConnection_totalCount(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "GroupConnection",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _GroupCreatePayload_group(ctx context.Context, field graphql.CollectedField, obj *GroupCreatePayload) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_GroupCreatePayload_group(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Group, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*generated.Group)
+	fc.Result = res
+	return ec.marshalNGroup2ᚖgithubᚗcomᚋdatumforgeᚋgeodeticᚋinternalᚋentᚋgeneratedᚐGroup(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_GroupCreatePayload_group(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "GroupCreatePayload",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Group_id(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Group_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Group_updatedAt(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_Group_createdBy(ctx, field)
+			case "updatedBy":
+				return ec.fieldContext_Group_updatedBy(ctx, field)
+			case "deletedAt":
+				return ec.fieldContext_Group_deletedAt(ctx, field)
+			case "deletedBy":
+				return ec.fieldContext_Group_deletedBy(ctx, field)
+			case "name":
+				return ec.fieldContext_Group_name(ctx, field)
+			case "description":
+				return ec.fieldContext_Group_description(ctx, field)
+			case "primaryLocation":
+				return ec.fieldContext_Group_primaryLocation(ctx, field)
+			case "locations":
+				return ec.fieldContext_Group_locations(ctx, field)
+			case "region":
+				return ec.fieldContext_Group_region(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Group", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _GroupDeletePayload_deletedID(ctx context.Context, field graphql.CollectedField, obj *GroupDeletePayload) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_GroupDeletePayload_deletedID(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.DeletedID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNID2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_GroupDeletePayload_deletedID(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "GroupDeletePayload",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type ID does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _GroupEdge_node(ctx context.Context, field graphql.CollectedField, obj *generated.GroupEdge) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_GroupEdge_node(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Node, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*generated.Group)
+	fc.Result = res
+	return ec.marshalOGroup2ᚖgithubᚗcomᚋdatumforgeᚋgeodeticᚋinternalᚋentᚋgeneratedᚐGroup(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_GroupEdge_node(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "GroupEdge",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Group_id(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Group_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Group_updatedAt(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_Group_createdBy(ctx, field)
+			case "updatedBy":
+				return ec.fieldContext_Group_updatedBy(ctx, field)
+			case "deletedAt":
+				return ec.fieldContext_Group_deletedAt(ctx, field)
+			case "deletedBy":
+				return ec.fieldContext_Group_deletedBy(ctx, field)
+			case "name":
+				return ec.fieldContext_Group_name(ctx, field)
+			case "description":
+				return ec.fieldContext_Group_description(ctx, field)
+			case "primaryLocation":
+				return ec.fieldContext_Group_primaryLocation(ctx, field)
+			case "locations":
+				return ec.fieldContext_Group_locations(ctx, field)
+			case "region":
+				return ec.fieldContext_Group_region(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Group", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _GroupEdge_cursor(ctx context.Context, field graphql.CollectedField, obj *generated.GroupEdge) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_GroupEdge_cursor(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Cursor, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(entgql.Cursor[string])
+	fc.Result = res
+	return ec.marshalNCursor2entgoᚗioᚋcontribᚋentgqlᚐCursor(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_GroupEdge_cursor(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "GroupEdge",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Cursor does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _GroupUpdatePayload_group(ctx context.Context, field graphql.CollectedField, obj *GroupUpdatePayload) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_GroupUpdatePayload_group(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Group, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*generated.Group)
+	fc.Result = res
+	return ec.marshalNGroup2ᚖgithubᚗcomᚋdatumforgeᚋgeodeticᚋinternalᚋentᚋgeneratedᚐGroup(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_GroupUpdatePayload_group(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "GroupUpdatePayload",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Group_id(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Group_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Group_updatedAt(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_Group_createdBy(ctx, field)
+			case "updatedBy":
+				return ec.fieldContext_Group_updatedBy(ctx, field)
+			case "deletedAt":
+				return ec.fieldContext_Group_deletedAt(ctx, field)
+			case "deletedBy":
+				return ec.fieldContext_Group_deletedBy(ctx, field)
+			case "name":
+				return ec.fieldContext_Group_name(ctx, field)
+			case "description":
+				return ec.fieldContext_Group_description(ctx, field)
+			case "primaryLocation":
+				return ec.fieldContext_Group_primaryLocation(ctx, field)
+			case "locations":
+				return ec.fieldContext_Group_locations(ctx, field)
+			case "region":
+				return ec.fieldContext_Group_region(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Group", field.Name)
 		},
 	}
 	return fc, nil
@@ -1818,6 +3719,183 @@ func (ec *executionContext) fieldContext_Mutation_deleteDatabase(ctx context.Con
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_deleteDatabase_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_createGroup(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_createGroup(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().CreateGroup(rctx, fc.Args["input"].(generated.CreateGroupInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*GroupCreatePayload)
+	fc.Result = res
+	return ec.marshalNGroupCreatePayload2ᚖgithubᚗcomᚋdatumforgeᚋgeodeticᚋinternalᚋgraphapiᚐGroupCreatePayload(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_createGroup(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "group":
+				return ec.fieldContext_GroupCreatePayload_group(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type GroupCreatePayload", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_createGroup_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_updateGroup(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_updateGroup(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().UpdateGroup(rctx, fc.Args["id"].(string), fc.Args["input"].(generated.UpdateGroupInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*GroupUpdatePayload)
+	fc.Result = res
+	return ec.marshalNGroupUpdatePayload2ᚖgithubᚗcomᚋdatumforgeᚋgeodeticᚋinternalᚋgraphapiᚐGroupUpdatePayload(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_updateGroup(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "group":
+				return ec.fieldContext_GroupUpdatePayload_group(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type GroupUpdatePayload", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_updateGroup_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_deleteGroup(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_deleteGroup(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().DeleteGroup(rctx, fc.Args["id"].(string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*GroupDeletePayload)
+	fc.Result = res
+	return ec.marshalNGroupDeletePayload2ᚖgithubᚗcomᚋdatumforgeᚋgeodeticᚋinternalᚋgraphapiᚐGroupDeletePayload(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_deleteGroup(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "deletedID":
+				return ec.fieldContext_GroupDeletePayload_deletedID(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type GroupDeletePayload", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_deleteGroup_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
@@ -2101,6 +4179,69 @@ func (ec *executionContext) fieldContext_Query_nodes(ctx context.Context, field 
 	return fc, nil
 }
 
+func (ec *executionContext) _Query_groups(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_groups(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().Groups(rctx, fc.Args["after"].(*entgql.Cursor[string]), fc.Args["first"].(*int), fc.Args["before"].(*entgql.Cursor[string]), fc.Args["last"].(*int), fc.Args["where"].(*generated.GroupWhereInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*generated.GroupConnection)
+	fc.Result = res
+	return ec.marshalNGroupConnection2ᚖgithubᚗcomᚋdatumforgeᚋgeodeticᚋinternalᚋentᚋgeneratedᚐGroupConnection(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Query_groups(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "edges":
+				return ec.fieldContext_GroupConnection_edges(ctx, field)
+			case "pageInfo":
+				return ec.fieldContext_GroupConnection_pageInfo(ctx, field)
+			case "totalCount":
+				return ec.fieldContext_GroupConnection_totalCount(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type GroupConnection", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_groups_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Query_database(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Query_database(ctx, field)
 	if err != nil {
@@ -2162,6 +4303,10 @@ func (ec *executionContext) fieldContext_Query_database(ctx context.Context, fie
 				return ec.fieldContext_Database_geo(ctx, field)
 			case "dsn":
 				return ec.fieldContext_Database_dsn(ctx, field)
+			case "status":
+				return ec.fieldContext_Database_status(ctx, field)
+			case "provider":
+				return ec.fieldContext_Database_provider(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Database", field.Name)
 		},
@@ -2174,6 +4319,87 @@ func (ec *executionContext) fieldContext_Query_database(ctx context.Context, fie
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Query_database_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_group(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_group(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().Group(rctx, fc.Args["id"].(string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*generated.Group)
+	fc.Result = res
+	return ec.marshalNGroup2ᚖgithubᚗcomᚋdatumforgeᚋgeodeticᚋinternalᚋentᚋgeneratedᚐGroup(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Query_group(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Group_id(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Group_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Group_updatedAt(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_Group_createdBy(ctx, field)
+			case "updatedBy":
+				return ec.fieldContext_Group_updatedBy(ctx, field)
+			case "deletedAt":
+				return ec.fieldContext_Group_deletedAt(ctx, field)
+			case "deletedBy":
+				return ec.fieldContext_Group_deletedBy(ctx, field)
+			case "name":
+				return ec.fieldContext_Group_name(ctx, field)
+			case "description":
+				return ec.fieldContext_Group_description(ctx, field)
+			case "primaryLocation":
+				return ec.fieldContext_Group_primaryLocation(ctx, field)
+			case "locations":
+				return ec.fieldContext_Group_locations(ctx, field)
+			case "region":
+				return ec.fieldContext_Group_region(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Group", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_group_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
@@ -4089,7 +6315,7 @@ func (ec *executionContext) unmarshalInputCreateDatabaseInput(ctx context.Contex
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"createdAt", "updatedAt", "createdBy", "updatedBy", "organizationID", "name", "geo", "dsn"}
+	fieldsInOrder := [...]string{"createdAt", "updatedAt", "createdBy", "updatedBy", "organizationID", "name", "geo", "dsn", "token", "status", "provider"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -4152,6 +6378,117 @@ func (ec *executionContext) unmarshalInputCreateDatabaseInput(ctx context.Contex
 				return it, err
 			}
 			it.Dsn = data
+		case "token":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("token"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Token = data
+		case "status":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("status"))
+			data, err := ec.unmarshalODatabaseDatabaseStatus2ᚖgithubᚗcomᚋdatumforgeᚋgeodeticᚋinternalᚋentᚋenumsᚐDatabaseStatus(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Status = data
+		case "provider":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("provider"))
+			data, err := ec.unmarshalODatabaseDatabaseProvider2ᚖgithubᚗcomᚋdatumforgeᚋgeodeticᚋinternalᚋentᚋenumsᚐDatabaseProvider(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Provider = data
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputCreateGroupInput(ctx context.Context, obj interface{}) (generated.CreateGroupInput, error) {
+	var it generated.CreateGroupInput
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"createdAt", "updatedAt", "createdBy", "updatedBy", "name", "description", "primaryLocation", "locations", "token", "region"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "createdAt":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdAt"))
+			data, err := ec.unmarshalOTime2ᚖtimeᚐTime(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CreatedAt = data
+		case "updatedAt":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("updatedAt"))
+			data, err := ec.unmarshalOTime2ᚖtimeᚐTime(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.UpdatedAt = data
+		case "createdBy":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdBy"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CreatedBy = data
+		case "updatedBy":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("updatedBy"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.UpdatedBy = data
+		case "name":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Name = data
+		case "description":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("description"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Description = data
+		case "primaryLocation":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("primaryLocation"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.PrimaryLocation = data
+		case "locations":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("locations"))
+			data, err := ec.unmarshalOString2ᚕstringᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Locations = data
+		case "token":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("token"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Token = data
+		case "region":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("region"))
+			data, err := ec.unmarshalOGroupRegion2ᚖgithubᚗcomᚋdatumforgeᚋgeodeticᚋinternalᚋentᚋenumsᚐRegion(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Region = data
 		}
 	}
 
@@ -4165,7 +6502,7 @@ func (ec *executionContext) unmarshalInputDatabaseWhereInput(ctx context.Context
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"not", "and", "or", "id", "idNEQ", "idIn", "idNotIn", "idGT", "idGTE", "idLT", "idLTE", "idEqualFold", "idContainsFold", "createdAt", "createdAtNEQ", "createdAtIn", "createdAtNotIn", "createdAtGT", "createdAtGTE", "createdAtLT", "createdAtLTE", "createdAtIsNil", "createdAtNotNil", "updatedAt", "updatedAtNEQ", "updatedAtIn", "updatedAtNotIn", "updatedAtGT", "updatedAtGTE", "updatedAtLT", "updatedAtLTE", "updatedAtIsNil", "updatedAtNotNil", "createdBy", "createdByNEQ", "createdByIn", "createdByNotIn", "createdByGT", "createdByGTE", "createdByLT", "createdByLTE", "createdByContains", "createdByHasPrefix", "createdByHasSuffix", "createdByIsNil", "createdByNotNil", "createdByEqualFold", "createdByContainsFold", "updatedBy", "updatedByNEQ", "updatedByIn", "updatedByNotIn", "updatedByGT", "updatedByGTE", "updatedByLT", "updatedByLTE", "updatedByContains", "updatedByHasPrefix", "updatedByHasSuffix", "updatedByIsNil", "updatedByNotNil", "updatedByEqualFold", "updatedByContainsFold", "deletedAt", "deletedAtNEQ", "deletedAtIn", "deletedAtNotIn", "deletedAtGT", "deletedAtGTE", "deletedAtLT", "deletedAtLTE", "deletedAtIsNil", "deletedAtNotNil", "deletedBy", "deletedByNEQ", "deletedByIn", "deletedByNotIn", "deletedByGT", "deletedByGTE", "deletedByLT", "deletedByLTE", "deletedByContains", "deletedByHasPrefix", "deletedByHasSuffix", "deletedByIsNil", "deletedByNotNil", "deletedByEqualFold", "deletedByContainsFold", "organizationID", "organizationIDNEQ", "organizationIDIn", "organizationIDNotIn", "organizationIDGT", "organizationIDGTE", "organizationIDLT", "organizationIDLTE", "organizationIDContains", "organizationIDHasPrefix", "organizationIDHasSuffix", "organizationIDEqualFold", "organizationIDContainsFold", "name", "nameNEQ", "nameIn", "nameNotIn", "nameGT", "nameGTE", "nameLT", "nameLTE", "nameContains", "nameHasPrefix", "nameHasSuffix", "nameEqualFold", "nameContainsFold", "geo", "geoNEQ", "geoIn", "geoNotIn", "geoGT", "geoGTE", "geoLT", "geoLTE", "geoContains", "geoHasPrefix", "geoHasSuffix", "geoIsNil", "geoNotNil", "geoEqualFold", "geoContainsFold", "dsn", "dsnNEQ", "dsnIn", "dsnNotIn", "dsnGT", "dsnGTE", "dsnLT", "dsnLTE", "dsnContains", "dsnHasPrefix", "dsnHasSuffix", "dsnEqualFold", "dsnContainsFold"}
+	fieldsInOrder := [...]string{"not", "and", "or", "id", "idNEQ", "idIn", "idNotIn", "idGT", "idGTE", "idLT", "idLTE", "idEqualFold", "idContainsFold", "createdAt", "createdAtNEQ", "createdAtIn", "createdAtNotIn", "createdAtGT", "createdAtGTE", "createdAtLT", "createdAtLTE", "createdAtIsNil", "createdAtNotNil", "updatedAt", "updatedAtNEQ", "updatedAtIn", "updatedAtNotIn", "updatedAtGT", "updatedAtGTE", "updatedAtLT", "updatedAtLTE", "updatedAtIsNil", "updatedAtNotNil", "createdBy", "createdByNEQ", "createdByIn", "createdByNotIn", "createdByGT", "createdByGTE", "createdByLT", "createdByLTE", "createdByContains", "createdByHasPrefix", "createdByHasSuffix", "createdByIsNil", "createdByNotNil", "createdByEqualFold", "createdByContainsFold", "updatedBy", "updatedByNEQ", "updatedByIn", "updatedByNotIn", "updatedByGT", "updatedByGTE", "updatedByLT", "updatedByLTE", "updatedByContains", "updatedByHasPrefix", "updatedByHasSuffix", "updatedByIsNil", "updatedByNotNil", "updatedByEqualFold", "updatedByContainsFold", "deletedAt", "deletedAtNEQ", "deletedAtIn", "deletedAtNotIn", "deletedAtGT", "deletedAtGTE", "deletedAtLT", "deletedAtLTE", "deletedAtIsNil", "deletedAtNotNil", "deletedBy", "deletedByNEQ", "deletedByIn", "deletedByNotIn", "deletedByGT", "deletedByGTE", "deletedByLT", "deletedByLTE", "deletedByContains", "deletedByHasPrefix", "deletedByHasSuffix", "deletedByIsNil", "deletedByNotNil", "deletedByEqualFold", "deletedByContainsFold", "organizationID", "organizationIDNEQ", "organizationIDIn", "organizationIDNotIn", "organizationIDGT", "organizationIDGTE", "organizationIDLT", "organizationIDLTE", "organizationIDContains", "organizationIDHasPrefix", "organizationIDHasSuffix", "organizationIDEqualFold", "organizationIDContainsFold", "name", "nameNEQ", "nameIn", "nameNotIn", "nameGT", "nameGTE", "nameLT", "nameLTE", "nameContains", "nameHasPrefix", "nameHasSuffix", "nameEqualFold", "nameContainsFold", "geo", "geoNEQ", "geoIn", "geoNotIn", "geoGT", "geoGTE", "geoLT", "geoLTE", "geoContains", "geoHasPrefix", "geoHasSuffix", "geoIsNil", "geoNotNil", "geoEqualFold", "geoContainsFold", "dsn", "dsnNEQ", "dsnIn", "dsnNotIn", "dsnGT", "dsnGTE", "dsnLT", "dsnLTE", "dsnContains", "dsnHasPrefix", "dsnHasSuffix", "dsnEqualFold", "dsnContainsFold", "status", "statusNEQ", "statusIn", "statusNotIn", "provider", "providerNEQ", "providerIn", "providerNotIn"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -5166,6 +7503,1027 @@ func (ec *executionContext) unmarshalInputDatabaseWhereInput(ctx context.Context
 				return it, err
 			}
 			it.DsnContainsFold = data
+		case "status":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("status"))
+			data, err := ec.unmarshalODatabaseDatabaseStatus2ᚖgithubᚗcomᚋdatumforgeᚋgeodeticᚋinternalᚋentᚋenumsᚐDatabaseStatus(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Status = data
+		case "statusNEQ":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("statusNEQ"))
+			data, err := ec.unmarshalODatabaseDatabaseStatus2ᚖgithubᚗcomᚋdatumforgeᚋgeodeticᚋinternalᚋentᚋenumsᚐDatabaseStatus(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.StatusNEQ = data
+		case "statusIn":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("statusIn"))
+			data, err := ec.unmarshalODatabaseDatabaseStatus2ᚕgithubᚗcomᚋdatumforgeᚋgeodeticᚋinternalᚋentᚋenumsᚐDatabaseStatusᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.StatusIn = data
+		case "statusNotIn":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("statusNotIn"))
+			data, err := ec.unmarshalODatabaseDatabaseStatus2ᚕgithubᚗcomᚋdatumforgeᚋgeodeticᚋinternalᚋentᚋenumsᚐDatabaseStatusᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.StatusNotIn = data
+		case "provider":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("provider"))
+			data, err := ec.unmarshalODatabaseDatabaseProvider2ᚖgithubᚗcomᚋdatumforgeᚋgeodeticᚋinternalᚋentᚋenumsᚐDatabaseProvider(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Provider = data
+		case "providerNEQ":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("providerNEQ"))
+			data, err := ec.unmarshalODatabaseDatabaseProvider2ᚖgithubᚗcomᚋdatumforgeᚋgeodeticᚋinternalᚋentᚋenumsᚐDatabaseProvider(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ProviderNEQ = data
+		case "providerIn":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("providerIn"))
+			data, err := ec.unmarshalODatabaseDatabaseProvider2ᚕgithubᚗcomᚋdatumforgeᚋgeodeticᚋinternalᚋentᚋenumsᚐDatabaseProviderᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ProviderIn = data
+		case "providerNotIn":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("providerNotIn"))
+			data, err := ec.unmarshalODatabaseDatabaseProvider2ᚕgithubᚗcomᚋdatumforgeᚋgeodeticᚋinternalᚋentᚋenumsᚐDatabaseProviderᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ProviderNotIn = data
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputGroupWhereInput(ctx context.Context, obj interface{}) (generated.GroupWhereInput, error) {
+	var it generated.GroupWhereInput
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"not", "and", "or", "id", "idNEQ", "idIn", "idNotIn", "idGT", "idGTE", "idLT", "idLTE", "idEqualFold", "idContainsFold", "createdAt", "createdAtNEQ", "createdAtIn", "createdAtNotIn", "createdAtGT", "createdAtGTE", "createdAtLT", "createdAtLTE", "createdAtIsNil", "createdAtNotNil", "updatedAt", "updatedAtNEQ", "updatedAtIn", "updatedAtNotIn", "updatedAtGT", "updatedAtGTE", "updatedAtLT", "updatedAtLTE", "updatedAtIsNil", "updatedAtNotNil", "createdBy", "createdByNEQ", "createdByIn", "createdByNotIn", "createdByGT", "createdByGTE", "createdByLT", "createdByLTE", "createdByContains", "createdByHasPrefix", "createdByHasSuffix", "createdByIsNil", "createdByNotNil", "createdByEqualFold", "createdByContainsFold", "updatedBy", "updatedByNEQ", "updatedByIn", "updatedByNotIn", "updatedByGT", "updatedByGTE", "updatedByLT", "updatedByLTE", "updatedByContains", "updatedByHasPrefix", "updatedByHasSuffix", "updatedByIsNil", "updatedByNotNil", "updatedByEqualFold", "updatedByContainsFold", "deletedAt", "deletedAtNEQ", "deletedAtIn", "deletedAtNotIn", "deletedAtGT", "deletedAtGTE", "deletedAtLT", "deletedAtLTE", "deletedAtIsNil", "deletedAtNotNil", "deletedBy", "deletedByNEQ", "deletedByIn", "deletedByNotIn", "deletedByGT", "deletedByGTE", "deletedByLT", "deletedByLTE", "deletedByContains", "deletedByHasPrefix", "deletedByHasSuffix", "deletedByIsNil", "deletedByNotNil", "deletedByEqualFold", "deletedByContainsFold", "name", "nameNEQ", "nameIn", "nameNotIn", "nameGT", "nameGTE", "nameLT", "nameLTE", "nameContains", "nameHasPrefix", "nameHasSuffix", "nameEqualFold", "nameContainsFold", "description", "descriptionNEQ", "descriptionIn", "descriptionNotIn", "descriptionGT", "descriptionGTE", "descriptionLT", "descriptionLTE", "descriptionContains", "descriptionHasPrefix", "descriptionHasSuffix", "descriptionIsNil", "descriptionNotNil", "descriptionEqualFold", "descriptionContainsFold", "primaryLocation", "primaryLocationNEQ", "primaryLocationIn", "primaryLocationNotIn", "primaryLocationGT", "primaryLocationGTE", "primaryLocationLT", "primaryLocationLTE", "primaryLocationContains", "primaryLocationHasPrefix", "primaryLocationHasSuffix", "primaryLocationIsNil", "primaryLocationNotNil", "primaryLocationEqualFold", "primaryLocationContainsFold", "region", "regionNEQ", "regionIn", "regionNotIn"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "not":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("not"))
+			data, err := ec.unmarshalOGroupWhereInput2ᚖgithubᚗcomᚋdatumforgeᚋgeodeticᚋinternalᚋentᚋgeneratedᚐGroupWhereInput(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Not = data
+		case "and":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("and"))
+			data, err := ec.unmarshalOGroupWhereInput2ᚕᚖgithubᚗcomᚋdatumforgeᚋgeodeticᚋinternalᚋentᚋgeneratedᚐGroupWhereInputᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.And = data
+		case "or":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("or"))
+			data, err := ec.unmarshalOGroupWhereInput2ᚕᚖgithubᚗcomᚋdatumforgeᚋgeodeticᚋinternalᚋentᚋgeneratedᚐGroupWhereInputᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Or = data
+		case "id":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+			data, err := ec.unmarshalOID2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ID = data
+		case "idNEQ":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("idNEQ"))
+			data, err := ec.unmarshalOID2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.IDNEQ = data
+		case "idIn":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("idIn"))
+			data, err := ec.unmarshalOID2ᚕstringᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.IDIn = data
+		case "idNotIn":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("idNotIn"))
+			data, err := ec.unmarshalOID2ᚕstringᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.IDNotIn = data
+		case "idGT":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("idGT"))
+			data, err := ec.unmarshalOID2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.IDGT = data
+		case "idGTE":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("idGTE"))
+			data, err := ec.unmarshalOID2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.IDGTE = data
+		case "idLT":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("idLT"))
+			data, err := ec.unmarshalOID2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.IDLT = data
+		case "idLTE":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("idLTE"))
+			data, err := ec.unmarshalOID2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.IDLTE = data
+		case "idEqualFold":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("idEqualFold"))
+			data, err := ec.unmarshalOID2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.IDEqualFold = data
+		case "idContainsFold":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("idContainsFold"))
+			data, err := ec.unmarshalOID2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.IDContainsFold = data
+		case "createdAt":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdAt"))
+			data, err := ec.unmarshalOTime2ᚖtimeᚐTime(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CreatedAt = data
+		case "createdAtNEQ":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdAtNEQ"))
+			data, err := ec.unmarshalOTime2ᚖtimeᚐTime(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CreatedAtNEQ = data
+		case "createdAtIn":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdAtIn"))
+			data, err := ec.unmarshalOTime2ᚕtimeᚐTimeᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CreatedAtIn = data
+		case "createdAtNotIn":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdAtNotIn"))
+			data, err := ec.unmarshalOTime2ᚕtimeᚐTimeᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CreatedAtNotIn = data
+		case "createdAtGT":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdAtGT"))
+			data, err := ec.unmarshalOTime2ᚖtimeᚐTime(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CreatedAtGT = data
+		case "createdAtGTE":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdAtGTE"))
+			data, err := ec.unmarshalOTime2ᚖtimeᚐTime(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CreatedAtGTE = data
+		case "createdAtLT":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdAtLT"))
+			data, err := ec.unmarshalOTime2ᚖtimeᚐTime(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CreatedAtLT = data
+		case "createdAtLTE":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdAtLTE"))
+			data, err := ec.unmarshalOTime2ᚖtimeᚐTime(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CreatedAtLTE = data
+		case "createdAtIsNil":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdAtIsNil"))
+			data, err := ec.unmarshalOBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CreatedAtIsNil = data
+		case "createdAtNotNil":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdAtNotNil"))
+			data, err := ec.unmarshalOBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CreatedAtNotNil = data
+		case "updatedAt":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("updatedAt"))
+			data, err := ec.unmarshalOTime2ᚖtimeᚐTime(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.UpdatedAt = data
+		case "updatedAtNEQ":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("updatedAtNEQ"))
+			data, err := ec.unmarshalOTime2ᚖtimeᚐTime(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.UpdatedAtNEQ = data
+		case "updatedAtIn":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("updatedAtIn"))
+			data, err := ec.unmarshalOTime2ᚕtimeᚐTimeᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.UpdatedAtIn = data
+		case "updatedAtNotIn":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("updatedAtNotIn"))
+			data, err := ec.unmarshalOTime2ᚕtimeᚐTimeᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.UpdatedAtNotIn = data
+		case "updatedAtGT":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("updatedAtGT"))
+			data, err := ec.unmarshalOTime2ᚖtimeᚐTime(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.UpdatedAtGT = data
+		case "updatedAtGTE":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("updatedAtGTE"))
+			data, err := ec.unmarshalOTime2ᚖtimeᚐTime(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.UpdatedAtGTE = data
+		case "updatedAtLT":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("updatedAtLT"))
+			data, err := ec.unmarshalOTime2ᚖtimeᚐTime(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.UpdatedAtLT = data
+		case "updatedAtLTE":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("updatedAtLTE"))
+			data, err := ec.unmarshalOTime2ᚖtimeᚐTime(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.UpdatedAtLTE = data
+		case "updatedAtIsNil":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("updatedAtIsNil"))
+			data, err := ec.unmarshalOBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.UpdatedAtIsNil = data
+		case "updatedAtNotNil":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("updatedAtNotNil"))
+			data, err := ec.unmarshalOBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.UpdatedAtNotNil = data
+		case "createdBy":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdBy"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CreatedBy = data
+		case "createdByNEQ":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdByNEQ"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CreatedByNEQ = data
+		case "createdByIn":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdByIn"))
+			data, err := ec.unmarshalOString2ᚕstringᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CreatedByIn = data
+		case "createdByNotIn":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdByNotIn"))
+			data, err := ec.unmarshalOString2ᚕstringᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CreatedByNotIn = data
+		case "createdByGT":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdByGT"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CreatedByGT = data
+		case "createdByGTE":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdByGTE"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CreatedByGTE = data
+		case "createdByLT":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdByLT"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CreatedByLT = data
+		case "createdByLTE":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdByLTE"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CreatedByLTE = data
+		case "createdByContains":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdByContains"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CreatedByContains = data
+		case "createdByHasPrefix":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdByHasPrefix"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CreatedByHasPrefix = data
+		case "createdByHasSuffix":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdByHasSuffix"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CreatedByHasSuffix = data
+		case "createdByIsNil":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdByIsNil"))
+			data, err := ec.unmarshalOBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CreatedByIsNil = data
+		case "createdByNotNil":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdByNotNil"))
+			data, err := ec.unmarshalOBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CreatedByNotNil = data
+		case "createdByEqualFold":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdByEqualFold"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CreatedByEqualFold = data
+		case "createdByContainsFold":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdByContainsFold"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CreatedByContainsFold = data
+		case "updatedBy":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("updatedBy"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.UpdatedBy = data
+		case "updatedByNEQ":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("updatedByNEQ"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.UpdatedByNEQ = data
+		case "updatedByIn":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("updatedByIn"))
+			data, err := ec.unmarshalOString2ᚕstringᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.UpdatedByIn = data
+		case "updatedByNotIn":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("updatedByNotIn"))
+			data, err := ec.unmarshalOString2ᚕstringᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.UpdatedByNotIn = data
+		case "updatedByGT":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("updatedByGT"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.UpdatedByGT = data
+		case "updatedByGTE":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("updatedByGTE"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.UpdatedByGTE = data
+		case "updatedByLT":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("updatedByLT"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.UpdatedByLT = data
+		case "updatedByLTE":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("updatedByLTE"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.UpdatedByLTE = data
+		case "updatedByContains":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("updatedByContains"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.UpdatedByContains = data
+		case "updatedByHasPrefix":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("updatedByHasPrefix"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.UpdatedByHasPrefix = data
+		case "updatedByHasSuffix":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("updatedByHasSuffix"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.UpdatedByHasSuffix = data
+		case "updatedByIsNil":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("updatedByIsNil"))
+			data, err := ec.unmarshalOBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.UpdatedByIsNil = data
+		case "updatedByNotNil":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("updatedByNotNil"))
+			data, err := ec.unmarshalOBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.UpdatedByNotNil = data
+		case "updatedByEqualFold":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("updatedByEqualFold"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.UpdatedByEqualFold = data
+		case "updatedByContainsFold":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("updatedByContainsFold"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.UpdatedByContainsFold = data
+		case "deletedAt":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("deletedAt"))
+			data, err := ec.unmarshalOTime2ᚖtimeᚐTime(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.DeletedAt = data
+		case "deletedAtNEQ":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("deletedAtNEQ"))
+			data, err := ec.unmarshalOTime2ᚖtimeᚐTime(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.DeletedAtNEQ = data
+		case "deletedAtIn":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("deletedAtIn"))
+			data, err := ec.unmarshalOTime2ᚕtimeᚐTimeᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.DeletedAtIn = data
+		case "deletedAtNotIn":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("deletedAtNotIn"))
+			data, err := ec.unmarshalOTime2ᚕtimeᚐTimeᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.DeletedAtNotIn = data
+		case "deletedAtGT":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("deletedAtGT"))
+			data, err := ec.unmarshalOTime2ᚖtimeᚐTime(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.DeletedAtGT = data
+		case "deletedAtGTE":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("deletedAtGTE"))
+			data, err := ec.unmarshalOTime2ᚖtimeᚐTime(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.DeletedAtGTE = data
+		case "deletedAtLT":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("deletedAtLT"))
+			data, err := ec.unmarshalOTime2ᚖtimeᚐTime(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.DeletedAtLT = data
+		case "deletedAtLTE":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("deletedAtLTE"))
+			data, err := ec.unmarshalOTime2ᚖtimeᚐTime(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.DeletedAtLTE = data
+		case "deletedAtIsNil":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("deletedAtIsNil"))
+			data, err := ec.unmarshalOBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.DeletedAtIsNil = data
+		case "deletedAtNotNil":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("deletedAtNotNil"))
+			data, err := ec.unmarshalOBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.DeletedAtNotNil = data
+		case "deletedBy":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("deletedBy"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.DeletedBy = data
+		case "deletedByNEQ":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("deletedByNEQ"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.DeletedByNEQ = data
+		case "deletedByIn":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("deletedByIn"))
+			data, err := ec.unmarshalOString2ᚕstringᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.DeletedByIn = data
+		case "deletedByNotIn":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("deletedByNotIn"))
+			data, err := ec.unmarshalOString2ᚕstringᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.DeletedByNotIn = data
+		case "deletedByGT":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("deletedByGT"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.DeletedByGT = data
+		case "deletedByGTE":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("deletedByGTE"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.DeletedByGTE = data
+		case "deletedByLT":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("deletedByLT"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.DeletedByLT = data
+		case "deletedByLTE":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("deletedByLTE"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.DeletedByLTE = data
+		case "deletedByContains":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("deletedByContains"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.DeletedByContains = data
+		case "deletedByHasPrefix":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("deletedByHasPrefix"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.DeletedByHasPrefix = data
+		case "deletedByHasSuffix":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("deletedByHasSuffix"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.DeletedByHasSuffix = data
+		case "deletedByIsNil":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("deletedByIsNil"))
+			data, err := ec.unmarshalOBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.DeletedByIsNil = data
+		case "deletedByNotNil":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("deletedByNotNil"))
+			data, err := ec.unmarshalOBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.DeletedByNotNil = data
+		case "deletedByEqualFold":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("deletedByEqualFold"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.DeletedByEqualFold = data
+		case "deletedByContainsFold":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("deletedByContainsFold"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.DeletedByContainsFold = data
+		case "name":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Name = data
+		case "nameNEQ":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("nameNEQ"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.NameNEQ = data
+		case "nameIn":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("nameIn"))
+			data, err := ec.unmarshalOString2ᚕstringᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.NameIn = data
+		case "nameNotIn":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("nameNotIn"))
+			data, err := ec.unmarshalOString2ᚕstringᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.NameNotIn = data
+		case "nameGT":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("nameGT"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.NameGT = data
+		case "nameGTE":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("nameGTE"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.NameGTE = data
+		case "nameLT":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("nameLT"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.NameLT = data
+		case "nameLTE":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("nameLTE"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.NameLTE = data
+		case "nameContains":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("nameContains"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.NameContains = data
+		case "nameHasPrefix":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("nameHasPrefix"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.NameHasPrefix = data
+		case "nameHasSuffix":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("nameHasSuffix"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.NameHasSuffix = data
+		case "nameEqualFold":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("nameEqualFold"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.NameEqualFold = data
+		case "nameContainsFold":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("nameContainsFold"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.NameContainsFold = data
+		case "description":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("description"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Description = data
+		case "descriptionNEQ":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("descriptionNEQ"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.DescriptionNEQ = data
+		case "descriptionIn":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("descriptionIn"))
+			data, err := ec.unmarshalOString2ᚕstringᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.DescriptionIn = data
+		case "descriptionNotIn":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("descriptionNotIn"))
+			data, err := ec.unmarshalOString2ᚕstringᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.DescriptionNotIn = data
+		case "descriptionGT":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("descriptionGT"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.DescriptionGT = data
+		case "descriptionGTE":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("descriptionGTE"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.DescriptionGTE = data
+		case "descriptionLT":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("descriptionLT"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.DescriptionLT = data
+		case "descriptionLTE":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("descriptionLTE"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.DescriptionLTE = data
+		case "descriptionContains":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("descriptionContains"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.DescriptionContains = data
+		case "descriptionHasPrefix":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("descriptionHasPrefix"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.DescriptionHasPrefix = data
+		case "descriptionHasSuffix":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("descriptionHasSuffix"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.DescriptionHasSuffix = data
+		case "descriptionIsNil":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("descriptionIsNil"))
+			data, err := ec.unmarshalOBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.DescriptionIsNil = data
+		case "descriptionNotNil":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("descriptionNotNil"))
+			data, err := ec.unmarshalOBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.DescriptionNotNil = data
+		case "descriptionEqualFold":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("descriptionEqualFold"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.DescriptionEqualFold = data
+		case "descriptionContainsFold":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("descriptionContainsFold"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.DescriptionContainsFold = data
+		case "primaryLocation":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("primaryLocation"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.PrimaryLocation = data
+		case "primaryLocationNEQ":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("primaryLocationNEQ"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.PrimaryLocationNEQ = data
+		case "primaryLocationIn":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("primaryLocationIn"))
+			data, err := ec.unmarshalOString2ᚕstringᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.PrimaryLocationIn = data
+		case "primaryLocationNotIn":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("primaryLocationNotIn"))
+			data, err := ec.unmarshalOString2ᚕstringᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.PrimaryLocationNotIn = data
+		case "primaryLocationGT":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("primaryLocationGT"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.PrimaryLocationGT = data
+		case "primaryLocationGTE":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("primaryLocationGTE"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.PrimaryLocationGTE = data
+		case "primaryLocationLT":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("primaryLocationLT"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.PrimaryLocationLT = data
+		case "primaryLocationLTE":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("primaryLocationLTE"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.PrimaryLocationLTE = data
+		case "primaryLocationContains":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("primaryLocationContains"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.PrimaryLocationContains = data
+		case "primaryLocationHasPrefix":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("primaryLocationHasPrefix"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.PrimaryLocationHasPrefix = data
+		case "primaryLocationHasSuffix":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("primaryLocationHasSuffix"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.PrimaryLocationHasSuffix = data
+		case "primaryLocationIsNil":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("primaryLocationIsNil"))
+			data, err := ec.unmarshalOBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.PrimaryLocationIsNil = data
+		case "primaryLocationNotNil":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("primaryLocationNotNil"))
+			data, err := ec.unmarshalOBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.PrimaryLocationNotNil = data
+		case "primaryLocationEqualFold":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("primaryLocationEqualFold"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.PrimaryLocationEqualFold = data
+		case "primaryLocationContainsFold":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("primaryLocationContainsFold"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.PrimaryLocationContainsFold = data
+		case "region":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("region"))
+			data, err := ec.unmarshalOGroupRegion2ᚖgithubᚗcomᚋdatumforgeᚋgeodeticᚋinternalᚋentᚋenumsᚐRegion(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Region = data
+		case "regionNEQ":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("regionNEQ"))
+			data, err := ec.unmarshalOGroupRegion2ᚖgithubᚗcomᚋdatumforgeᚋgeodeticᚋinternalᚋentᚋenumsᚐRegion(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.RegionNEQ = data
+		case "regionIn":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("regionIn"))
+			data, err := ec.unmarshalOGroupRegion2ᚕgithubᚗcomᚋdatumforgeᚋgeodeticᚋinternalᚋentᚋenumsᚐRegionᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.RegionIn = data
+		case "regionNotIn":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("regionNotIn"))
+			data, err := ec.unmarshalOGroupRegion2ᚕgithubᚗcomᚋdatumforgeᚋgeodeticᚋinternalᚋentᚋenumsᚐRegionᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.RegionNotIn = data
 		}
 	}
 
@@ -5179,7 +8537,7 @@ func (ec *executionContext) unmarshalInputUpdateDatabaseInput(ctx context.Contex
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"updatedAt", "clearUpdatedAt", "updatedBy", "clearUpdatedBy", "organizationID", "name", "geo", "clearGeo", "dsn"}
+	fieldsInOrder := [...]string{"updatedAt", "clearUpdatedAt", "updatedBy", "clearUpdatedBy", "organizationID", "name", "geo", "clearGeo", "dsn", "token", "status", "provider"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -5249,6 +8607,145 @@ func (ec *executionContext) unmarshalInputUpdateDatabaseInput(ctx context.Contex
 				return it, err
 			}
 			it.Dsn = data
+		case "token":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("token"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Token = data
+		case "status":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("status"))
+			data, err := ec.unmarshalODatabaseDatabaseStatus2ᚖgithubᚗcomᚋdatumforgeᚋgeodeticᚋinternalᚋentᚋenumsᚐDatabaseStatus(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Status = data
+		case "provider":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("provider"))
+			data, err := ec.unmarshalODatabaseDatabaseProvider2ᚖgithubᚗcomᚋdatumforgeᚋgeodeticᚋinternalᚋentᚋenumsᚐDatabaseProvider(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Provider = data
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputUpdateGroupInput(ctx context.Context, obj interface{}) (generated.UpdateGroupInput, error) {
+	var it generated.UpdateGroupInput
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"updatedAt", "clearUpdatedAt", "updatedBy", "clearUpdatedBy", "name", "description", "clearDescription", "primaryLocation", "clearPrimaryLocation", "locations", "appendLocations", "clearLocations", "token", "region"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "updatedAt":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("updatedAt"))
+			data, err := ec.unmarshalOTime2ᚖtimeᚐTime(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.UpdatedAt = data
+		case "clearUpdatedAt":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("clearUpdatedAt"))
+			data, err := ec.unmarshalOBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ClearUpdatedAt = data
+		case "updatedBy":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("updatedBy"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.UpdatedBy = data
+		case "clearUpdatedBy":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("clearUpdatedBy"))
+			data, err := ec.unmarshalOBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ClearUpdatedBy = data
+		case "name":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Name = data
+		case "description":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("description"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Description = data
+		case "clearDescription":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("clearDescription"))
+			data, err := ec.unmarshalOBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ClearDescription = data
+		case "primaryLocation":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("primaryLocation"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.PrimaryLocation = data
+		case "clearPrimaryLocation":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("clearPrimaryLocation"))
+			data, err := ec.unmarshalOBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ClearPrimaryLocation = data
+		case "locations":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("locations"))
+			data, err := ec.unmarshalOString2ᚕstringᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Locations = data
+		case "appendLocations":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("appendLocations"))
+			data, err := ec.unmarshalOString2ᚕstringᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.AppendLocations = data
+		case "clearLocations":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("clearLocations"))
+			data, err := ec.unmarshalOBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ClearLocations = data
+		case "token":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("token"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Token = data
+		case "region":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("region"))
+			data, err := ec.unmarshalOGroupRegion2ᚖgithubᚗcomᚋdatumforgeᚋgeodeticᚋinternalᚋentᚋenumsᚐRegion(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Region = data
 		}
 	}
 
@@ -5268,6 +8765,11 @@ func (ec *executionContext) _Node(ctx context.Context, sel ast.SelectionSet, obj
 			return graphql.Null
 		}
 		return ec._Database(ctx, sel, obj)
+	case *generated.Group:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._Group(ctx, sel, obj)
 	default:
 		panic(fmt.Errorf("unexpected type %T", obj))
 	}
@@ -5319,6 +8821,16 @@ func (ec *executionContext) _Database(ctx context.Context, sel ast.SelectionSet,
 			out.Values[i] = ec._Database_geo(ctx, field, obj)
 		case "dsn":
 			out.Values[i] = ec._Database_dsn(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "status":
+			out.Values[i] = ec._Database_status(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "provider":
+			out.Values[i] = ec._Database_provider(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
@@ -5462,6 +8974,277 @@ func (ec *executionContext) _DatabaseUpdatePayload(ctx context.Context, sel ast.
 	return out
 }
 
+var groupImplementors = []string{"Group", "Node"}
+
+func (ec *executionContext) _Group(ctx context.Context, sel ast.SelectionSet, obj *generated.Group) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, groupImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("Group")
+		case "id":
+			out.Values[i] = ec._Group_id(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "createdAt":
+			out.Values[i] = ec._Group_createdAt(ctx, field, obj)
+		case "updatedAt":
+			out.Values[i] = ec._Group_updatedAt(ctx, field, obj)
+		case "createdBy":
+			out.Values[i] = ec._Group_createdBy(ctx, field, obj)
+		case "updatedBy":
+			out.Values[i] = ec._Group_updatedBy(ctx, field, obj)
+		case "deletedAt":
+			out.Values[i] = ec._Group_deletedAt(ctx, field, obj)
+		case "deletedBy":
+			out.Values[i] = ec._Group_deletedBy(ctx, field, obj)
+		case "name":
+			out.Values[i] = ec._Group_name(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "description":
+			out.Values[i] = ec._Group_description(ctx, field, obj)
+		case "primaryLocation":
+			out.Values[i] = ec._Group_primaryLocation(ctx, field, obj)
+		case "locations":
+			out.Values[i] = ec._Group_locations(ctx, field, obj)
+		case "region":
+			out.Values[i] = ec._Group_region(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var groupConnectionImplementors = []string{"GroupConnection"}
+
+func (ec *executionContext) _GroupConnection(ctx context.Context, sel ast.SelectionSet, obj *generated.GroupConnection) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, groupConnectionImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("GroupConnection")
+		case "edges":
+			out.Values[i] = ec._GroupConnection_edges(ctx, field, obj)
+		case "pageInfo":
+			out.Values[i] = ec._GroupConnection_pageInfo(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "totalCount":
+			out.Values[i] = ec._GroupConnection_totalCount(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var groupCreatePayloadImplementors = []string{"GroupCreatePayload"}
+
+func (ec *executionContext) _GroupCreatePayload(ctx context.Context, sel ast.SelectionSet, obj *GroupCreatePayload) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, groupCreatePayloadImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("GroupCreatePayload")
+		case "group":
+			out.Values[i] = ec._GroupCreatePayload_group(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var groupDeletePayloadImplementors = []string{"GroupDeletePayload"}
+
+func (ec *executionContext) _GroupDeletePayload(ctx context.Context, sel ast.SelectionSet, obj *GroupDeletePayload) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, groupDeletePayloadImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("GroupDeletePayload")
+		case "deletedID":
+			out.Values[i] = ec._GroupDeletePayload_deletedID(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var groupEdgeImplementors = []string{"GroupEdge"}
+
+func (ec *executionContext) _GroupEdge(ctx context.Context, sel ast.SelectionSet, obj *generated.GroupEdge) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, groupEdgeImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("GroupEdge")
+		case "node":
+			out.Values[i] = ec._GroupEdge_node(ctx, field, obj)
+		case "cursor":
+			out.Values[i] = ec._GroupEdge_cursor(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var groupUpdatePayloadImplementors = []string{"GroupUpdatePayload"}
+
+func (ec *executionContext) _GroupUpdatePayload(ctx context.Context, sel ast.SelectionSet, obj *GroupUpdatePayload) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, groupUpdatePayloadImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("GroupUpdatePayload")
+		case "group":
+			out.Values[i] = ec._GroupUpdatePayload_group(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
 var mutationImplementors = []string{"Mutation"}
 
 func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet) graphql.Marshaler {
@@ -5498,6 +9281,27 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 		case "deleteDatabase":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_deleteDatabase(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "createGroup":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_createGroup(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "updateGroup":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_updateGroup(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "deleteGroup":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_deleteGroup(ctx, field)
 			})
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
@@ -5633,6 +9437,28 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
+		case "groups":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_groups(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
 		case "database":
 			field := field
 
@@ -5643,6 +9469,28 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 					}
 				}()
 				res = ec._Query_database(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
+		case "group":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_group(ctx, field)
 				if res == graphql.Null {
 					atomic.AddUint32(&fs.Invalids, 1)
 				}
@@ -6032,6 +9880,21 @@ func (ec *executionContext) unmarshalNCreateDatabaseInput2githubᚗcomᚋdatumfo
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
+func (ec *executionContext) unmarshalNCreateGroupInput2githubᚗcomᚋdatumforgeᚋgeodeticᚋinternalᚋentᚋgeneratedᚐCreateGroupInput(ctx context.Context, v interface{}) (generated.CreateGroupInput, error) {
+	res, err := ec.unmarshalInputCreateGroupInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalNCursor2entgoᚗioᚋcontribᚋentgqlᚐCursor(ctx context.Context, v interface{}) (entgql.Cursor[string], error) {
+	var res entgql.Cursor[string]
+	err := res.UnmarshalGQL(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNCursor2entgoᚗioᚋcontribᚋentgqlᚐCursor(ctx context.Context, sel ast.SelectionSet, v entgql.Cursor[string]) graphql.Marshaler {
+	return v
+}
+
 func (ec *executionContext) marshalNDatabase2githubᚗcomᚋdatumforgeᚋgeodeticᚋinternalᚋentᚋgeneratedᚐDatabase(ctx context.Context, sel ast.SelectionSet, v generated.Database) graphql.Marshaler {
 	return ec._Database(ctx, sel, &v)
 }
@@ -6058,6 +9921,26 @@ func (ec *executionContext) marshalNDatabaseCreatePayload2ᚖgithubᚗcomᚋdatu
 		return graphql.Null
 	}
 	return ec._DatabaseCreatePayload(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalNDatabaseDatabaseProvider2githubᚗcomᚋdatumforgeᚋgeodeticᚋinternalᚋentᚋenumsᚐDatabaseProvider(ctx context.Context, v interface{}) (enums.DatabaseProvider, error) {
+	var res enums.DatabaseProvider
+	err := res.UnmarshalGQL(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNDatabaseDatabaseProvider2githubᚗcomᚋdatumforgeᚋgeodeticᚋinternalᚋentᚋenumsᚐDatabaseProvider(ctx context.Context, sel ast.SelectionSet, v enums.DatabaseProvider) graphql.Marshaler {
+	return v
+}
+
+func (ec *executionContext) unmarshalNDatabaseDatabaseStatus2githubᚗcomᚋdatumforgeᚋgeodeticᚋinternalᚋentᚋenumsᚐDatabaseStatus(ctx context.Context, v interface{}) (enums.DatabaseStatus, error) {
+	var res enums.DatabaseStatus
+	err := res.UnmarshalGQL(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNDatabaseDatabaseStatus2githubᚗcomᚋdatumforgeᚋgeodeticᚋinternalᚋentᚋenumsᚐDatabaseStatus(ctx context.Context, sel ast.SelectionSet, v enums.DatabaseStatus) graphql.Marshaler {
+	return v
 }
 
 func (ec *executionContext) marshalNDatabaseDeletePayload2githubᚗcomᚋdatumforgeᚋgeodeticᚋinternalᚋgraphapiᚐDatabaseDeletePayload(ctx context.Context, sel ast.SelectionSet, v DatabaseDeletePayload) graphql.Marshaler {
@@ -6090,6 +9973,91 @@ func (ec *executionContext) marshalNDatabaseUpdatePayload2ᚖgithubᚗcomᚋdatu
 
 func (ec *executionContext) unmarshalNDatabaseWhereInput2ᚖgithubᚗcomᚋdatumforgeᚋgeodeticᚋinternalᚋentᚋgeneratedᚐDatabaseWhereInput(ctx context.Context, v interface{}) (*generated.DatabaseWhereInput, error) {
 	res, err := ec.unmarshalInputDatabaseWhereInput(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNGroup2githubᚗcomᚋdatumforgeᚋgeodeticᚋinternalᚋentᚋgeneratedᚐGroup(ctx context.Context, sel ast.SelectionSet, v generated.Group) graphql.Marshaler {
+	return ec._Group(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNGroup2ᚖgithubᚗcomᚋdatumforgeᚋgeodeticᚋinternalᚋentᚋgeneratedᚐGroup(ctx context.Context, sel ast.SelectionSet, v *generated.Group) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._Group(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNGroupConnection2githubᚗcomᚋdatumforgeᚋgeodeticᚋinternalᚋentᚋgeneratedᚐGroupConnection(ctx context.Context, sel ast.SelectionSet, v generated.GroupConnection) graphql.Marshaler {
+	return ec._GroupConnection(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNGroupConnection2ᚖgithubᚗcomᚋdatumforgeᚋgeodeticᚋinternalᚋentᚋgeneratedᚐGroupConnection(ctx context.Context, sel ast.SelectionSet, v *generated.GroupConnection) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._GroupConnection(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNGroupCreatePayload2githubᚗcomᚋdatumforgeᚋgeodeticᚋinternalᚋgraphapiᚐGroupCreatePayload(ctx context.Context, sel ast.SelectionSet, v GroupCreatePayload) graphql.Marshaler {
+	return ec._GroupCreatePayload(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNGroupCreatePayload2ᚖgithubᚗcomᚋdatumforgeᚋgeodeticᚋinternalᚋgraphapiᚐGroupCreatePayload(ctx context.Context, sel ast.SelectionSet, v *GroupCreatePayload) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._GroupCreatePayload(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNGroupDeletePayload2githubᚗcomᚋdatumforgeᚋgeodeticᚋinternalᚋgraphapiᚐGroupDeletePayload(ctx context.Context, sel ast.SelectionSet, v GroupDeletePayload) graphql.Marshaler {
+	return ec._GroupDeletePayload(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNGroupDeletePayload2ᚖgithubᚗcomᚋdatumforgeᚋgeodeticᚋinternalᚋgraphapiᚐGroupDeletePayload(ctx context.Context, sel ast.SelectionSet, v *GroupDeletePayload) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._GroupDeletePayload(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalNGroupRegion2githubᚗcomᚋdatumforgeᚋgeodeticᚋinternalᚋentᚋenumsᚐRegion(ctx context.Context, v interface{}) (enums.Region, error) {
+	var res enums.Region
+	err := res.UnmarshalGQL(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNGroupRegion2githubᚗcomᚋdatumforgeᚋgeodeticᚋinternalᚋentᚋenumsᚐRegion(ctx context.Context, sel ast.SelectionSet, v enums.Region) graphql.Marshaler {
+	return v
+}
+
+func (ec *executionContext) marshalNGroupUpdatePayload2githubᚗcomᚋdatumforgeᚋgeodeticᚋinternalᚋgraphapiᚐGroupUpdatePayload(ctx context.Context, sel ast.SelectionSet, v GroupUpdatePayload) graphql.Marshaler {
+	return ec._GroupUpdatePayload(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNGroupUpdatePayload2ᚖgithubᚗcomᚋdatumforgeᚋgeodeticᚋinternalᚋgraphapiᚐGroupUpdatePayload(ctx context.Context, sel ast.SelectionSet, v *GroupUpdatePayload) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._GroupUpdatePayload(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalNGroupWhereInput2ᚖgithubᚗcomᚋdatumforgeᚋgeodeticᚋinternalᚋentᚋgeneratedᚐGroupWhereInput(ctx context.Context, v interface{}) (*generated.GroupWhereInput, error) {
+	res, err := ec.unmarshalInputGroupWhereInput(ctx, v)
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
@@ -6140,6 +10108,21 @@ func (ec *executionContext) marshalNID2ᚕstringᚄ(ctx context.Context, sel ast
 	return ret
 }
 
+func (ec *executionContext) unmarshalNInt2int(ctx context.Context, v interface{}) (int, error) {
+	res, err := graphql.UnmarshalInt(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNInt2int(ctx context.Context, sel ast.SelectionSet, v int) graphql.Marshaler {
+	res := graphql.MarshalInt(v)
+	if res == graphql.Null {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+	}
+	return res
+}
+
 func (ec *executionContext) marshalNNode2ᚕgithubᚗcomᚋdatumforgeᚋgeodeticᚋinternalᚋentᚋgeneratedᚐNoder(ctx context.Context, sel ast.SelectionSet, v []generated.Noder) graphql.Marshaler {
 	ret := make(graphql.Array, len(v))
 	var wg sync.WaitGroup
@@ -6178,6 +10161,10 @@ func (ec *executionContext) marshalNNode2ᚕgithubᚗcomᚋdatumforgeᚋgeodetic
 	return ret
 }
 
+func (ec *executionContext) marshalNPageInfo2entgoᚗioᚋcontribᚋentgqlᚐPageInfo(ctx context.Context, sel ast.SelectionSet, v entgql.PageInfo[string]) graphql.Marshaler {
+	return ec._PageInfo(ctx, sel, &v)
+}
+
 func (ec *executionContext) unmarshalNString2string(ctx context.Context, v interface{}) (string, error) {
 	res, err := graphql.UnmarshalString(v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -6210,6 +10197,11 @@ func (ec *executionContext) marshalNTime2timeᚐTime(ctx context.Context, sel as
 
 func (ec *executionContext) unmarshalNUpdateDatabaseInput2githubᚗcomᚋdatumforgeᚋgeodeticᚋinternalᚋentᚋgeneratedᚐUpdateDatabaseInput(ctx context.Context, v interface{}) (generated.UpdateDatabaseInput, error) {
 	res, err := ec.unmarshalInputUpdateDatabaseInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalNUpdateGroupInput2githubᚗcomᚋdatumforgeᚋgeodeticᚋinternalᚋentᚋgeneratedᚐUpdateGroupInput(ctx context.Context, v interface{}) (generated.UpdateGroupInput, error) {
+	res, err := ec.unmarshalInputUpdateGroupInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
@@ -6508,6 +10500,172 @@ func (ec *executionContext) marshalOCursor2ᚖentgoᚗioᚋcontribᚋentgqlᚐCu
 	return v
 }
 
+func (ec *executionContext) unmarshalODatabaseDatabaseProvider2ᚕgithubᚗcomᚋdatumforgeᚋgeodeticᚋinternalᚋentᚋenumsᚐDatabaseProviderᚄ(ctx context.Context, v interface{}) ([]enums.DatabaseProvider, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var vSlice []interface{}
+	if v != nil {
+		vSlice = graphql.CoerceList(v)
+	}
+	var err error
+	res := make([]enums.DatabaseProvider, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalNDatabaseDatabaseProvider2githubᚗcomᚋdatumforgeᚋgeodeticᚋinternalᚋentᚋenumsᚐDatabaseProvider(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) marshalODatabaseDatabaseProvider2ᚕgithubᚗcomᚋdatumforgeᚋgeodeticᚋinternalᚋentᚋenumsᚐDatabaseProviderᚄ(ctx context.Context, sel ast.SelectionSet, v []enums.DatabaseProvider) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNDatabaseDatabaseProvider2githubᚗcomᚋdatumforgeᚋgeodeticᚋinternalᚋentᚋenumsᚐDatabaseProvider(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
+}
+
+func (ec *executionContext) unmarshalODatabaseDatabaseProvider2ᚖgithubᚗcomᚋdatumforgeᚋgeodeticᚋinternalᚋentᚋenumsᚐDatabaseProvider(ctx context.Context, v interface{}) (*enums.DatabaseProvider, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var res = new(enums.DatabaseProvider)
+	err := res.UnmarshalGQL(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalODatabaseDatabaseProvider2ᚖgithubᚗcomᚋdatumforgeᚋgeodeticᚋinternalᚋentᚋenumsᚐDatabaseProvider(ctx context.Context, sel ast.SelectionSet, v *enums.DatabaseProvider) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return v
+}
+
+func (ec *executionContext) unmarshalODatabaseDatabaseStatus2ᚕgithubᚗcomᚋdatumforgeᚋgeodeticᚋinternalᚋentᚋenumsᚐDatabaseStatusᚄ(ctx context.Context, v interface{}) ([]enums.DatabaseStatus, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var vSlice []interface{}
+	if v != nil {
+		vSlice = graphql.CoerceList(v)
+	}
+	var err error
+	res := make([]enums.DatabaseStatus, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalNDatabaseDatabaseStatus2githubᚗcomᚋdatumforgeᚋgeodeticᚋinternalᚋentᚋenumsᚐDatabaseStatus(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) marshalODatabaseDatabaseStatus2ᚕgithubᚗcomᚋdatumforgeᚋgeodeticᚋinternalᚋentᚋenumsᚐDatabaseStatusᚄ(ctx context.Context, sel ast.SelectionSet, v []enums.DatabaseStatus) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNDatabaseDatabaseStatus2githubᚗcomᚋdatumforgeᚋgeodeticᚋinternalᚋentᚋenumsᚐDatabaseStatus(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
+}
+
+func (ec *executionContext) unmarshalODatabaseDatabaseStatus2ᚖgithubᚗcomᚋdatumforgeᚋgeodeticᚋinternalᚋentᚋenumsᚐDatabaseStatus(ctx context.Context, v interface{}) (*enums.DatabaseStatus, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var res = new(enums.DatabaseStatus)
+	err := res.UnmarshalGQL(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalODatabaseDatabaseStatus2ᚖgithubᚗcomᚋdatumforgeᚋgeodeticᚋinternalᚋentᚋenumsᚐDatabaseStatus(ctx context.Context, sel ast.SelectionSet, v *enums.DatabaseStatus) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return v
+}
+
 func (ec *executionContext) unmarshalODatabaseWhereInput2ᚕᚖgithubᚗcomᚋdatumforgeᚋgeodeticᚋinternalᚋentᚋgeneratedᚐDatabaseWhereInputᚄ(ctx context.Context, v interface{}) ([]*generated.DatabaseWhereInput, error) {
 	if v == nil {
 		return nil, nil
@@ -6533,6 +10691,172 @@ func (ec *executionContext) unmarshalODatabaseWhereInput2ᚖgithubᚗcomᚋdatum
 		return nil, nil
 	}
 	res, err := ec.unmarshalInputDatabaseWhereInput(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalOGroup2ᚖgithubᚗcomᚋdatumforgeᚋgeodeticᚋinternalᚋentᚋgeneratedᚐGroup(ctx context.Context, sel ast.SelectionSet, v *generated.Group) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._Group(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalOGroupEdge2ᚕᚖgithubᚗcomᚋdatumforgeᚋgeodeticᚋinternalᚋentᚋgeneratedᚐGroupEdge(ctx context.Context, sel ast.SelectionSet, v []*generated.GroupEdge) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalOGroupEdge2ᚖgithubᚗcomᚋdatumforgeᚋgeodeticᚋinternalᚋentᚋgeneratedᚐGroupEdge(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	return ret
+}
+
+func (ec *executionContext) marshalOGroupEdge2ᚖgithubᚗcomᚋdatumforgeᚋgeodeticᚋinternalᚋentᚋgeneratedᚐGroupEdge(ctx context.Context, sel ast.SelectionSet, v *generated.GroupEdge) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._GroupEdge(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalOGroupRegion2ᚕgithubᚗcomᚋdatumforgeᚋgeodeticᚋinternalᚋentᚋenumsᚐRegionᚄ(ctx context.Context, v interface{}) ([]enums.Region, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var vSlice []interface{}
+	if v != nil {
+		vSlice = graphql.CoerceList(v)
+	}
+	var err error
+	res := make([]enums.Region, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalNGroupRegion2githubᚗcomᚋdatumforgeᚋgeodeticᚋinternalᚋentᚋenumsᚐRegion(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) marshalOGroupRegion2ᚕgithubᚗcomᚋdatumforgeᚋgeodeticᚋinternalᚋentᚋenumsᚐRegionᚄ(ctx context.Context, sel ast.SelectionSet, v []enums.Region) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNGroupRegion2githubᚗcomᚋdatumforgeᚋgeodeticᚋinternalᚋentᚋenumsᚐRegion(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
+}
+
+func (ec *executionContext) unmarshalOGroupRegion2ᚖgithubᚗcomᚋdatumforgeᚋgeodeticᚋinternalᚋentᚋenumsᚐRegion(ctx context.Context, v interface{}) (*enums.Region, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var res = new(enums.Region)
+	err := res.UnmarshalGQL(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalOGroupRegion2ᚖgithubᚗcomᚋdatumforgeᚋgeodeticᚋinternalᚋentᚋenumsᚐRegion(ctx context.Context, sel ast.SelectionSet, v *enums.Region) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return v
+}
+
+func (ec *executionContext) unmarshalOGroupWhereInput2ᚕᚖgithubᚗcomᚋdatumforgeᚋgeodeticᚋinternalᚋentᚋgeneratedᚐGroupWhereInputᚄ(ctx context.Context, v interface{}) ([]*generated.GroupWhereInput, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var vSlice []interface{}
+	if v != nil {
+		vSlice = graphql.CoerceList(v)
+	}
+	var err error
+	res := make([]*generated.GroupWhereInput, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalNGroupWhereInput2ᚖgithubᚗcomᚋdatumforgeᚋgeodeticᚋinternalᚋentᚋgeneratedᚐGroupWhereInput(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) unmarshalOGroupWhereInput2ᚖgithubᚗcomᚋdatumforgeᚋgeodeticᚋinternalᚋentᚋgeneratedᚐGroupWhereInput(ctx context.Context, v interface{}) (*generated.GroupWhereInput, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputGroupWhereInput(ctx, v)
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
@@ -6587,6 +10911,22 @@ func (ec *executionContext) marshalOID2ᚖstring(ctx context.Context, sel ast.Se
 		return graphql.Null
 	}
 	res := graphql.MarshalString(*v)
+	return res
+}
+
+func (ec *executionContext) unmarshalOInt2ᚖint(ctx context.Context, v interface{}) (*int, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := graphql.UnmarshalInt(v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalOInt2ᚖint(ctx context.Context, sel ast.SelectionSet, v *int) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	res := graphql.MarshalInt(*v)
 	return res
 }
 

@@ -377,6 +377,26 @@
       },
       "additionalProperties": false,
       "type": "object"
+    },
+    "turso.Config": {
+      "properties": {
+        "token": {
+          "type": "string"
+        },
+        "base_url": {
+          "type": "string"
+        },
+        "org_name": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "token",
+        "base_url",
+        "org_name"
+      ]
     }
   },
   "properties": {
@@ -391,6 +411,10 @@
     "db": {
       "$ref": "#/$defs/entx.Config",
       "description": "DB contains the database configuration for the ent client"
+    },
+    "turso": {
+      "$ref": "#/$defs/turso.Config",
+      "description": "Turso contains the configuration for the turso client"
     },
     "redis": {
       "$ref": "#/$defs/cache.Config",

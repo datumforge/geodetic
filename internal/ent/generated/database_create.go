@@ -10,6 +10,7 @@ import (
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/datumforge/geodetic/internal/ent/enums"
 	"github.com/datumforge/geodetic/internal/ent/generated/database"
 )
 
@@ -136,6 +137,40 @@ func (dc *DatabaseCreate) SetDsn(s string) *DatabaseCreate {
 	return dc
 }
 
+// SetToken sets the "token" field.
+func (dc *DatabaseCreate) SetToken(s string) *DatabaseCreate {
+	dc.mutation.SetToken(s)
+	return dc
+}
+
+// SetStatus sets the "status" field.
+func (dc *DatabaseCreate) SetStatus(es enums.DatabaseStatus) *DatabaseCreate {
+	dc.mutation.SetStatus(es)
+	return dc
+}
+
+// SetNillableStatus sets the "status" field if the given value is not nil.
+func (dc *DatabaseCreate) SetNillableStatus(es *enums.DatabaseStatus) *DatabaseCreate {
+	if es != nil {
+		dc.SetStatus(*es)
+	}
+	return dc
+}
+
+// SetProvider sets the "provider" field.
+func (dc *DatabaseCreate) SetProvider(ep enums.DatabaseProvider) *DatabaseCreate {
+	dc.mutation.SetProvider(ep)
+	return dc
+}
+
+// SetNillableProvider sets the "provider" field if the given value is not nil.
+func (dc *DatabaseCreate) SetNillableProvider(ep *enums.DatabaseProvider) *DatabaseCreate {
+	if ep != nil {
+		dc.SetProvider(*ep)
+	}
+	return dc
+}
+
 // SetID sets the "id" field.
 func (dc *DatabaseCreate) SetID(s string) *DatabaseCreate {
 	dc.mutation.SetID(s)
@@ -201,6 +236,14 @@ func (dc *DatabaseCreate) defaults() error {
 		v := database.DefaultUpdatedAt()
 		dc.mutation.SetUpdatedAt(v)
 	}
+	if _, ok := dc.mutation.Status(); !ok {
+		v := database.DefaultStatus
+		dc.mutation.SetStatus(v)
+	}
+	if _, ok := dc.mutation.Provider(); !ok {
+		v := database.DefaultProvider
+		dc.mutation.SetProvider(v)
+	}
 	if _, ok := dc.mutation.ID(); !ok {
 		if database.DefaultID == nil {
 			return fmt.Errorf("generated: uninitialized database.DefaultID (forgotten import generated/runtime?)")
@@ -235,6 +278,30 @@ func (dc *DatabaseCreate) check() error {
 	if v, ok := dc.mutation.Dsn(); ok {
 		if err := database.DsnValidator(v); err != nil {
 			return &ValidationError{Name: "dsn", err: fmt.Errorf(`generated: validator failed for field "Database.dsn": %w`, err)}
+		}
+	}
+	if _, ok := dc.mutation.Token(); !ok {
+		return &ValidationError{Name: "token", err: errors.New(`generated: missing required field "Database.token"`)}
+	}
+	if v, ok := dc.mutation.Token(); ok {
+		if err := database.TokenValidator(v); err != nil {
+			return &ValidationError{Name: "token", err: fmt.Errorf(`generated: validator failed for field "Database.token": %w`, err)}
+		}
+	}
+	if _, ok := dc.mutation.Status(); !ok {
+		return &ValidationError{Name: "status", err: errors.New(`generated: missing required field "Database.status"`)}
+	}
+	if v, ok := dc.mutation.Status(); ok {
+		if err := database.StatusValidator(v); err != nil {
+			return &ValidationError{Name: "status", err: fmt.Errorf(`generated: validator failed for field "Database.status": %w`, err)}
+		}
+	}
+	if _, ok := dc.mutation.Provider(); !ok {
+		return &ValidationError{Name: "provider", err: errors.New(`generated: missing required field "Database.provider"`)}
+	}
+	if v, ok := dc.mutation.Provider(); ok {
+		if err := database.ProviderValidator(v); err != nil {
+			return &ValidationError{Name: "provider", err: fmt.Errorf(`generated: validator failed for field "Database.provider": %w`, err)}
 		}
 	}
 	return nil
@@ -312,6 +379,18 @@ func (dc *DatabaseCreate) createSpec() (*Database, *sqlgraph.CreateSpec) {
 	if value, ok := dc.mutation.Dsn(); ok {
 		_spec.SetField(database.FieldDsn, field.TypeString, value)
 		_node.Dsn = value
+	}
+	if value, ok := dc.mutation.Token(); ok {
+		_spec.SetField(database.FieldToken, field.TypeString, value)
+		_node.Token = value
+	}
+	if value, ok := dc.mutation.Status(); ok {
+		_spec.SetField(database.FieldStatus, field.TypeEnum, value)
+		_node.Status = value
+	}
+	if value, ok := dc.mutation.Provider(); ok {
+		_spec.SetField(database.FieldProvider, field.TypeEnum, value)
+		_node.Provider = value
 	}
 	return _node, _spec
 }

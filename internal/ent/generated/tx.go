@@ -14,6 +14,8 @@ type Tx struct {
 	config
 	// Database is the client for interacting with the Database builders.
 	Database *DatabaseClient
+	// Group is the client for interacting with the Group builders.
+	Group *GroupClient
 
 	// lazily loaded.
 	client     *Client
@@ -146,6 +148,7 @@ func (tx *Tx) Client() *Client {
 
 func (tx *Tx) init() {
 	tx.Database = NewDatabaseClient(tx.config)
+	tx.Group = NewGroupClient(tx.config)
 }
 
 // txDriver wraps the given dialect.Tx with a nop dialect.Driver implementation.

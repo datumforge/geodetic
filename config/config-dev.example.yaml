@@ -13,3 +13,8 @@ db:
   driverName: libsql
   primaryDbSource: "file:geodetic.db"
   multiWrite: false
+
+turso:
+  base_url: ""
+  org_name: "datum"
+  token: ""

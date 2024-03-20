@@ -9,6 +9,7 @@ import (
 	"go.uber.org/zap"
 
 	"github.com/datumforge/datum/pkg/cache"
+	"github.com/datumforge/go-turso"
 
 	ent "github.com/datumforge/geodetic/internal/ent/generated"
 	"github.com/datumforge/geodetic/internal/entdb"
@@ -38,9 +39,6 @@ func serve(ctx context.Context) error {
 		err error
 	)
 
-	// create ent dependency injection
-	entOpts := []ent.Option{ent.Logger(*logger)}
-
 	serverOpts := []serveropts.ServerOption{}
 	serverOpts = append(serverOpts,
 		serveropts.WithConfigProvider(&config.ConfigProviderWithRefresh{}),
@@ -55,6 +53,14 @@ func serve(ctx context.Context) error {
 	if err != nil {
 		logger.Fatalw("failed to initialize tracer", "error", err)
 	}
+
+	tursoClient, err := turso.NewClient(so.Config.Settings.Turso)
+	if err != nil {
+		logger.Fatalw("failed to initialize turso client", "error", err)
+	}
+
+	// create ent dependency injection
+	entOpts := []ent.Option{ent.Logger(*logger), ent.Turso(tursoClient)}
 
 	// Setup DB connection
 	entdbClient, dbConfig, err := entdb.NewMultiDriverDBClient(ctx, so.Config.Settings.DB, logger, entOpts)

@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/datumforge/geodetic/internal/ent/generated/database"
+	"github.com/datumforge/geodetic/internal/ent/generated/group"
 	"github.com/datumforge/geodetic/internal/ent/schema"
 )
 
@@ -15,7 +16,9 @@ import (
 func init() {
 	databaseMixin := schema.Database{}.Mixin()
 	databaseMixinHooks0 := databaseMixin[0].Hooks()
+	databaseHooks := schema.Database{}.Hooks()
 	database.Hooks[0] = databaseMixinHooks0[0]
+	database.Hooks[1] = databaseHooks[0]
 	databaseMixinFields0 := databaseMixin[0].Fields()
 	_ = databaseMixinFields0
 	databaseMixinFields2 := databaseMixin[2].Fields()
@@ -44,10 +47,49 @@ func init() {
 	databaseDescDsn := databaseFields[3].Descriptor()
 	// database.DsnValidator is a validator for the "dsn" field. It is called by the builders before save.
 	database.DsnValidator = databaseDescDsn.Validators[0].(func(string) error)
+	// databaseDescToken is the schema descriptor for token field.
+	databaseDescToken := databaseFields[4].Descriptor()
+	// database.TokenValidator is a validator for the "token" field. It is called by the builders before save.
+	database.TokenValidator = databaseDescToken.Validators[0].(func(string) error)
 	// databaseDescID is the schema descriptor for id field.
 	databaseDescID := databaseMixinFields2[0].Descriptor()
 	// database.DefaultID holds the default value on creation for the id field.
 	database.DefaultID = databaseDescID.Default.(func() string)
+	groupMixin := schema.Group{}.Mixin()
+	groupMixinHooks0 := groupMixin[0].Hooks()
+	groupHooks := schema.Group{}.Hooks()
+	group.Hooks[0] = groupMixinHooks0[0]
+	group.Hooks[1] = groupHooks[0]
+	group.Hooks[2] = groupHooks[1]
+	group.Hooks[3] = groupHooks[2]
+	groupMixinFields0 := groupMixin[0].Fields()
+	_ = groupMixinFields0
+	groupMixinFields1 := groupMixin[1].Fields()
+	_ = groupMixinFields1
+	groupFields := schema.Group{}.Fields()
+	_ = groupFields
+	// groupDescCreatedAt is the schema descriptor for created_at field.
+	groupDescCreatedAt := groupMixinFields0[0].Descriptor()
+	// group.DefaultCreatedAt holds the default value on creation for the created_at field.
+	group.DefaultCreatedAt = groupDescCreatedAt.Default.(func() time.Time)
+	// groupDescUpdatedAt is the schema descriptor for updated_at field.
+	groupDescUpdatedAt := groupMixinFields0[1].Descriptor()
+	// group.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	group.DefaultUpdatedAt = groupDescUpdatedAt.Default.(func() time.Time)
+	// group.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	group.UpdateDefaultUpdatedAt = groupDescUpdatedAt.UpdateDefault.(func() time.Time)
+	// groupDescName is the schema descriptor for name field.
+	groupDescName := groupFields[0].Descriptor()
+	// group.NameValidator is a validator for the "name" field. It is called by the builders before save.
+	group.NameValidator = groupDescName.Validators[0].(func(string) error)
+	// groupDescToken is the schema descriptor for token field.
+	groupDescToken := groupFields[4].Descriptor()
+	// group.TokenValidator is a validator for the "token" field. It is called by the builders before save.
+	group.TokenValidator = groupDescToken.Validators[0].(func(string) error)
+	// groupDescID is the schema descriptor for id field.
+	groupDescID := groupMixinFields1[0].Descriptor()
+	// group.DefaultID holds the default value on creation for the id field.
+	group.DefaultID = groupDescID.Default.(func() string)
 }
 
 const (

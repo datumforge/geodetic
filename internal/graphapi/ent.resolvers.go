@@ -8,6 +8,7 @@ import (
 	"context"
 	"fmt"
 
+	"entgo.io/contrib/entgql"
 	"github.com/datumforge/geodetic/internal/ent/generated"
 )
 
@@ -19,6 +20,11 @@ func (r *queryResolver) Node(ctx context.Context, id string) (generated.Noder, e
 // Nodes is the resolver for the nodes field.
 func (r *queryResolver) Nodes(ctx context.Context, ids []string) ([]generated.Noder, error) {
 	panic(fmt.Errorf("not implemented: Nodes - nodes"))
+}
+
+// Groups is the resolver for the groups field.
+func (r *queryResolver) Groups(ctx context.Context, after *entgql.Cursor[string], first *int, before *entgql.Cursor[string], last *int, where *generated.GroupWhereInput) (*generated.GroupConnection, error) {
+	panic(fmt.Errorf("not implemented: Groups - groups"))
 }
 
 // Query returns QueryResolver implementation.

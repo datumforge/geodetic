@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"entgo.io/ent/dialect/sql"
+	"github.com/datumforge/geodetic/internal/ent/enums"
 	"github.com/datumforge/geodetic/internal/ent/generated/predicate"
 )
 
@@ -112,6 +113,11 @@ func Geo(v string) predicate.Database {
 // Dsn applies equality check predicate on the "dsn" field. It's identical to DsnEQ.
 func Dsn(v string) predicate.Database {
 	return predicate.Database(sql.FieldEQ(FieldDsn, v))
+}
+
+// Token applies equality check predicate on the "token" field. It's identical to TokenEQ.
+func Token(v string) predicate.Database {
+	return predicate.Database(sql.FieldEQ(FieldToken, v))
 }
 
 // CreatedAtEQ applies the EQ predicate on the "created_at" field.
@@ -757,6 +763,131 @@ func DsnEqualFold(v string) predicate.Database {
 // DsnContainsFold applies the ContainsFold predicate on the "dsn" field.
 func DsnContainsFold(v string) predicate.Database {
 	return predicate.Database(sql.FieldContainsFold(FieldDsn, v))
+}
+
+// TokenEQ applies the EQ predicate on the "token" field.
+func TokenEQ(v string) predicate.Database {
+	return predicate.Database(sql.FieldEQ(FieldToken, v))
+}
+
+// TokenNEQ applies the NEQ predicate on the "token" field.
+func TokenNEQ(v string) predicate.Database {
+	return predicate.Database(sql.FieldNEQ(FieldToken, v))
+}
+
+// TokenIn applies the In predicate on the "token" field.
+func TokenIn(vs ...string) predicate.Database {
+	return predicate.Database(sql.FieldIn(FieldToken, vs...))
+}
+
+// TokenNotIn applies the NotIn predicate on the "token" field.
+func TokenNotIn(vs ...string) predicate.Database {
+	return predicate.Database(sql.FieldNotIn(FieldToken, vs...))
+}
+
+// TokenGT applies the GT predicate on the "token" field.
+func TokenGT(v string) predicate.Database {
+	return predicate.Database(sql.FieldGT(FieldToken, v))
+}
+
+// TokenGTE applies the GTE predicate on the "token" field.
+func TokenGTE(v string) predicate.Database {
+	return predicate.Database(sql.FieldGTE(FieldToken, v))
+}
+
+// TokenLT applies the LT predicate on the "token" field.
+func TokenLT(v string) predicate.Database {
+	return predicate.Database(sql.FieldLT(FieldToken, v))
+}
+
+// TokenLTE applies the LTE predicate on the "token" field.
+func TokenLTE(v string) predicate.Database {
+	return predicate.Database(sql.FieldLTE(FieldToken, v))
+}
+
+// TokenContains applies the Contains predicate on the "token" field.
+func TokenContains(v string) predicate.Database {
+	return predicate.Database(sql.FieldContains(FieldToken, v))
+}
+
+// TokenHasPrefix applies the HasPrefix predicate on the "token" field.
+func TokenHasPrefix(v string) predicate.Database {
+	return predicate.Database(sql.FieldHasPrefix(FieldToken, v))
+}
+
+// TokenHasSuffix applies the HasSuffix predicate on the "token" field.
+func TokenHasSuffix(v string) predicate.Database {
+	return predicate.Database(sql.FieldHasSuffix(FieldToken, v))
+}
+
+// TokenEqualFold applies the EqualFold predicate on the "token" field.
+func TokenEqualFold(v string) predicate.Database {
+	return predicate.Database(sql.FieldEqualFold(FieldToken, v))
+}
+
+// TokenContainsFold applies the ContainsFold predicate on the "token" field.
+func TokenContainsFold(v string) predicate.Database {
+	return predicate.Database(sql.FieldContainsFold(FieldToken, v))
+}
+
+// StatusEQ applies the EQ predicate on the "status" field.
+func StatusEQ(v enums.DatabaseStatus) predicate.Database {
+	vc := v
+	return predicate.Database(sql.FieldEQ(FieldStatus, vc))
+}
+
+// StatusNEQ applies the NEQ predicate on the "status" field.
+func StatusNEQ(v enums.DatabaseStatus) predicate.Database {
+	vc := v
+	return predicate.Database(sql.FieldNEQ(FieldStatus, vc))
+}
+
+// StatusIn applies the In predicate on the "status" field.
+func StatusIn(vs ...enums.DatabaseStatus) predicate.Database {
+	v := make([]any, len(vs))
+	for i := range v {
+		v[i] = vs[i]
+	}
+	return predicate.Database(sql.FieldIn(FieldStatus, v...))
+}
+
+// StatusNotIn applies the NotIn predicate on the "status" field.
+func StatusNotIn(vs ...enums.DatabaseStatus) predicate.Database {
+	v := make([]any, len(vs))
+	for i := range v {
+		v[i] = vs[i]
+	}
+	return predicate.Database(sql.FieldNotIn(FieldStatus, v...))
+}
+
+// ProviderEQ applies the EQ predicate on the "provider" field.
+func ProviderEQ(v enums.DatabaseProvider) predicate.Database {
+	vc := v
+	return predicate.Database(sql.FieldEQ(FieldProvider, vc))
+}
+
+// ProviderNEQ applies the NEQ predicate on the "provider" field.
+func ProviderNEQ(v enums.DatabaseProvider) predicate.Database {
+	vc := v
+	return predicate.Database(sql.FieldNEQ(FieldProvider, vc))
+}
+
+// ProviderIn applies the In predicate on the "provider" field.
+func ProviderIn(vs ...enums.DatabaseProvider) predicate.Database {
+	v := make([]any, len(vs))
+	for i := range v {
+		v[i] = vs[i]
+	}
+	return predicate.Database(sql.FieldIn(FieldProvider, v...))
+}
+
+// ProviderNotIn applies the NotIn predicate on the "provider" field.
+func ProviderNotIn(vs ...enums.DatabaseProvider) predicate.Database {
+	v := make([]any, len(vs))
+	for i := range v {
+		v[i] = vs[i]
+	}
+	return predicate.Database(sql.FieldNotIn(FieldProvider, v...))
 }
 
 // And groups predicates with the AND operator between them.
