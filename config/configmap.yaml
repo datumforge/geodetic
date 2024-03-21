@@ -1,0 +1,88 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "common.names.fullname" . -}}-config
+  {{ $labels := include "common.tplvalues.merge" (dict "values" ( list .Values.api.commonLabels (include "common.labels.standard" .) ) "context" . ) }}
+  labels: {{- include "common.tplvalues.render" ( dict "value" $labels "context" $) | nindent 4 }}   
+  {{- if .Values.api.commonAnnotations }}
+  {{- $annotations := include "common.tplvalues.merge" ( dict "values" ( list .Values.api.commonAnnotations ) "context" . ) }}
+  annotations: {{- include "common.tplvalues.render" ( dict "value" $annotations "context" $) | nindent 4 }}
+  {{- end }}
+data:
+  GEODETIC_REFRESH_INTERVAL: {{ .Values.geodetic.refresh_interval | 10m }}
+  GEODETIC_SERVER_DEBUG: {{ .Values.geodetic.server.debug | false }}
+  GEODETIC_SERVER_DEV: {{ .Values.geodetic.server.dev | false }}
+  GEODETIC_SERVER_LISTEN: {{ .Values.geodetic.server.listen | ":1337" }}
+  GEODETIC_SERVER_SHUTDOWN_GRACE_PERIOD: {{ .Values.geodetic.server.shutdown_grace_period | 10s }}
+  GEODETIC_SERVER_READ_TIMEOUT: {{ .Values.geodetic.server.read_timeout | 15s }}
+  GEODETIC_SERVER_WRITE_TIMEOUT: {{ .Values.geodetic.server.write_timeout | 15s }}
+  GEODETIC_SERVER_IDLE_TIMEOUT: {{ .Values.geodetic.server.idle_timeout | 30s }}
+  GEODETIC_SERVER_READ_HEADER_TIMEOUT: {{ .Values.geodetic.server.read_header_timeout | 2s }}
+  GEODETIC_SERVER_TLS_ENABLED: {{ .Values.geodetic.server.tls.enabled | false }}
+  GEODETIC_SERVER_TLS_CERT_FILE: {{ .Values.geodetic.server.tls.cert_file | "server.crt" }}
+  GEODETIC_SERVER_TLS_CERT_KEY: {{ .Values.geodetic.server.tls.cert_key | "server.key" }}
+  GEODETIC_SERVER_TLS_AUTO_CERT: {{ .Values.geodetic.server.tls.auto_cert | false }}
+  GEODETIC_SERVER_CORS_ENABLED: {{ .Values.geodetic.server.cors.enabled | true }}
+  GEODETIC_SERVER_CORS_PREFIXES: {{ .Values.geodetic.server.cors.prefixes }}
+  GEODETIC_SERVER_CORS_ALLOWORIGINS: {{ .Values.geodetic.server.cors.allowOrigins }}
+  GEODETIC_SERVER_CORS_COOKIEINSECURE: {{ .Values.geodetic.server.cors.cookieInsecure }}
+  GEODETIC_SERVER_SECURE_ENABLED: {{ .Values.geodetic.server.secure.enabled | true }}
+  GEODETIC_SERVER_SECURE_XSSPROTECTION: {{ .Values.geodetic.server.secure.xssprotection | "1; mode=block" }}
+  GEODETIC_SERVER_SECURE_CONTENTTYPENOSNIFF: {{ .Values.geodetic.server.secure.contenttypenosniff | "nosniff" }}
+  GEODETIC_SERVER_SECURE_XFRAMEOPTIONS: {{ .Values.geodetic.server.secure.xframeoptions | "SAMEORIGIN" }}
+  GEODETIC_SERVER_SECURE_HSTSPRELOADENABLED: {{ .Values.geodetic.server.secure.hstspreloadenabled | false }}
+  GEODETIC_SERVER_SECURE_HSTSMAXAGE: {{ .Values.geodetic.server.secure.hstsmaxage | 31536000 }}
+  GEODETIC_SERVER_SECURE_CONTENTSECURITYPOLICY: {{ .Values.geodetic.server.secure.contentsecuritypolicy | "default-src 'self'" }}
+  GEODETIC_SERVER_SECURE_REFERRERPOLICY: {{ .Values.geodetic.server.secure.referrerpolicy | "same-origin" }}
+  GEODETIC_SERVER_SECURE_CSPREPORTONLY: {{ .Values.geodetic.server.secure.cspreportonly | false }}
+  GEODETIC_SERVER_REDIRECTS_ENABLED: {{ .Values.geodetic.server.redirects.enabled | true }}
+  GEODETIC_SERVER_REDIRECTS_REDIRECTS: {{ .Values.geodetic.server.redirects.redirects }}
+  GEODETIC_SERVER_REDIRECTS_CODE: {{ .Values.geodetic.server.redirects.code }}
+  GEODETIC_SERVER_CACHECONTROL_ENABLED: {{ .Values.geodetic.server.cachecontrol.enabled | true }}
+  GEODETIC_SERVER_CACHECONTROL_NOCACHEHEADERS: {{ .Values.geodetic.server.cachecontrol.noCacheHeaders }}
+  GEODETIC_SERVER_CACHECONTROL_ETAGHEADERS: {{ .Values.geodetic.server.cachecontrol.etagHeaders }}
+  GEODETIC_SERVER_MIME_ENABLED: {{ .Values.geodetic.server.mime.enabled | true }}
+  GEODETIC_SERVER_MIME_MIMETYPESFILE: {{ .Values.geodetic.server.mime.mimeTypesFile }}
+  GEODETIC_SERVER_MIME_DEFAULTCONTENTTYPE: {{ .Values.geodetic.server.mime.defaultContentType | "application/data" }}
+  GEODETIC_DB_DEBUG: {{ .Values.geodetic.db.debug | false }}
+  GEODETIC_DB_DATABASENAME: {{ .Values.geodetic.db.databaseName | "datum" }}
+  GEODETIC_DB_DRIVERNAME: {{ .Values.geodetic.db.driverName | "libsql" }}
+  GEODETIC_DB_MULTIWRITE: {{ .Values.geodetic.db.multiWrite | false }}
+  GEODETIC_DB_PRIMARYDBSOURCE: {{ .Values.geodetic.db.primaryDbSource | "file:datum.db" }}
+  GEODETIC_DB_SECONDARYDBSOURCE: {{ .Values.geodetic.db.secondaryDbSource | "file:backup.db" }}
+  GEODETIC_DB_CACHETTL: {{ .Values.geodetic.db.cacheTTL | 1s }}
+  GEODETIC_DB_RUNMIGRATIONS: {{ .Values.geodetic.db.runMigrations | true }}
+  GEODETIC_TURSO_TOKEN: {{ .Values.geodetic.turso.token }}
+  GEODETIC_TURSO_BASE_URL: {{ .Values.geodetic.turso.base_url | "https://api.turso.tech" }}
+  GEODETIC_TURSO_ORG_NAME: {{ .Values.geodetic.turso.org_name }}
+  GEODETIC_REDIS_ENABLED: {{ .Values.geodetic.redis.enabled | true }}
+  GEODETIC_REDIS_ADDRESS: {{ .Values.geodetic.redis.address | "localhost:6379" }}
+  GEODETIC_REDIS_NAME: {{ .Values.geodetic.redis.name | "datum" }}
+  GEODETIC_REDIS_USERNAME: {{ .Values.geodetic.redis.username }}
+  GEODETIC_REDIS_PASSWORD: {{ .Values.geodetic.redis.password }}
+  GEODETIC_REDIS_DB: {{ .Values.geodetic.redis.db | 0 }}
+  GEODETIC_REDIS_DIALTIMEOUT: {{ .Values.geodetic.redis.dialTimeout | 5s }}
+  GEODETIC_REDIS_READTIMEOUT: {{ .Values.geodetic.redis.readTimeout | 0 }}
+  GEODETIC_REDIS_WRITETIMEOUT: {{ .Values.geodetic.redis.writeTimeout | 0 }}
+  GEODETIC_REDIS_MAXRETRIES: {{ .Values.geodetic.redis.maxRetries | 3 }}
+  GEODETIC_REDIS_MINIDLECONNS: {{ .Values.geodetic.redis.minIdleConns | 0 }}
+  GEODETIC_REDIS_MAXIDLECONNS: {{ .Values.geodetic.redis.maxIdleConns | 0 }}
+  GEODETIC_REDIS_MAXACTIVECONNS: {{ .Values.geodetic.redis.maxActiveConns | 0 }}
+  GEODETIC_TRACER_ENABLED: {{ .Values.geodetic.tracer.enabled | false }}
+  GEODETIC_TRACER_PROVIDER: {{ .Values.geodetic.tracer.provider | "stdout" }}
+  GEODETIC_TRACER_ENVIRONMENT: {{ .Values.geodetic.tracer.environment | "development" }}
+  GEODETIC_TRACER_STDOUT_PRETTY: {{ .Values.geodetic.tracer.stdout.pretty | true }}
+  GEODETIC_TRACER_STDOUT_DISABLETIMESTAMP: {{ .Values.geodetic.tracer.stdout.disableTimestamp | false }}
+  GEODETIC_TRACER_OTLP_ENDPOINT: {{ .Values.geodetic.tracer.otlp.endpoint | "localhost:4317" }}
+  GEODETIC_TRACER_OTLP_INSECURE: {{ .Values.geodetic.tracer.otlp.insecure | true }}
+  GEODETIC_TRACER_OTLP_CERTIFICATE: {{ .Values.geodetic.tracer.otlp.certificate }}
+  GEODETIC_TRACER_OTLP_HEADERS: {{ .Values.geodetic.tracer.otlp.headers }}
+  GEODETIC_TRACER_OTLP_COMPRESSION: {{ .Values.geodetic.tracer.otlp.compression }}
+  GEODETIC_TRACER_OTLP_TIMEOUT: {{ .Values.geodetic.tracer.otlp.timeout | 10s }}
+  GEODETIC_SESSIONS_SIGNINGKEY: {{ .Values.geodetic.sessions.signingKey | "my-signing-secret" }}
+  GEODETIC_SESSIONS_ENCRYPTIONKEY: {{ .Values.geodetic.sessions.encryptionKey | "encryptionsecret" }}
+  GEODETIC_RATELIMIT_ENABLED: {{ .Values.geodetic.ratelimit.enabled | false }}
+  GEODETIC_RATELIMIT_LIMIT: {{ .Values.geodetic.ratelimit.limit | 10 }}
+  GEODETIC_RATELIMIT_BURST: {{ .Values.geodetic.ratelimit.burst | 30 }}
+  GEODETIC_RATELIMIT_EXPIRES: {{ .Values.geodetic.ratelimit.expires | 10m }}
