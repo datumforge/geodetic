@@ -1,11 +1,11 @@
 package schema
 
 import (
-	"entgo.io/contrib/entgql"
-	"entgo.io/ent"
-	"entgo.io/ent/schema"
+    "entgo.io/contrib/entgql"
+    "entgo.io/ent"
+    "entgo.io/ent/schema"
 
-	emixin "github.com/datumforge/entx/mixin"
+    emixin "github.com/datumforge/entx/mixin"
 
     "github.com/datumforge/geodetic/internal/ent/mixin"
 )
@@ -25,27 +25,27 @@ func ({{ . }}) Fields() []ent.Field {
 // Mixin of the {{ . }}
 func ({{ . }}) Mixin() []ent.Mixin {
     return []ent.Mixin{
-		emixin.AuditMixin{},
-		emixin.IDMixin{},
-		mixin.SoftDeleteMixin{},
+        emixin.AuditMixin{},
+        emixin.IDMixin{},
+        mixin.SoftDeleteMixin{},
     }
 }
 
 // Edges of the {{ . }}
 func ({{ . }}) Edges() []ent.Edge {
-	return []ent.Edge{
-		// Edges go here
-	}
+    return []ent.Edge{
+        // Edges go here
+    }
 }
 
 // Annotations of the {{ . }}
 func ({{ . }}) Annotations() []schema.Annotation {
-	return []schema.Annotation{
-		entgql.QueryField(),
-		entgql.RelayConnection(),
-		entgql.Mutations(entgql.MutationCreate(), (entgql.MutationUpdate())),
+    return []schema.Annotation{
+        entgql.QueryField(),
+        entgql.RelayConnection(),
+        entgql.Mutations(entgql.MutationCreate(), (entgql.MutationUpdate())),
         // the above annotations create all the graphQL goodness; if you need the schema only and not the endpoints, use the below annotation instead
         // if you do not need the graphql bits, also be certain to add an exclusion to scripts/files_to_skip.txt
-		entgql.Skip(entgql.SkipAll),
-	}
+        entgql.Skip(entgql.SkipAll),
+    }
 }

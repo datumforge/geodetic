@@ -15,6 +15,6 @@ db:
   multiWrite: false
 
 turso:
-  base_url: ""
+  base_url: https://api.turso.tech
   org_name: "datum"
   token: ""
