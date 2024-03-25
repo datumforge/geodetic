@@ -2,6 +2,8 @@ module github.com/datumforge/geodetic
 
 go 1.22.1
 
+replace github.com/datumforge/go-turso => /Users/sarahfunkhouser/go/src/github.com/datumforge/go-turso
+
 require (
 	ariga.io/entcache v0.1.0
 	entgo.io/contrib v0.4.5
@@ -9,6 +11,7 @@ require (
 	github.com/99designs/gqlgen v0.17.45
 	github.com/TylerBrock/colorjson v0.0.0-20200706003622-8a50f05110d2
 	github.com/Yamashou/gqlgenc v0.19.3
+	github.com/brianvoe/gofakeit/v7 v7.0.2
 	github.com/datumforge/datum v0.4.7
 	github.com/datumforge/echo-prometheus/v5 v5.0.0-20231205192725-e697eaa86d58
 	github.com/datumforge/echox v0.0.0-20240312185605-fdb5a150410e

@@ -209,6 +209,7 @@ func GetHeaders(s interface{}, prefix string) []string {
 	headers := []string{}
 	val := reflect.Indirect(reflect.ValueOf(s))
 
+	// ensure we have a struct otherwise this will panic
 	if val.Kind() == reflect.Struct {
 		for i := range val.NumField() { //nolint:typecheck // go 1.22+ allows this, linter is wrong
 			if val.Type().Field(i).Type.Kind() == reflect.Struct {
@@ -216,11 +217,6 @@ func GetHeaders(s interface{}, prefix string) []string {
 			}
 
 			headers = append(headers, fmt.Sprintf("%s%s", prefix, val.Type().Field(i).Name))
-		}
-	} else {
-		// if the struct is a map, get the keys
-		for k := range val.Interface().(map[string]interface{}) {
-			headers = append(headers, fmt.Sprintf("%s%s", prefix, k))
 		}
 	}
 
@@ -231,6 +227,7 @@ func GetHeaders(s interface{}, prefix string) []string {
 func GetFields(i interface{}) (res []string) {
 	v := reflect.ValueOf(i)
 
+	// ensure we have a struct otherwise this will panic
 	if v.Kind() == reflect.Struct {
 		for j := range v.NumField() { //nolint:typecheck // go 1.22+ allows this, linter is wrong
 			t := v.Field(j).Type()
@@ -251,24 +248,22 @@ func GetFields(i interface{}) (res []string) {
 
 			res = append(res, val)
 		}
-	} else {
-		// if the struct is a map, get the keys
-		for _, val := range v.Interface().(map[string]interface{}) {
-			res = append(res, val.(string))
-		}
 	}
 
 	return
 }
 
+// GraphResponse is the response from the graph api containing a list of edges
 type GraphResponse struct {
 	Edges []Edge `json:"edges"`
 }
 
+// Edge is a single edge in the graph response
 type Edge struct {
 	Node interface{} `json:"node"`
 }
 
+// RowsTablePrint prints a table to the console with multiple rows using a map[string]interface{} as the row data
 func RowsTablePrint(resp GraphResponse) error {
 	// check if there are any groups, otherwise we have nothing to print
 	if len(resp.Edges) > 0 {
@@ -278,6 +273,7 @@ func RowsTablePrint(resp GraphResponse) error {
 
 		headers := GetHeaders(rows[0].Node, "")
 
+		// get the field values using the header names as the key to ensure the order is correct
 		for _, r := range rows {
 			rowMap := r.Node.(map[string]interface{})
 			row := []string{}

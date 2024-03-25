@@ -10,6 +10,7 @@ import (
 
 	"entgo.io/contrib/entgql"
 	"github.com/datumforge/geodetic/internal/ent/generated"
+	_ "github.com/datumforge/geodetic/internal/ent/generated/runtime"
 )
 
 // Node is the resolver for the node field.
