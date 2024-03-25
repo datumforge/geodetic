@@ -109,6 +109,9 @@
                   "dsn": {
                     "type": "string"
                   },
+                  "group_id": {
+                    "type": "string"
+                  },
                   "token": {
                     "type": "string"
                   },
@@ -129,15 +132,19 @@
                       "TURSO"
                     ],
                     "default": "LOCAL"
+                  },
+                  "group": {
+                    "type": "string"
                   }
                 },
                 "required": [
                   "organization_id",
                   "name",
                   "dsn",
-                  "token",
+                  "group_id",
                   "status",
-                  "provider"
+                  "provider",
+                  "group"
                 ]
               }
             }
@@ -284,6 +291,9 @@
                   "dsn": {
                     "type": "string"
                   },
+                  "group_id": {
+                    "type": "string"
+                  },
                   "token": {
                     "type": "string"
                   },
@@ -304,6 +314,9 @@
                       "TURSO"
                     ],
                     "default": "LOCAL"
+                  },
+                  "group": {
+                    "type": "string"
                   }
                 }
               }
@@ -318,6 +331,51 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/Database"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/400"
+          },
+          "404": {
+            "$ref": "#/components/responses/404"
+          },
+          "409": {
+            "$ref": "#/components/responses/409"
+          },
+          "500": {
+            "$ref": "#/components/responses/500"
+          }
+        }
+      }
+    },
+    "/databases/{id}/group": {
+      "get": {
+        "tags": [
+          "Database"
+        ],
+        "summary": "Find the attached Group",
+        "description": "Find the attached Group of the Database with the given ID",
+        "operationId": "readDatabaseGroup",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID of the Database",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Group attached to Database with requested ID was found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Group"
                 }
               }
             }
@@ -434,11 +492,16 @@
                       "APAC"
                     ],
                     "default": "AMER"
+                  },
+                  "databases": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
                   }
                 },
                 "required": [
                   "name",
-                  "token",
                   "region"
                 ]
               }
@@ -600,6 +663,12 @@
                       "APAC"
                     ],
                     "default": "AMER"
+                  },
+                  "databases": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
                   }
                 }
               }
@@ -614,6 +683,70 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/Group"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/400"
+          },
+          "404": {
+            "$ref": "#/components/responses/404"
+          },
+          "409": {
+            "$ref": "#/components/responses/409"
+          },
+          "500": {
+            "$ref": "#/components/responses/500"
+          }
+        }
+      }
+    },
+    "/groups/{id}/databases": {
+      "get": {
+        "tags": [
+          "Group"
+        ],
+        "summary": "List attached Databases",
+        "description": "List attached Databases.",
+        "operationId": "listGroupDatabases",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID of the Group",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "what page to render",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "itemsPerPage",
+            "in": "query",
+            "description": "item count to render per page",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "result Groups list",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Database"
+                  }
                 }
               }
             }
@@ -675,6 +808,9 @@
           "dsn": {
             "type": "string"
           },
+          "group_id": {
+            "type": "string"
+          },
           "token": {
             "type": "string"
           },
@@ -695,6 +831,9 @@
               "TURSO"
             ],
             "default": "LOCAL"
+          },
+          "group": {
+            "$ref": "#/components/schemas/Group"
           }
         },
         "required": [
@@ -702,9 +841,10 @@
           "organization_id",
           "name",
           "dsn",
-          "token",
+          "group_id",
           "status",
-          "provider"
+          "provider",
+          "group"
         ]
       },
       "Group": {
@@ -760,12 +900,17 @@
               "APAC"
             ],
             "default": "AMER"
+          },
+          "databases": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Database"
+            }
           }
         },
         "required": [
           "id",
           "name",
-          "token",
           "region"
         ]
       }

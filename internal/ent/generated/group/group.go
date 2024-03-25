@@ -8,6 +8,7 @@ import (
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
+	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/datumforge/geodetic/internal/ent/enums"
 )
@@ -41,8 +42,17 @@ const (
 	FieldToken = "token"
 	// FieldRegion holds the string denoting the region field in the database.
 	FieldRegion = "region"
+	// EdgeDatabases holds the string denoting the databases edge name in mutations.
+	EdgeDatabases = "databases"
 	// Table holds the table name of the group in the database.
 	Table = "groups"
+	// DatabasesTable is the table that holds the databases relation/edge.
+	DatabasesTable = "databases"
+	// DatabasesInverseTable is the table name for the Database entity.
+	// It exists in this package in order to avoid circular dependency with the "database" package.
+	DatabasesInverseTable = "databases"
+	// DatabasesColumn is the table column denoting the databases relation/edge.
+	DatabasesColumn = "group_id"
 )
 
 // Columns holds all SQL columns for group fields.
@@ -87,8 +97,6 @@ var (
 	UpdateDefaultUpdatedAt func() time.Time
 	// NameValidator is a validator for the "name" field. It is called by the builders before save.
 	NameValidator func(string) error
-	// TokenValidator is a validator for the "token" field. It is called by the builders before save.
-	TokenValidator func(string) error
 	// DefaultID holds the default value on creation for the "id" field.
 	DefaultID func() string
 )
@@ -166,6 +174,27 @@ func ByToken(opts ...sql.OrderTermOption) OrderOption {
 // ByRegion orders the results by the region field.
 func ByRegion(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldRegion, opts...).ToFunc()
+}
+
+// ByDatabasesCount orders the results by databases count.
+func ByDatabasesCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newDatabasesStep(), opts...)
+	}
+}
+
+// ByDatabases orders the results by databases terms.
+func ByDatabases(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newDatabasesStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+func newDatabasesStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(DatabasesInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, DatabasesTable, DatabasesColumn),
+	)
 }
 
 var (

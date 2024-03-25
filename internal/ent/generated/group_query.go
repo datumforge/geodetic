@@ -4,12 +4,14 @@ package generated
 
 import (
 	"context"
+	"database/sql/driver"
 	"fmt"
 	"math"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/datumforge/geodetic/internal/ent/generated/database"
 	"github.com/datumforge/geodetic/internal/ent/generated/group"
 	"github.com/datumforge/geodetic/internal/ent/generated/predicate"
 
@@ -19,12 +21,14 @@ import (
 // GroupQuery is the builder for querying Group entities.
 type GroupQuery struct {
 	config
-	ctx        *QueryContext
-	order      []group.OrderOption
-	inters     []Interceptor
-	predicates []predicate.Group
-	modifiers  []func(*sql.Selector)
-	loadTotal  []func(context.Context, []*Group) error
+	ctx                *QueryContext
+	order              []group.OrderOption
+	inters             []Interceptor
+	predicates         []predicate.Group
+	withDatabases      *DatabaseQuery
+	modifiers          []func(*sql.Selector)
+	loadTotal          []func(context.Context, []*Group) error
+	withNamedDatabases map[string]*DatabaseQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -59,6 +63,31 @@ func (gq *GroupQuery) Unique(unique bool) *GroupQuery {
 func (gq *GroupQuery) Order(o ...group.OrderOption) *GroupQuery {
 	gq.order = append(gq.order, o...)
 	return gq
+}
+
+// QueryDatabases chains the current query on the "databases" edge.
+func (gq *GroupQuery) QueryDatabases() *DatabaseQuery {
+	query := (&DatabaseClient{config: gq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := gq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := gq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(group.Table, group.FieldID, selector),
+			sqlgraph.To(database.Table, database.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, group.DatabasesTable, group.DatabasesColumn),
+		)
+		schemaConfig := gq.schemaConfig
+		step.To.Schema = schemaConfig.Database
+		step.Edge.Schema = schemaConfig.Database
+		fromU = sqlgraph.SetNeighbors(gq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
 }
 
 // First returns the first Group entity from the query.
@@ -248,15 +277,27 @@ func (gq *GroupQuery) Clone() *GroupQuery {
 		return nil
 	}
 	return &GroupQuery{
-		config:     gq.config,
-		ctx:        gq.ctx.Clone(),
-		order:      append([]group.OrderOption{}, gq.order...),
-		inters:     append([]Interceptor{}, gq.inters...),
-		predicates: append([]predicate.Group{}, gq.predicates...),
+		config:        gq.config,
+		ctx:           gq.ctx.Clone(),
+		order:         append([]group.OrderOption{}, gq.order...),
+		inters:        append([]Interceptor{}, gq.inters...),
+		predicates:    append([]predicate.Group{}, gq.predicates...),
+		withDatabases: gq.withDatabases.Clone(),
 		// clone intermediate query.
 		sql:  gq.sql.Clone(),
 		path: gq.path,
 	}
+}
+
+// WithDatabases tells the query-builder to eager-load the nodes that are connected to
+// the "databases" edge. The optional arguments are used to configure the query builder of the edge.
+func (gq *GroupQuery) WithDatabases(opts ...func(*DatabaseQuery)) *GroupQuery {
+	query := (&DatabaseClient{config: gq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	gq.withDatabases = query
+	return gq
 }
 
 // GroupBy is used to group vertices by one or more fields/columns.
@@ -335,8 +376,11 @@ func (gq *GroupQuery) prepareQuery(ctx context.Context) error {
 
 func (gq *GroupQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Group, error) {
 	var (
-		nodes = []*Group{}
-		_spec = gq.querySpec()
+		nodes       = []*Group{}
+		_spec       = gq.querySpec()
+		loadedTypes = [1]bool{
+			gq.withDatabases != nil,
+		}
 	)
 	_spec.ScanValues = func(columns []string) ([]any, error) {
 		return (*Group).scanValues(nil, columns)
@@ -344,6 +388,7 @@ func (gq *GroupQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Group,
 	_spec.Assign = func(columns []string, values []any) error {
 		node := &Group{config: gq.config}
 		nodes = append(nodes, node)
+		node.Edges.loadedTypes = loadedTypes
 		return node.assignValues(columns, values)
 	}
 	_spec.Node.Schema = gq.schemaConfig.Group
@@ -360,12 +405,57 @@ func (gq *GroupQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Group,
 	if len(nodes) == 0 {
 		return nodes, nil
 	}
+	if query := gq.withDatabases; query != nil {
+		if err := gq.loadDatabases(ctx, query, nodes,
+			func(n *Group) { n.Edges.Databases = []*Database{} },
+			func(n *Group, e *Database) { n.Edges.Databases = append(n.Edges.Databases, e) }); err != nil {
+			return nil, err
+		}
+	}
+	for name, query := range gq.withNamedDatabases {
+		if err := gq.loadDatabases(ctx, query, nodes,
+			func(n *Group) { n.appendNamedDatabases(name) },
+			func(n *Group, e *Database) { n.appendNamedDatabases(name, e) }); err != nil {
+			return nil, err
+		}
+	}
 	for i := range gq.loadTotal {
 		if err := gq.loadTotal[i](ctx, nodes); err != nil {
 			return nil, err
 		}
 	}
 	return nodes, nil
+}
+
+func (gq *GroupQuery) loadDatabases(ctx context.Context, query *DatabaseQuery, nodes []*Group, init func(*Group), assign func(*Group, *Database)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[string]*Group)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(database.FieldGroupID)
+	}
+	query.Where(predicate.Database(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(group.DatabasesColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.GroupID
+		node, ok := nodeids[fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "group_id" returned %v for node %v`, fk, n.ID)
+		}
+		assign(node, n)
+	}
+	return nil
 }
 
 func (gq *GroupQuery) sqlCount(ctx context.Context) (int, error) {
@@ -455,6 +545,20 @@ func (gq *GroupQuery) sqlQuery(ctx context.Context) *sql.Selector {
 		selector.Limit(*limit)
 	}
 	return selector
+}
+
+// WithNamedDatabases tells the query-builder to eager-load the nodes that are connected to the "databases"
+// edge with the given name. The optional arguments are used to configure the query builder of the edge.
+func (gq *GroupQuery) WithNamedDatabases(name string, opts ...func(*DatabaseQuery)) *GroupQuery {
+	query := (&DatabaseClient{config: gq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	if gq.withNamedDatabases == nil {
+		gq.withNamedDatabases = make(map[string]*DatabaseQuery)
+	}
+	gq.withNamedDatabases[name] = query
+	return gq
 }
 
 // GroupGroupBy is the group-by builder for Group entities.

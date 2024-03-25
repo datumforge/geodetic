@@ -87,6 +87,6 @@ tracer:
         disableTimestamp: false
         pretty: true
 turso:
-    base_url: https://api.turso.tech
-    org_name: ""
+    baseUrl: https://api.turso.tech
+    orgName: ""
     token: ""

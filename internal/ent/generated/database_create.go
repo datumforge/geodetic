@@ -12,6 +12,7 @@ import (
 	"entgo.io/ent/schema/field"
 	"github.com/datumforge/geodetic/internal/ent/enums"
 	"github.com/datumforge/geodetic/internal/ent/generated/database"
+	"github.com/datumforge/geodetic/internal/ent/generated/group"
 )
 
 // DatabaseCreate is the builder for creating a Database entity.
@@ -137,9 +138,23 @@ func (dc *DatabaseCreate) SetDsn(s string) *DatabaseCreate {
 	return dc
 }
 
+// SetGroupID sets the "group_id" field.
+func (dc *DatabaseCreate) SetGroupID(s string) *DatabaseCreate {
+	dc.mutation.SetGroupID(s)
+	return dc
+}
+
 // SetToken sets the "token" field.
 func (dc *DatabaseCreate) SetToken(s string) *DatabaseCreate {
 	dc.mutation.SetToken(s)
+	return dc
+}
+
+// SetNillableToken sets the "token" field if the given value is not nil.
+func (dc *DatabaseCreate) SetNillableToken(s *string) *DatabaseCreate {
+	if s != nil {
+		dc.SetToken(*s)
+	}
 	return dc
 }
 
@@ -183,6 +198,11 @@ func (dc *DatabaseCreate) SetNillableID(s *string) *DatabaseCreate {
 		dc.SetID(*s)
 	}
 	return dc
+}
+
+// SetGroup sets the "group" edge to the Group entity.
+func (dc *DatabaseCreate) SetGroup(g *Group) *DatabaseCreate {
+	return dc.SetGroupID(g.ID)
 }
 
 // Mutation returns the DatabaseMutation object of the builder.
@@ -280,13 +300,8 @@ func (dc *DatabaseCreate) check() error {
 			return &ValidationError{Name: "dsn", err: fmt.Errorf(`generated: validator failed for field "Database.dsn": %w`, err)}
 		}
 	}
-	if _, ok := dc.mutation.Token(); !ok {
-		return &ValidationError{Name: "token", err: errors.New(`generated: missing required field "Database.token"`)}
-	}
-	if v, ok := dc.mutation.Token(); ok {
-		if err := database.TokenValidator(v); err != nil {
-			return &ValidationError{Name: "token", err: fmt.Errorf(`generated: validator failed for field "Database.token": %w`, err)}
-		}
+	if _, ok := dc.mutation.GroupID(); !ok {
+		return &ValidationError{Name: "group_id", err: errors.New(`generated: missing required field "Database.group_id"`)}
 	}
 	if _, ok := dc.mutation.Status(); !ok {
 		return &ValidationError{Name: "status", err: errors.New(`generated: missing required field "Database.status"`)}
@@ -303,6 +318,9 @@ func (dc *DatabaseCreate) check() error {
 		if err := database.ProviderValidator(v); err != nil {
 			return &ValidationError{Name: "provider", err: fmt.Errorf(`generated: validator failed for field "Database.provider": %w`, err)}
 		}
+	}
+	if _, ok := dc.mutation.GroupID(); !ok {
+		return &ValidationError{Name: "group", err: errors.New(`generated: missing required edge "Database.group"`)}
 	}
 	return nil
 }
@@ -391,6 +409,24 @@ func (dc *DatabaseCreate) createSpec() (*Database, *sqlgraph.CreateSpec) {
 	if value, ok := dc.mutation.Provider(); ok {
 		_spec.SetField(database.FieldProvider, field.TypeEnum, value)
 		_node.Provider = value
+	}
+	if nodes := dc.mutation.GroupIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   database.GroupTable,
+			Columns: []string{database.GroupColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(group.FieldID, field.TypeString),
+			},
+		}
+		edge.Schema = dc.schemaConfig.Database
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_node.GroupID = nodes[0]
+		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec
 }

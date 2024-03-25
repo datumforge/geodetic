@@ -8,6 +8,7 @@ import (
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
+	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/datumforge/geodetic/internal/ent/enums"
 )
@@ -37,14 +38,25 @@ const (
 	FieldGeo = "geo"
 	// FieldDsn holds the string denoting the dsn field in the database.
 	FieldDsn = "dsn"
+	// FieldGroupID holds the string denoting the group_id field in the database.
+	FieldGroupID = "group_id"
 	// FieldToken holds the string denoting the token field in the database.
 	FieldToken = "token"
 	// FieldStatus holds the string denoting the status field in the database.
 	FieldStatus = "status"
 	// FieldProvider holds the string denoting the provider field in the database.
 	FieldProvider = "provider"
+	// EdgeGroup holds the string denoting the group edge name in mutations.
+	EdgeGroup = "group"
 	// Table holds the table name of the database in the database.
 	Table = "databases"
+	// GroupTable is the table that holds the group relation/edge.
+	GroupTable = "databases"
+	// GroupInverseTable is the table name for the Group entity.
+	// It exists in this package in order to avoid circular dependency with the "group" package.
+	GroupInverseTable = "groups"
+	// GroupColumn is the table column denoting the group relation/edge.
+	GroupColumn = "group_id"
 )
 
 // Columns holds all SQL columns for database fields.
@@ -60,6 +72,7 @@ var Columns = []string{
 	FieldName,
 	FieldGeo,
 	FieldDsn,
+	FieldGroupID,
 	FieldToken,
 	FieldStatus,
 	FieldProvider,
@@ -81,7 +94,7 @@ func ValidColumn(column string) bool {
 //
 //	import _ "github.com/datumforge/geodetic/internal/ent/generated/runtime"
 var (
-	Hooks [2]ent.Hook
+	Hooks [3]ent.Hook
 	// DefaultCreatedAt holds the default value on creation for the "created_at" field.
 	DefaultCreatedAt func() time.Time
 	// DefaultUpdatedAt holds the default value on creation for the "updated_at" field.
@@ -94,8 +107,6 @@ var (
 	NameValidator func(string) error
 	// DsnValidator is a validator for the "dsn" field. It is called by the builders before save.
 	DsnValidator func(string) error
-	// TokenValidator is a validator for the "token" field. It is called by the builders before save.
-	TokenValidator func(string) error
 	// DefaultID holds the default value on creation for the "id" field.
 	DefaultID func() string
 )
@@ -182,6 +193,11 @@ func ByDsn(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldDsn, opts...).ToFunc()
 }
 
+// ByGroupID orders the results by the group_id field.
+func ByGroupID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldGroupID, opts...).ToFunc()
+}
+
 // ByToken orders the results by the token field.
 func ByToken(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldToken, opts...).ToFunc()
@@ -195,6 +211,20 @@ func ByStatus(opts ...sql.OrderTermOption) OrderOption {
 // ByProvider orders the results by the provider field.
 func ByProvider(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldProvider, opts...).ToFunc()
+}
+
+// ByGroupField orders the results by group field.
+func ByGroupField(field string, opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newGroupStep(), sql.OrderByField(field, opts...))
+	}
+}
+func newGroupStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(GroupInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2O, true, GroupTable, GroupColumn),
+	)
 }
 
 var (

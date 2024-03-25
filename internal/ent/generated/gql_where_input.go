@@ -181,6 +181,21 @@ type DatabaseWhereInput struct {
 	DsnEqualFold    *string  `json:"dsnEqualFold,omitempty"`
 	DsnContainsFold *string  `json:"dsnContainsFold,omitempty"`
 
+	// "group_id" field predicates.
+	GroupID             *string  `json:"groupID,omitempty"`
+	GroupIDNEQ          *string  `json:"groupIDNEQ,omitempty"`
+	GroupIDIn           []string `json:"groupIDIn,omitempty"`
+	GroupIDNotIn        []string `json:"groupIDNotIn,omitempty"`
+	GroupIDGT           *string  `json:"groupIDGT,omitempty"`
+	GroupIDGTE          *string  `json:"groupIDGTE,omitempty"`
+	GroupIDLT           *string  `json:"groupIDLT,omitempty"`
+	GroupIDLTE          *string  `json:"groupIDLTE,omitempty"`
+	GroupIDContains     *string  `json:"groupIDContains,omitempty"`
+	GroupIDHasPrefix    *string  `json:"groupIDHasPrefix,omitempty"`
+	GroupIDHasSuffix    *string  `json:"groupIDHasSuffix,omitempty"`
+	GroupIDEqualFold    *string  `json:"groupIDEqualFold,omitempty"`
+	GroupIDContainsFold *string  `json:"groupIDContainsFold,omitempty"`
+
 	// "token" field predicates.
 	Token             *string  `json:"token,omitempty"`
 	TokenNEQ          *string  `json:"tokenNEQ,omitempty"`
@@ -193,6 +208,8 @@ type DatabaseWhereInput struct {
 	TokenContains     *string  `json:"tokenContains,omitempty"`
 	TokenHasPrefix    *string  `json:"tokenHasPrefix,omitempty"`
 	TokenHasSuffix    *string  `json:"tokenHasSuffix,omitempty"`
+	TokenIsNil        bool     `json:"tokenIsNil,omitempty"`
+	TokenNotNil       bool     `json:"tokenNotNil,omitempty"`
 	TokenEqualFold    *string  `json:"tokenEqualFold,omitempty"`
 	TokenContainsFold *string  `json:"tokenContainsFold,omitempty"`
 
@@ -207,6 +224,10 @@ type DatabaseWhereInput struct {
 	ProviderNEQ   *enums.DatabaseProvider  `json:"providerNEQ,omitempty"`
 	ProviderIn    []enums.DatabaseProvider `json:"providerIn,omitempty"`
 	ProviderNotIn []enums.DatabaseProvider `json:"providerNotIn,omitempty"`
+
+	// "group" edge predicates.
+	HasGroup     *bool              `json:"hasGroup,omitempty"`
+	HasGroupWith []*GroupWhereInput `json:"hasGroupWith,omitempty"`
 }
 
 // AddPredicates adds custom predicates to the where input to be used during the filtering phase.
@@ -697,6 +718,45 @@ func (i *DatabaseWhereInput) P() (predicate.Database, error) {
 	if i.DsnContainsFold != nil {
 		predicates = append(predicates, database.DsnContainsFold(*i.DsnContainsFold))
 	}
+	if i.GroupID != nil {
+		predicates = append(predicates, database.GroupIDEQ(*i.GroupID))
+	}
+	if i.GroupIDNEQ != nil {
+		predicates = append(predicates, database.GroupIDNEQ(*i.GroupIDNEQ))
+	}
+	if len(i.GroupIDIn) > 0 {
+		predicates = append(predicates, database.GroupIDIn(i.GroupIDIn...))
+	}
+	if len(i.GroupIDNotIn) > 0 {
+		predicates = append(predicates, database.GroupIDNotIn(i.GroupIDNotIn...))
+	}
+	if i.GroupIDGT != nil {
+		predicates = append(predicates, database.GroupIDGT(*i.GroupIDGT))
+	}
+	if i.GroupIDGTE != nil {
+		predicates = append(predicates, database.GroupIDGTE(*i.GroupIDGTE))
+	}
+	if i.GroupIDLT != nil {
+		predicates = append(predicates, database.GroupIDLT(*i.GroupIDLT))
+	}
+	if i.GroupIDLTE != nil {
+		predicates = append(predicates, database.GroupIDLTE(*i.GroupIDLTE))
+	}
+	if i.GroupIDContains != nil {
+		predicates = append(predicates, database.GroupIDContains(*i.GroupIDContains))
+	}
+	if i.GroupIDHasPrefix != nil {
+		predicates = append(predicates, database.GroupIDHasPrefix(*i.GroupIDHasPrefix))
+	}
+	if i.GroupIDHasSuffix != nil {
+		predicates = append(predicates, database.GroupIDHasSuffix(*i.GroupIDHasSuffix))
+	}
+	if i.GroupIDEqualFold != nil {
+		predicates = append(predicates, database.GroupIDEqualFold(*i.GroupIDEqualFold))
+	}
+	if i.GroupIDContainsFold != nil {
+		predicates = append(predicates, database.GroupIDContainsFold(*i.GroupIDContainsFold))
+	}
 	if i.Token != nil {
 		predicates = append(predicates, database.TokenEQ(*i.Token))
 	}
@@ -730,6 +790,12 @@ func (i *DatabaseWhereInput) P() (predicate.Database, error) {
 	if i.TokenHasSuffix != nil {
 		predicates = append(predicates, database.TokenHasSuffix(*i.TokenHasSuffix))
 	}
+	if i.TokenIsNil {
+		predicates = append(predicates, database.TokenIsNil())
+	}
+	if i.TokenNotNil {
+		predicates = append(predicates, database.TokenNotNil())
+	}
 	if i.TokenEqualFold != nil {
 		predicates = append(predicates, database.TokenEqualFold(*i.TokenEqualFold))
 	}
@@ -761,6 +827,24 @@ func (i *DatabaseWhereInput) P() (predicate.Database, error) {
 		predicates = append(predicates, database.ProviderNotIn(i.ProviderNotIn...))
 	}
 
+	if i.HasGroup != nil {
+		p := database.HasGroup()
+		if !*i.HasGroup {
+			p = database.Not(p)
+		}
+		predicates = append(predicates, p)
+	}
+	if len(i.HasGroupWith) > 0 {
+		with := make([]predicate.Group, 0, len(i.HasGroupWith))
+		for _, w := range i.HasGroupWith {
+			p, err := w.P()
+			if err != nil {
+				return nil, fmt.Errorf("%w: field 'HasGroupWith'", err)
+			}
+			with = append(with, p)
+		}
+		predicates = append(predicates, database.HasGroupWith(with...))
+	}
 	switch len(predicates) {
 	case 0:
 		return nil, ErrEmptyDatabaseWhereInput
@@ -938,6 +1022,8 @@ type GroupWhereInput struct {
 	TokenContains     *string  `json:"tokenContains,omitempty"`
 	TokenHasPrefix    *string  `json:"tokenHasPrefix,omitempty"`
 	TokenHasSuffix    *string  `json:"tokenHasSuffix,omitempty"`
+	TokenIsNil        bool     `json:"tokenIsNil,omitempty"`
+	TokenNotNil       bool     `json:"tokenNotNil,omitempty"`
 	TokenEqualFold    *string  `json:"tokenEqualFold,omitempty"`
 	TokenContainsFold *string  `json:"tokenContainsFold,omitempty"`
 
@@ -946,6 +1032,10 @@ type GroupWhereInput struct {
 	RegionNEQ   *enums.Region  `json:"regionNEQ,omitempty"`
 	RegionIn    []enums.Region `json:"regionIn,omitempty"`
 	RegionNotIn []enums.Region `json:"regionNotIn,omitempty"`
+
+	// "databases" edge predicates.
+	HasDatabases     *bool                 `json:"hasDatabases,omitempty"`
+	HasDatabasesWith []*DatabaseWhereInput `json:"hasDatabasesWith,omitempty"`
 }
 
 // AddPredicates adds custom predicates to the where input to be used during the filtering phase.
@@ -1436,6 +1526,12 @@ func (i *GroupWhereInput) P() (predicate.Group, error) {
 	if i.TokenHasSuffix != nil {
 		predicates = append(predicates, group.TokenHasSuffix(*i.TokenHasSuffix))
 	}
+	if i.TokenIsNil {
+		predicates = append(predicates, group.TokenIsNil())
+	}
+	if i.TokenNotNil {
+		predicates = append(predicates, group.TokenNotNil())
+	}
 	if i.TokenEqualFold != nil {
 		predicates = append(predicates, group.TokenEqualFold(*i.TokenEqualFold))
 	}
@@ -1455,6 +1551,24 @@ func (i *GroupWhereInput) P() (predicate.Group, error) {
 		predicates = append(predicates, group.RegionNotIn(i.RegionNotIn...))
 	}
 
+	if i.HasDatabases != nil {
+		p := group.HasDatabases()
+		if !*i.HasDatabases {
+			p = group.Not(p)
+		}
+		predicates = append(predicates, p)
+	}
+	if len(i.HasDatabasesWith) > 0 {
+		with := make([]predicate.Database, 0, len(i.HasDatabasesWith))
+		for _, w := range i.HasDatabasesWith {
+			p, err := w.P()
+			if err != nil {
+				return nil, fmt.Errorf("%w: field 'HasDatabasesWith'", err)
+			}
+			with = append(with, p)
+		}
+		predicates = append(predicates, group.HasDatabasesWith(with...))
+	}
 	switch len(predicates) {
 	case 0:
 		return nil, ErrEmptyGroupWhereInput

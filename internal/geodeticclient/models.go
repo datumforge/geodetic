@@ -27,11 +27,12 @@ type CreateDatabaseInput struct {
 	// the DSN to the database
 	Dsn string `json:"dsn"`
 	// the auth token used to connect to the database
-	Token string `json:"token"`
+	Token *string `json:"token,omitempty"`
 	// status of the database
 	Status *enums.DatabaseStatus `json:"status,omitempty"`
 	// provider of the database
 	Provider *enums.DatabaseProvider `json:"provider,omitempty"`
+	GroupID  string                  `json:"groupID"`
 }
 
 // CreateGroupInput is used for create Group object.
@@ -50,9 +51,10 @@ type CreateGroupInput struct {
 	// the replica locations of the group
 	Locations []string `json:"locations,omitempty"`
 	// the auth token used to connect to the group
-	Token string `json:"token"`
+	Token *string `json:"token,omitempty"`
 	// region the group
-	Region *enums.Region `json:"region,omitempty"`
+	Region      *enums.Region `json:"region,omitempty"`
+	DatabaseIDs []string      `json:"databaseIDs,omitempty"`
 }
 
 type Database struct {
@@ -71,13 +73,26 @@ type Database struct {
 	Geo *string `json:"geo,omitempty"`
 	// the DSN to the database
 	Dsn string `json:"dsn"`
+	// the ID of the group
+	GroupID string `json:"groupID"`
 	// status of the database
 	Status enums.DatabaseStatus `json:"status"`
 	// provider of the database
 	Provider enums.DatabaseProvider `json:"provider"`
+	Group    *Group                 `json:"group"`
 }
 
 func (Database) IsNode() {}
+
+// A connection to a list of items.
+type DatabaseConnection struct {
+	// A list of edges.
+	Edges []*DatabaseEdge `json:"edges,omitempty"`
+	// Information to aid in pagination.
+	PageInfo *PageInfo `json:"pageInfo"`
+	// Identifies the total count of items in the connection.
+	TotalCount int64 `json:"totalCount"`
+}
 
 // Return response for createDatabase mutation
 type DatabaseCreatePayload struct {
@@ -89,6 +104,14 @@ type DatabaseCreatePayload struct {
 type DatabaseDeletePayload struct {
 	// Deleted database ID
 	DeletedID string `json:"deletedID"`
+}
+
+// An edge in a connection.
+type DatabaseEdge struct {
+	// The item at the end of the edge.
+	Node *Database `json:"node,omitempty"`
+	// A cursor for use in pagination.
+	Cursor string `json:"cursor"`
 }
 
 // Return response for updateDatabase mutation
@@ -253,6 +276,20 @@ type DatabaseWhereInput struct {
 	DsnHasSuffix    *string  `json:"dsnHasSuffix,omitempty"`
 	DsnEqualFold    *string  `json:"dsnEqualFold,omitempty"`
 	DsnContainsFold *string  `json:"dsnContainsFold,omitempty"`
+	// group_id field predicates
+	GroupID             *string  `json:"groupID,omitempty"`
+	GroupIDNeq          *string  `json:"groupIDNEQ,omitempty"`
+	GroupIDIn           []string `json:"groupIDIn,omitempty"`
+	GroupIDNotIn        []string `json:"groupIDNotIn,omitempty"`
+	GroupIDGt           *string  `json:"groupIDGT,omitempty"`
+	GroupIDGte          *string  `json:"groupIDGTE,omitempty"`
+	GroupIDLt           *string  `json:"groupIDLT,omitempty"`
+	GroupIDLte          *string  `json:"groupIDLTE,omitempty"`
+	GroupIDContains     *string  `json:"groupIDContains,omitempty"`
+	GroupIDHasPrefix    *string  `json:"groupIDHasPrefix,omitempty"`
+	GroupIDHasSuffix    *string  `json:"groupIDHasSuffix,omitempty"`
+	GroupIDEqualFold    *string  `json:"groupIDEqualFold,omitempty"`
+	GroupIDContainsFold *string  `json:"groupIDContainsFold,omitempty"`
 	// status field predicates
 	Status      *enums.DatabaseStatus  `json:"status,omitempty"`
 	StatusNeq   *enums.DatabaseStatus  `json:"statusNEQ,omitempty"`
@@ -263,6 +300,9 @@ type DatabaseWhereInput struct {
 	ProviderNeq   *enums.DatabaseProvider  `json:"providerNEQ,omitempty"`
 	ProviderIn    []enums.DatabaseProvider `json:"providerIn,omitempty"`
 	ProviderNotIn []enums.DatabaseProvider `json:"providerNotIn,omitempty"`
+	// group edge predicates
+	HasGroup     *bool              `json:"hasGroup,omitempty"`
+	HasGroupWith []*GroupWhereInput `json:"hasGroupWith,omitempty"`
 }
 
 type Group struct {
@@ -282,7 +322,8 @@ type Group struct {
 	// the replica locations of the group
 	Locations []string `json:"locations,omitempty"`
 	// region the group
-	Region enums.Region `json:"region"`
+	Region    enums.Region `json:"region"`
+	Databases []*Database  `json:"databases,omitempty"`
 }
 
 func (Group) IsNode() {}
@@ -472,6 +513,9 @@ type GroupWhereInput struct {
 	RegionNeq   *enums.Region  `json:"regionNEQ,omitempty"`
 	RegionIn    []enums.Region `json:"regionIn,omitempty"`
 	RegionNotIn []enums.Region `json:"regionNotIn,omitempty"`
+	// databases edge predicates
+	HasDatabases     *bool                 `json:"hasDatabases,omitempty"`
+	HasDatabasesWith []*DatabaseWhereInput `json:"hasDatabasesWith,omitempty"`
 }
 
 type Mutation struct {
@@ -510,11 +554,13 @@ type UpdateDatabaseInput struct {
 	// the DSN to the database
 	Dsn *string `json:"dsn,omitempty"`
 	// the auth token used to connect to the database
-	Token *string `json:"token,omitempty"`
+	Token      *string `json:"token,omitempty"`
+	ClearToken *bool   `json:"clearToken,omitempty"`
 	// status of the database
 	Status *enums.DatabaseStatus `json:"status,omitempty"`
 	// provider of the database
 	Provider *enums.DatabaseProvider `json:"provider,omitempty"`
+	GroupID  *string                 `json:"groupID,omitempty"`
 }
 
 // UpdateGroupInput is used for update Group object.
@@ -537,9 +583,13 @@ type UpdateGroupInput struct {
 	AppendLocations []string `json:"appendLocations,omitempty"`
 	ClearLocations  *bool    `json:"clearLocations,omitempty"`
 	// the auth token used to connect to the group
-	Token *string `json:"token,omitempty"`
+	Token      *string `json:"token,omitempty"`
+	ClearToken *bool   `json:"clearToken,omitempty"`
 	// region the group
-	Region *enums.Region `json:"region,omitempty"`
+	Region            *enums.Region `json:"region,omitempty"`
+	AddDatabaseIDs    []string      `json:"addDatabaseIDs,omitempty"`
+	RemoveDatabaseIDs []string      `json:"removeDatabaseIDs,omitempty"`
+	ClearDatabases    *bool         `json:"clearDatabases,omitempty"`
 }
 
 // Possible directions in which to order a list of items when provided an `orderBy` argument.

@@ -19,6 +19,7 @@ func init() {
 	databaseHooks := schema.Database{}.Hooks()
 	database.Hooks[0] = databaseMixinHooks0[0]
 	database.Hooks[1] = databaseHooks[0]
+	database.Hooks[2] = databaseHooks[1]
 	databaseMixinFields0 := databaseMixin[0].Fields()
 	_ = databaseMixinFields0
 	databaseMixinFields2 := databaseMixin[2].Fields()
@@ -47,10 +48,6 @@ func init() {
 	databaseDescDsn := databaseFields[3].Descriptor()
 	// database.DsnValidator is a validator for the "dsn" field. It is called by the builders before save.
 	database.DsnValidator = databaseDescDsn.Validators[0].(func(string) error)
-	// databaseDescToken is the schema descriptor for token field.
-	databaseDescToken := databaseFields[4].Descriptor()
-	// database.TokenValidator is a validator for the "token" field. It is called by the builders before save.
-	database.TokenValidator = databaseDescToken.Validators[0].(func(string) error)
 	// databaseDescID is the schema descriptor for id field.
 	databaseDescID := databaseMixinFields2[0].Descriptor()
 	// database.DefaultID holds the default value on creation for the id field.
@@ -82,10 +79,6 @@ func init() {
 	groupDescName := groupFields[0].Descriptor()
 	// group.NameValidator is a validator for the "name" field. It is called by the builders before save.
 	group.NameValidator = groupDescName.Validators[0].(func(string) error)
-	// groupDescToken is the schema descriptor for token field.
-	groupDescToken := groupFields[4].Descriptor()
-	// group.TokenValidator is a validator for the "token" field. It is called by the builders before save.
-	group.TokenValidator = groupDescToken.Validators[0].(func(string) error)
 	// groupDescID is the schema descriptor for id field.
 	groupDescID := groupMixinFields1[0].Descriptor()
 	// group.DefaultID holds the default value on creation for the id field.

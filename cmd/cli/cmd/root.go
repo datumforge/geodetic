@@ -4,15 +4,22 @@ package datum
 import (
 	"encoding/json"
 	"fmt"
+	"net/http"
+	"os"
+	"reflect"
 	"strings"
+	"text/tabwriter"
 
 	"github.com/TylerBrock/colorjson"
 	"github.com/Yamashou/gqlgenc/clientv2"
+	"github.com/datumforge/datum/pkg/utils/cli/rows"
 	homedir "github.com/mitchellh/go-homedir"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
 	"go.uber.org/zap"
+
+	"github.com/datumforge/geodetic/internal/geodeticclient"
 )
 
 const (
@@ -34,6 +41,7 @@ var (
 )
 
 type CLI struct {
+	Client      geodeticclient.GeodeticClient
 	Interceptor clientv2.RequestInterceptor
 	AccessToken string
 }
@@ -58,6 +66,9 @@ func init() {
 
 	RootCmd.PersistentFlags().StringVar(&RootHost, "host", defaultRootHost, "api host url")
 	ViperBindFlag(appName+".host", RootCmd.PersistentFlags().Lookup("host"))
+
+	RootCmd.PersistentFlags().StringP("format", "f", "table", "output format (json, table)")
+	ViperBindFlag("output.format", RootCmd.PersistentFlags().Lookup("format"))
 
 	// Logging flags
 	RootCmd.PersistentFlags().Bool("debug", false, "enable debug logging")
@@ -126,6 +137,34 @@ func ViperBindFlag(name string, flag *pflag.Flag) {
 	}
 }
 
+func createClient(baseURL string) (*CLI, error) {
+	cli := CLI{}
+
+	h := http.DefaultClient
+
+	// set options
+	opt := &clientv2.Options{
+		ParseDataAlongWithErrors: false,
+	}
+
+	i := geodeticclient.WithEmptyInterceptor()
+	interceptors := []clientv2.RequestInterceptor{i}
+
+	if viper.GetBool("logging.debug") {
+		interceptors = append(interceptors, geodeticclient.WithLoggingInterceptor())
+	}
+
+	cli.Client = geodeticclient.NewClient(h, baseURL, opt, interceptors...)
+	cli.Interceptor = i
+
+	// new client with params
+	return &cli, nil
+}
+
+func GetGraphClient() (*CLI, error) {
+	return createClient(GraphAPIHost)
+}
+
 func JSONPrint(s []byte) error {
 	var obj map[string]interface{}
 
@@ -145,4 +184,65 @@ func JSONPrint(s []byte) error {
 	fmt.Println(string(o))
 
 	return nil
+}
+
+// TablePrint prints a table to the console
+func TablePrint(header []string, data [][]string) error {
+	w := rows.NewTabRowWriter(tabwriter.NewWriter(os.Stdout, 1, 0, 4, ' ', 0)) //nolint:gomnd
+	defer w.(*rows.TabRowWriter).Flush()
+
+	if err := w.Write(header); err != nil {
+		return err
+	}
+
+	for _, r := range data {
+		if err := w.Write(r); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+// GetHeaders returns the name of each field in a struct
+func GetHeaders(s interface{}, prefix string) []string {
+	headers := []string{}
+	val := reflect.Indirect(reflect.ValueOf(s))
+
+	for i := 0; i < val.NumField(); i++ {
+		if val.Type().Field(i).Type.Kind() == reflect.Struct {
+			continue
+		}
+
+		headers = append(headers, fmt.Sprintf("%s%s", prefix, val.Type().Field(i).Name))
+	}
+
+	return headers
+}
+
+// GetFields returns the value of each field in a struct
+func GetFields(i interface{}) (res []string) {
+	v := reflect.ValueOf(i)
+
+	for j := range v.NumField() { //nolint:typecheck // go 1.22+ allows this, linter is wrong
+		t := v.Field(j).Type()
+		if t.Kind() == reflect.Struct {
+			continue
+		}
+
+		var val string
+
+		switch t.Kind() {
+		case reflect.Ptr:
+			val = v.Field(j).Elem().String()
+		case reflect.Slice:
+			val = fmt.Sprintf("%v", v.Field(j).Interface())
+		default:
+			val = v.Field(j).String()
+		}
+
+		res = append(res, val)
+	}
+
+	return
 }

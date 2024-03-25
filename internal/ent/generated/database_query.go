@@ -11,6 +11,7 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/datumforge/geodetic/internal/ent/generated/database"
+	"github.com/datumforge/geodetic/internal/ent/generated/group"
 	"github.com/datumforge/geodetic/internal/ent/generated/predicate"
 
 	"github.com/datumforge/geodetic/internal/ent/generated/internal"
@@ -23,6 +24,7 @@ type DatabaseQuery struct {
 	order      []database.OrderOption
 	inters     []Interceptor
 	predicates []predicate.Database
+	withGroup  *GroupQuery
 	modifiers  []func(*sql.Selector)
 	loadTotal  []func(context.Context, []*Database) error
 	// intermediate query (i.e. traversal path).
@@ -59,6 +61,31 @@ func (dq *DatabaseQuery) Unique(unique bool) *DatabaseQuery {
 func (dq *DatabaseQuery) Order(o ...database.OrderOption) *DatabaseQuery {
 	dq.order = append(dq.order, o...)
 	return dq
+}
+
+// QueryGroup chains the current query on the "group" edge.
+func (dq *DatabaseQuery) QueryGroup() *GroupQuery {
+	query := (&GroupClient{config: dq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := dq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := dq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(database.Table, database.FieldID, selector),
+			sqlgraph.To(group.Table, group.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, database.GroupTable, database.GroupColumn),
+		)
+		schemaConfig := dq.schemaConfig
+		step.To.Schema = schemaConfig.Group
+		step.Edge.Schema = schemaConfig.Database
+		fromU = sqlgraph.SetNeighbors(dq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
 }
 
 // First returns the first Database entity from the query.
@@ -253,10 +280,22 @@ func (dq *DatabaseQuery) Clone() *DatabaseQuery {
 		order:      append([]database.OrderOption{}, dq.order...),
 		inters:     append([]Interceptor{}, dq.inters...),
 		predicates: append([]predicate.Database{}, dq.predicates...),
+		withGroup:  dq.withGroup.Clone(),
 		// clone intermediate query.
 		sql:  dq.sql.Clone(),
 		path: dq.path,
 	}
+}
+
+// WithGroup tells the query-builder to eager-load the nodes that are connected to
+// the "group" edge. The optional arguments are used to configure the query builder of the edge.
+func (dq *DatabaseQuery) WithGroup(opts ...func(*GroupQuery)) *DatabaseQuery {
+	query := (&GroupClient{config: dq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	dq.withGroup = query
+	return dq
 }
 
 // GroupBy is used to group vertices by one or more fields/columns.
@@ -335,8 +374,11 @@ func (dq *DatabaseQuery) prepareQuery(ctx context.Context) error {
 
 func (dq *DatabaseQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Database, error) {
 	var (
-		nodes = []*Database{}
-		_spec = dq.querySpec()
+		nodes       = []*Database{}
+		_spec       = dq.querySpec()
+		loadedTypes = [1]bool{
+			dq.withGroup != nil,
+		}
 	)
 	_spec.ScanValues = func(columns []string) ([]any, error) {
 		return (*Database).scanValues(nil, columns)
@@ -344,6 +386,7 @@ func (dq *DatabaseQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Dat
 	_spec.Assign = func(columns []string, values []any) error {
 		node := &Database{config: dq.config}
 		nodes = append(nodes, node)
+		node.Edges.loadedTypes = loadedTypes
 		return node.assignValues(columns, values)
 	}
 	_spec.Node.Schema = dq.schemaConfig.Database
@@ -360,12 +403,48 @@ func (dq *DatabaseQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Dat
 	if len(nodes) == 0 {
 		return nodes, nil
 	}
+	if query := dq.withGroup; query != nil {
+		if err := dq.loadGroup(ctx, query, nodes, nil,
+			func(n *Database, e *Group) { n.Edges.Group = e }); err != nil {
+			return nil, err
+		}
+	}
 	for i := range dq.loadTotal {
 		if err := dq.loadTotal[i](ctx, nodes); err != nil {
 			return nil, err
 		}
 	}
 	return nodes, nil
+}
+
+func (dq *DatabaseQuery) loadGroup(ctx context.Context, query *GroupQuery, nodes []*Database, init func(*Database), assign func(*Database, *Group)) error {
+	ids := make([]string, 0, len(nodes))
+	nodeids := make(map[string][]*Database)
+	for i := range nodes {
+		fk := nodes[i].GroupID
+		if _, ok := nodeids[fk]; !ok {
+			ids = append(ids, fk)
+		}
+		nodeids[fk] = append(nodeids[fk], nodes[i])
+	}
+	if len(ids) == 0 {
+		return nil
+	}
+	query.Where(group.IDIn(ids...))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		nodes, ok := nodeids[n.ID]
+		if !ok {
+			return fmt.Errorf(`unexpected foreign-key "group_id" returned %v`, n.ID)
+		}
+		for i := range nodes {
+			assign(nodes[i], n)
+		}
+	}
+	return nil
 }
 
 func (dq *DatabaseQuery) sqlCount(ctx context.Context) (int, error) {
@@ -397,6 +476,9 @@ func (dq *DatabaseQuery) querySpec() *sqlgraph.QuerySpec {
 			if fields[i] != database.FieldID {
 				_spec.Node.Columns = append(_spec.Node.Columns, fields[i])
 			}
+		}
+		if dq.withGroup != nil {
+			_spec.Node.AddColumnOnce(database.FieldGroupID)
 		}
 	}
 	if ps := dq.predicates; len(ps) > 0 {

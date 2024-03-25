@@ -4,9 +4,9 @@ extend type Query {
     """
      group(
         """
-        ID of the group
+        Name of the group
         """
-        id: ID!
+        name: String!
     ):  Group!
 }
 
@@ -25,9 +25,9 @@ extend type Mutation{
     """
     updateGroup(
         """
-        ID of the group
+        Name of the group
         """
-        id: ID!
+        name: String!
         """
         New values for the group
         """
@@ -38,9 +38,9 @@ extend type Mutation{
     """
     deleteGroup(
         """
-        ID of the group
+        Name of the group
         """
-        id: ID!
+        name: String!
     ): GroupDeletePayload!
 }
 

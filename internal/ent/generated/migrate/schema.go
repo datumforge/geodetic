@@ -22,15 +22,24 @@ var (
 		{Name: "name", Type: field.TypeString},
 		{Name: "geo", Type: field.TypeString, Nullable: true},
 		{Name: "dsn", Type: field.TypeString},
-		{Name: "token", Type: field.TypeString},
+		{Name: "token", Type: field.TypeString, Nullable: true},
 		{Name: "status", Type: field.TypeEnum, Enums: []string{"ACTIVE", "CREATING", "DELETING", "DELETED"}, Default: "CREATING"},
 		{Name: "provider", Type: field.TypeEnum, Enums: []string{"LOCAL", "TURSO"}, Default: "LOCAL"},
+		{Name: "group_id", Type: field.TypeString},
 	}
 	// DatabasesTable holds the schema information for the "databases" table.
 	DatabasesTable = &schema.Table{
 		Name:       "databases",
 		Columns:    DatabasesColumns,
 		PrimaryKey: []*schema.Column{DatabasesColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "databases_groups_databases",
+				Columns:    []*schema.Column{DatabasesColumns[14]},
+				RefColumns: []*schema.Column{GroupsColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+		},
 		Indexes: []*schema.Index{
 			{
 				Name:    "database_organization_id",
@@ -55,7 +64,7 @@ var (
 		{Name: "description", Type: field.TypeString, Nullable: true},
 		{Name: "primary_location", Type: field.TypeString, Nullable: true},
 		{Name: "locations", Type: field.TypeJSON, Nullable: true},
-		{Name: "token", Type: field.TypeString},
+		{Name: "token", Type: field.TypeString, Nullable: true},
 		{Name: "region", Type: field.TypeEnum, Enums: []string{"AMER", "EMEA", "APAC"}, Default: "AMER"},
 	}
 	// GroupsTable holds the schema information for the "groups" table.
@@ -72,4 +81,5 @@ var (
 )
 
 func init() {
+	DatabasesTable.ForeignKeys[0].RefTable = GroupsTable
 }

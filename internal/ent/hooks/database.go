@@ -7,6 +7,7 @@ import (
 
 	"entgo.io/ent"
 
+	"github.com/99designs/gqlgen/graphql"
 	"github.com/datumforge/go-turso"
 
 	"github.com/datumforge/geodetic/internal/ent/enums"
@@ -14,7 +15,7 @@ import (
 	"github.com/datumforge/geodetic/internal/ent/generated/hook"
 )
 
-func HookDatabase() ent.Hook {
+func HookCreateDatabase() ent.Hook {
 	return hook.On(func(next ent.Mutator) ent.Mutator {
 		return hook.DatabaseFunc(func(ctx context.Context, mutation *generated.DatabaseMutation) (generated.Value, error) {
 			// get organization and provider from the request
@@ -27,9 +28,19 @@ func HookDatabase() ent.Hook {
 
 			// if the provider is turso, create a database
 			if provider == enums.Turso {
+				// get the group to assign the database to
+				groupID, _ := mutation.GroupID()
+
+				group, err := mutation.Client().Group.Get(ctx, groupID)
+				if err != nil {
+					mutation.Logger.Errorw("unable to get group", "error", err)
+
+					return nil, err
+				}
+
 				// create a turso db
 				body := turso.CreateDatabaseRequest{
-					Group: "default",
+					Group: group.Name,
 					Name:  name,
 				}
 
@@ -49,4 +60,29 @@ func HookDatabase() ent.Hook {
 			return next.Mutate(ctx, mutation)
 		})
 	}, ent.OpCreate)
+}
+
+func HookDatabaseDelete() ent.Hook {
+	return hook.On(func(next ent.Mutator) ent.Mutator {
+		return hook.DatabaseFunc(func(ctx context.Context, mutation *generated.DatabaseMutation) (generated.Value, error) {
+			gtx := graphql.GetOperationContext(ctx)
+			name := gtx.Variables["name"].(string)
+
+			if name == "" {
+				mutation.Logger.Errorw("unable to delete database, no name provided")
+
+				return nil, fmt.Errorf("no name provided") //nolint:goerr113
+			}
+
+			db, err := mutation.Turso.Database.DeleteDatabase(ctx, name)
+			if err != nil {
+				return nil, err
+			}
+
+			mutation.Logger.Infow("deleted turso database", "database", db.Database)
+
+			// write things that we need to the database
+			return next.Mutate(ctx, mutation)
+		})
+	}, ent.OpDelete|ent.OpDeleteOne)
 }

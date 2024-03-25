@@ -54,8 +54,8 @@ data:
   GEODETIC_DB_CACHETTL: {{ .Values.geodetic.db.cacheTTL | 1s }}
   GEODETIC_DB_RUNMIGRATIONS: {{ .Values.geodetic.db.runMigrations | true }}
   GEODETIC_TURSO_TOKEN: {{ .Values.geodetic.turso.token }}
-  GEODETIC_TURSO_BASE_URL: {{ .Values.geodetic.turso.base_url | "https://api.turso.tech" }}
-  GEODETIC_TURSO_ORG_NAME: {{ .Values.geodetic.turso.org_name }}
+  GEODETIC_TURSO_BASEURL: {{ .Values.geodetic.turso.baseUrl | "https://api.turso.tech" }}
+  GEODETIC_TURSO_ORGNAME: {{ .Values.geodetic.turso.orgName }}
   GEODETIC_REDIS_ENABLED: {{ .Values.geodetic.redis.enabled | true }}
   GEODETIC_REDIS_ADDRESS: {{ .Values.geodetic.redis.address | "localhost:6379" }}
   GEODETIC_REDIS_NAME: {{ .Values.geodetic.redis.name | "datum" }}

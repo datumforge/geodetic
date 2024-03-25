@@ -6,8 +6,11 @@ import (
 	"time"
 
 	"entgo.io/ent/dialect/sql"
+	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/datumforge/geodetic/internal/ent/enums"
 	"github.com/datumforge/geodetic/internal/ent/generated/predicate"
+
+	"github.com/datumforge/geodetic/internal/ent/generated/internal"
 )
 
 // ID filters vertices based on their ID field.
@@ -770,6 +773,16 @@ func TokenHasSuffix(v string) predicate.Group {
 	return predicate.Group(sql.FieldHasSuffix(FieldToken, v))
 }
 
+// TokenIsNil applies the IsNil predicate on the "token" field.
+func TokenIsNil() predicate.Group {
+	return predicate.Group(sql.FieldIsNull(FieldToken))
+}
+
+// TokenNotNil applies the NotNil predicate on the "token" field.
+func TokenNotNil() predicate.Group {
+	return predicate.Group(sql.FieldNotNull(FieldToken))
+}
+
 // TokenEqualFold applies the EqualFold predicate on the "token" field.
 func TokenEqualFold(v string) predicate.Group {
 	return predicate.Group(sql.FieldEqualFold(FieldToken, v))
@@ -808,6 +821,35 @@ func RegionNotIn(vs ...enums.Region) predicate.Group {
 		v[i] = vs[i]
 	}
 	return predicate.Group(sql.FieldNotIn(FieldRegion, v...))
+}
+
+// HasDatabases applies the HasEdge predicate on the "databases" edge.
+func HasDatabases() predicate.Group {
+	return predicate.Group(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, DatabasesTable, DatabasesColumn),
+		)
+		schemaConfig := internal.SchemaConfigFromContext(s.Context())
+		step.To.Schema = schemaConfig.Database
+		step.Edge.Schema = schemaConfig.Database
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasDatabasesWith applies the HasEdge predicate on the "databases" edge with a given conditions (other predicates).
+func HasDatabasesWith(preds ...predicate.Database) predicate.Group {
+	return predicate.Group(func(s *sql.Selector) {
+		step := newDatabasesStep()
+		schemaConfig := internal.SchemaConfigFromContext(s.Context())
+		step.To.Schema = schemaConfig.Database
+		step.Edge.Schema = schemaConfig.Database
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
 }
 
 // And groups predicates with the AND operator between them.

@@ -28,7 +28,7 @@ input CreateDatabaseInput {
   """
   the auth token used to connect to the database
   """
-  token: String!
+  token: String
   """
   status of the database
   """
@@ -37,6 +37,7 @@ input CreateDatabaseInput {
   provider of the database
   """
   provider: DatabaseDatabaseProvider
+  groupID: ID!
 }
 """
 CreateGroupInput is used for create Group object.
@@ -66,11 +67,12 @@ input CreateGroupInput {
   """
   the auth token used to connect to the group
   """
-  token: String!
+  token: String
   """
   region the group
   """
   region: GroupRegion
+  databaseIDs: [ID!]
 }
 """
 Define a Relay Cursor type:
@@ -102,6 +104,10 @@ type Database implements Node {
   """
   dsn: String!
   """
+  the ID of the group
+  """
+  groupID: ID!
+  """
   status of the database
   """
   status: DatabaseDatabaseStatus!
@@ -109,6 +115,24 @@ type Database implements Node {
   provider of the database
   """
   provider: DatabaseDatabaseProvider!
+  group: Group!
+}
+"""
+A connection to a list of items.
+"""
+type DatabaseConnection {
+  """
+  A list of edges.
+  """
+  edges: [DatabaseEdge]
+  """
+  Information to aid in pagination.
+  """
+  pageInfo: PageInfo!
+  """
+  Identifies the total count of items in the connection.
+  """
+  totalCount: Int!
 }
 """
 DatabaseDatabaseProvider is enum for the field provider
@@ -125,6 +149,19 @@ enum DatabaseDatabaseStatus @goModel(model: "github.com/datumforge/geodetic/inte
   CREATING
   DELETING
   DELETED
+}
+"""
+An edge in a connection.
+"""
+type DatabaseEdge {
+  """
+  The item at the end of the edge.
+  """
+  node: Database
+  """
+  A cursor for use in pagination.
+  """
+  cursor: Cursor!
 }
 """
 DatabaseWhereInput is used for filtering Database objects.
@@ -307,6 +344,22 @@ input DatabaseWhereInput {
   dsnEqualFold: String
   dsnContainsFold: String
   """
+  group_id field predicates
+  """
+  groupID: ID
+  groupIDNEQ: ID
+  groupIDIn: [ID!]
+  groupIDNotIn: [ID!]
+  groupIDGT: ID
+  groupIDGTE: ID
+  groupIDLT: ID
+  groupIDLTE: ID
+  groupIDContains: ID
+  groupIDHasPrefix: ID
+  groupIDHasSuffix: ID
+  groupIDEqualFold: ID
+  groupIDContainsFold: ID
+  """
   status field predicates
   """
   status: DatabaseDatabaseStatus
@@ -320,6 +373,11 @@ input DatabaseWhereInput {
   providerNEQ: DatabaseDatabaseProvider
   providerIn: [DatabaseDatabaseProvider!]
   providerNotIn: [DatabaseDatabaseProvider!]
+  """
+  group edge predicates
+  """
+  hasGroup: Boolean
+  hasGroupWith: [GroupWhereInput!]
 }
 type Group implements Node {
   id: ID!
@@ -349,6 +407,7 @@ type Group implements Node {
   region the group
   """
   region: GroupRegion!
+  databases: [Database!]
 }
 """
 A connection to a list of items.
@@ -561,6 +620,11 @@ input GroupWhereInput {
   regionNEQ: GroupRegion
   regionIn: [GroupRegion!]
   regionNotIn: [GroupRegion!]
+  """
+  databases edge predicates
+  """
+  hasDatabases: Boolean
+  hasDatabasesWith: [DatabaseWhereInput!]
 }
 """
 A valid JSON string.
@@ -630,6 +694,32 @@ type Query {
     """
     ids: [ID!]!
   ): [Node]!
+  databases(
+    """
+    Returns the elements in the list that come after the specified cursor.
+    """
+    after: Cursor
+
+    """
+    Returns the first _n_ elements from the list.
+    """
+    first: Int
+
+    """
+    Returns the elements in the list that come before the specified cursor.
+    """
+    before: Cursor
+
+    """
+    Returns the last _n_ elements from the list.
+    """
+    last: Int
+
+    """
+    Filtering options for Databases returned from the connection.
+    """
+    where: DatabaseWhereInput
+  ): DatabaseConnection!
   groups(
     """
     Returns the elements in the list that come after the specified cursor.
@@ -691,6 +781,7 @@ input UpdateDatabaseInput {
   the auth token used to connect to the database
   """
   token: String
+  clearToken: Boolean
   """
   status of the database
   """
@@ -699,6 +790,7 @@ input UpdateDatabaseInput {
   provider of the database
   """
   provider: DatabaseDatabaseProvider
+  groupID: ID
 }
 """
 UpdateGroupInput is used for update Group object.
@@ -733,8 +825,12 @@ input UpdateGroupInput {
   the auth token used to connect to the group
   """
   token: String
+  clearToken: Boolean
   """
   region the group
   """
   region: GroupRegion
+  addDatabaseIDs: [ID!]
+  removeDatabaseIDs: [ID!]
+  clearDatabases: Boolean
 }

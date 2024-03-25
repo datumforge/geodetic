@@ -18,9 +18,10 @@ type CreateDatabaseInput struct {
 	Name           string
 	Geo            *string
 	Dsn            string
-	Token          string
+	Token          *string
 	Status         *enums.DatabaseStatus
 	Provider       *enums.DatabaseProvider
+	GroupID        string
 }
 
 // Mutate applies the CreateDatabaseInput on the DatabaseMutation builder.
@@ -43,13 +44,16 @@ func (i *CreateDatabaseInput) Mutate(m *DatabaseMutation) {
 		m.SetGeo(*v)
 	}
 	m.SetDsn(i.Dsn)
-	m.SetToken(i.Token)
+	if v := i.Token; v != nil {
+		m.SetToken(*v)
+	}
 	if v := i.Status; v != nil {
 		m.SetStatus(*v)
 	}
 	if v := i.Provider; v != nil {
 		m.SetProvider(*v)
 	}
+	m.SetGroupID(i.GroupID)
 }
 
 // SetInput applies the change-set in the CreateDatabaseInput on the DatabaseCreate builder.
@@ -69,9 +73,11 @@ type UpdateDatabaseInput struct {
 	ClearGeo       bool
 	Geo            *string
 	Dsn            *string
+	ClearToken     bool
 	Token          *string
 	Status         *enums.DatabaseStatus
 	Provider       *enums.DatabaseProvider
+	GroupID        *string
 }
 
 // Mutate applies the UpdateDatabaseInput on the DatabaseMutation builder.
@@ -103,6 +109,9 @@ func (i *UpdateDatabaseInput) Mutate(m *DatabaseMutation) {
 	if v := i.Dsn; v != nil {
 		m.SetDsn(*v)
 	}
+	if i.ClearToken {
+		m.ClearToken()
+	}
 	if v := i.Token; v != nil {
 		m.SetToken(*v)
 	}
@@ -111,6 +120,9 @@ func (i *UpdateDatabaseInput) Mutate(m *DatabaseMutation) {
 	}
 	if v := i.Provider; v != nil {
 		m.SetProvider(*v)
+	}
+	if v := i.GroupID; v != nil {
+		m.SetGroupID(*v)
 	}
 }
 
@@ -136,8 +148,9 @@ type CreateGroupInput struct {
 	Description     *string
 	PrimaryLocation *string
 	Locations       []string
-	Token           string
+	Token           *string
 	Region          *enums.Region
+	DatabaseIDs     []string
 }
 
 // Mutate applies the CreateGroupInput on the GroupMutation builder.
@@ -164,9 +177,14 @@ func (i *CreateGroupInput) Mutate(m *GroupMutation) {
 	if v := i.Locations; v != nil {
 		m.SetLocations(v)
 	}
-	m.SetToken(i.Token)
+	if v := i.Token; v != nil {
+		m.SetToken(*v)
+	}
 	if v := i.Region; v != nil {
 		m.SetRegion(*v)
+	}
+	if v := i.DatabaseIDs; len(v) > 0 {
+		m.AddDatabaseIDs(v...)
 	}
 }
 
@@ -190,8 +208,12 @@ type UpdateGroupInput struct {
 	ClearLocations       bool
 	Locations            []string
 	AppendLocations      []string
+	ClearToken           bool
 	Token                *string
 	Region               *enums.Region
+	ClearDatabases       bool
+	AddDatabaseIDs       []string
+	RemoveDatabaseIDs    []string
 }
 
 // Mutate applies the UpdateGroupInput on the GroupMutation builder.
@@ -232,11 +254,23 @@ func (i *UpdateGroupInput) Mutate(m *GroupMutation) {
 	if i.AppendLocations != nil {
 		m.AppendLocations(i.Locations)
 	}
+	if i.ClearToken {
+		m.ClearToken()
+	}
 	if v := i.Token; v != nil {
 		m.SetToken(*v)
 	}
 	if v := i.Region; v != nil {
 		m.SetRegion(*v)
+	}
+	if i.ClearDatabases {
+		m.ClearDatabases()
+	}
+	if v := i.AddDatabaseIDs; len(v) > 0 {
+		m.AddDatabaseIDs(v...)
+	}
+	if v := i.RemoveDatabaseIDs; len(v) > 0 {
+		m.RemoveDatabaseIDs(v...)
 	}
 }
 

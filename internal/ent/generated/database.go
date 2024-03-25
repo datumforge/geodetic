@@ -11,6 +11,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"github.com/datumforge/geodetic/internal/ent/enums"
 	"github.com/datumforge/geodetic/internal/ent/generated/database"
+	"github.com/datumforge/geodetic/internal/ent/generated/group"
 )
 
 // Database is the model entity for the Database schema.
@@ -38,13 +39,40 @@ type Database struct {
 	Geo string `json:"geo,omitempty"`
 	// the DSN to the database
 	Dsn string `json:"dsn,omitempty"`
+	// the ID of the group
+	GroupID string `json:"group_id,omitempty"`
 	// the auth token used to connect to the database
 	Token string `json:"-"`
 	// status of the database
 	Status enums.DatabaseStatus `json:"status,omitempty"`
 	// provider of the database
-	Provider     enums.DatabaseProvider `json:"provider,omitempty"`
+	Provider enums.DatabaseProvider `json:"provider,omitempty"`
+	// Edges holds the relations/edges for other nodes in the graph.
+	// The values are being populated by the DatabaseQuery when eager-loading is set.
+	Edges        DatabaseEdges `json:"edges"`
 	selectValues sql.SelectValues
+}
+
+// DatabaseEdges holds the relations/edges for other nodes in the graph.
+type DatabaseEdges struct {
+	// Group holds the value of the group edge.
+	Group *Group `json:"group,omitempty"`
+	// loadedTypes holds the information for reporting if a
+	// type was loaded (or requested) in eager-loading or not.
+	loadedTypes [1]bool
+	// totalCount holds the count of the edges above.
+	totalCount [1]map[string]int
+}
+
+// GroupOrErr returns the Group value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e DatabaseEdges) GroupOrErr() (*Group, error) {
+	if e.Group != nil {
+		return e.Group, nil
+	} else if e.loadedTypes[0] {
+		return nil, &NotFoundError{label: group.Label}
+	}
+	return nil, &NotLoadedError{edge: "group"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -52,7 +80,7 @@ func (*Database) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case database.FieldID, database.FieldCreatedBy, database.FieldUpdatedBy, database.FieldDeletedBy, database.FieldOrganizationID, database.FieldName, database.FieldGeo, database.FieldDsn, database.FieldToken, database.FieldStatus, database.FieldProvider:
+		case database.FieldID, database.FieldCreatedBy, database.FieldUpdatedBy, database.FieldDeletedBy, database.FieldOrganizationID, database.FieldName, database.FieldGeo, database.FieldDsn, database.FieldGroupID, database.FieldToken, database.FieldStatus, database.FieldProvider:
 			values[i] = new(sql.NullString)
 		case database.FieldCreatedAt, database.FieldUpdatedAt, database.FieldDeletedAt:
 			values[i] = new(sql.NullTime)
@@ -137,6 +165,12 @@ func (d *Database) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				d.Dsn = value.String
 			}
+		case database.FieldGroupID:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field group_id", values[i])
+			} else if value.Valid {
+				d.GroupID = value.String
+			}
 		case database.FieldToken:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field token", values[i])
@@ -166,6 +200,11 @@ func (d *Database) assignValues(columns []string, values []any) error {
 // This includes values selected through modifiers, order, etc.
 func (d *Database) Value(name string) (ent.Value, error) {
 	return d.selectValues.Get(name)
+}
+
+// QueryGroup queries the "group" edge of the Database entity.
+func (d *Database) QueryGroup() *GroupQuery {
+	return NewDatabaseClient(d.config).QueryGroup(d)
 }
 
 // Update returns a builder for updating this Database.
@@ -220,6 +259,9 @@ func (d *Database) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("dsn=")
 	builder.WriteString(d.Dsn)
+	builder.WriteString(", ")
+	builder.WriteString("group_id=")
+	builder.WriteString(d.GroupID)
 	builder.WriteString(", ")
 	builder.WriteString("token=<sensitive>")
 	builder.WriteString(", ")

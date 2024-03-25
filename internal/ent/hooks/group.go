@@ -6,6 +6,7 @@ import (
 
 	"entgo.io/ent"
 
+	"github.com/99designs/gqlgen/graphql"
 	"github.com/datumforge/go-turso"
 
 	"github.com/datumforge/geodetic/internal/ent/generated"
@@ -75,8 +76,10 @@ func HookGroupUpdate() ent.Hook {
 func HookGroupDelete() ent.Hook {
 	return hook.On(func(next ent.Mutator) ent.Mutator {
 		return hook.GroupFunc(func(ctx context.Context, mutation *generated.GroupMutation) (generated.Value, error) {
-			name, ok := mutation.Name()
-			if !ok {
+			gtx := graphql.GetOperationContext(ctx)
+			name := gtx.Variables["name"].(string)
+
+			if name == "" {
 				mutation.Logger.Errorw("unable to delete group, no name provided")
 
 				return nil, fmt.Errorf("no name provided") //nolint:goerr113
@@ -92,7 +95,7 @@ func HookGroupDelete() ent.Hook {
 			// write things that we need to the database
 			return next.Mutate(ctx, mutation)
 		})
-	}, ent.OpCreate)
+	}, ent.OpDelete|ent.OpDeleteOne)
 }
 
 // exists checks if a location exists in a list of locations

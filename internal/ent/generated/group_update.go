@@ -13,6 +13,7 @@ import (
 	"entgo.io/ent/dialect/sql/sqljson"
 	"entgo.io/ent/schema/field"
 	"github.com/datumforge/geodetic/internal/ent/enums"
+	"github.com/datumforge/geodetic/internal/ent/generated/database"
 	"github.com/datumforge/geodetic/internal/ent/generated/group"
 	"github.com/datumforge/geodetic/internal/ent/generated/predicate"
 
@@ -190,6 +191,12 @@ func (gu *GroupUpdate) SetNillableToken(s *string) *GroupUpdate {
 	return gu
 }
 
+// ClearToken clears the value of the "token" field.
+func (gu *GroupUpdate) ClearToken() *GroupUpdate {
+	gu.mutation.ClearToken()
+	return gu
+}
+
 // SetRegion sets the "region" field.
 func (gu *GroupUpdate) SetRegion(e enums.Region) *GroupUpdate {
 	gu.mutation.SetRegion(e)
@@ -204,9 +211,45 @@ func (gu *GroupUpdate) SetNillableRegion(e *enums.Region) *GroupUpdate {
 	return gu
 }
 
+// AddDatabaseIDs adds the "databases" edge to the Database entity by IDs.
+func (gu *GroupUpdate) AddDatabaseIDs(ids ...string) *GroupUpdate {
+	gu.mutation.AddDatabaseIDs(ids...)
+	return gu
+}
+
+// AddDatabases adds the "databases" edges to the Database entity.
+func (gu *GroupUpdate) AddDatabases(d ...*Database) *GroupUpdate {
+	ids := make([]string, len(d))
+	for i := range d {
+		ids[i] = d[i].ID
+	}
+	return gu.AddDatabaseIDs(ids...)
+}
+
 // Mutation returns the GroupMutation object of the builder.
 func (gu *GroupUpdate) Mutation() *GroupMutation {
 	return gu.mutation
+}
+
+// ClearDatabases clears all "databases" edges to the Database entity.
+func (gu *GroupUpdate) ClearDatabases() *GroupUpdate {
+	gu.mutation.ClearDatabases()
+	return gu
+}
+
+// RemoveDatabaseIDs removes the "databases" edge to Database entities by IDs.
+func (gu *GroupUpdate) RemoveDatabaseIDs(ids ...string) *GroupUpdate {
+	gu.mutation.RemoveDatabaseIDs(ids...)
+	return gu
+}
+
+// RemoveDatabases removes "databases" edges to Database entities.
+func (gu *GroupUpdate) RemoveDatabases(d ...*Database) *GroupUpdate {
+	ids := make([]string, len(d))
+	for i := range d {
+		ids[i] = d[i].ID
+	}
+	return gu.RemoveDatabaseIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -256,11 +299,6 @@ func (gu *GroupUpdate) check() error {
 	if v, ok := gu.mutation.Name(); ok {
 		if err := group.NameValidator(v); err != nil {
 			return &ValidationError{Name: "name", err: fmt.Errorf(`generated: validator failed for field "Group.name": %w`, err)}
-		}
-	}
-	if v, ok := gu.mutation.Token(); ok {
-		if err := group.TokenValidator(v); err != nil {
-			return &ValidationError{Name: "token", err: fmt.Errorf(`generated: validator failed for field "Group.token": %w`, err)}
 		}
 	}
 	if v, ok := gu.mutation.Region(); ok {
@@ -342,8 +380,59 @@ func (gu *GroupUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := gu.mutation.Token(); ok {
 		_spec.SetField(group.FieldToken, field.TypeString, value)
 	}
+	if gu.mutation.TokenCleared() {
+		_spec.ClearField(group.FieldToken, field.TypeString)
+	}
 	if value, ok := gu.mutation.Region(); ok {
 		_spec.SetField(group.FieldRegion, field.TypeEnum, value)
+	}
+	if gu.mutation.DatabasesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   group.DatabasesTable,
+			Columns: []string{group.DatabasesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(database.FieldID, field.TypeString),
+			},
+		}
+		edge.Schema = gu.schemaConfig.Database
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := gu.mutation.RemovedDatabasesIDs(); len(nodes) > 0 && !gu.mutation.DatabasesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   group.DatabasesTable,
+			Columns: []string{group.DatabasesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(database.FieldID, field.TypeString),
+			},
+		}
+		edge.Schema = gu.schemaConfig.Database
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := gu.mutation.DatabasesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   group.DatabasesTable,
+			Columns: []string{group.DatabasesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(database.FieldID, field.TypeString),
+			},
+		}
+		edge.Schema = gu.schemaConfig.Database
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	_spec.Node.Schema = gu.schemaConfig.Group
 	ctx = internal.NewSchemaConfigContext(ctx, gu.schemaConfig)
@@ -525,6 +614,12 @@ func (guo *GroupUpdateOne) SetNillableToken(s *string) *GroupUpdateOne {
 	return guo
 }
 
+// ClearToken clears the value of the "token" field.
+func (guo *GroupUpdateOne) ClearToken() *GroupUpdateOne {
+	guo.mutation.ClearToken()
+	return guo
+}
+
 // SetRegion sets the "region" field.
 func (guo *GroupUpdateOne) SetRegion(e enums.Region) *GroupUpdateOne {
 	guo.mutation.SetRegion(e)
@@ -539,9 +634,45 @@ func (guo *GroupUpdateOne) SetNillableRegion(e *enums.Region) *GroupUpdateOne {
 	return guo
 }
 
+// AddDatabaseIDs adds the "databases" edge to the Database entity by IDs.
+func (guo *GroupUpdateOne) AddDatabaseIDs(ids ...string) *GroupUpdateOne {
+	guo.mutation.AddDatabaseIDs(ids...)
+	return guo
+}
+
+// AddDatabases adds the "databases" edges to the Database entity.
+func (guo *GroupUpdateOne) AddDatabases(d ...*Database) *GroupUpdateOne {
+	ids := make([]string, len(d))
+	for i := range d {
+		ids[i] = d[i].ID
+	}
+	return guo.AddDatabaseIDs(ids...)
+}
+
 // Mutation returns the GroupMutation object of the builder.
 func (guo *GroupUpdateOne) Mutation() *GroupMutation {
 	return guo.mutation
+}
+
+// ClearDatabases clears all "databases" edges to the Database entity.
+func (guo *GroupUpdateOne) ClearDatabases() *GroupUpdateOne {
+	guo.mutation.ClearDatabases()
+	return guo
+}
+
+// RemoveDatabaseIDs removes the "databases" edge to Database entities by IDs.
+func (guo *GroupUpdateOne) RemoveDatabaseIDs(ids ...string) *GroupUpdateOne {
+	guo.mutation.RemoveDatabaseIDs(ids...)
+	return guo
+}
+
+// RemoveDatabases removes "databases" edges to Database entities.
+func (guo *GroupUpdateOne) RemoveDatabases(d ...*Database) *GroupUpdateOne {
+	ids := make([]string, len(d))
+	for i := range d {
+		ids[i] = d[i].ID
+	}
+	return guo.RemoveDatabaseIDs(ids...)
 }
 
 // Where appends a list predicates to the GroupUpdate builder.
@@ -604,11 +735,6 @@ func (guo *GroupUpdateOne) check() error {
 	if v, ok := guo.mutation.Name(); ok {
 		if err := group.NameValidator(v); err != nil {
 			return &ValidationError{Name: "name", err: fmt.Errorf(`generated: validator failed for field "Group.name": %w`, err)}
-		}
-	}
-	if v, ok := guo.mutation.Token(); ok {
-		if err := group.TokenValidator(v); err != nil {
-			return &ValidationError{Name: "token", err: fmt.Errorf(`generated: validator failed for field "Group.token": %w`, err)}
 		}
 	}
 	if v, ok := guo.mutation.Region(); ok {
@@ -707,8 +833,59 @@ func (guo *GroupUpdateOne) sqlSave(ctx context.Context) (_node *Group, err error
 	if value, ok := guo.mutation.Token(); ok {
 		_spec.SetField(group.FieldToken, field.TypeString, value)
 	}
+	if guo.mutation.TokenCleared() {
+		_spec.ClearField(group.FieldToken, field.TypeString)
+	}
 	if value, ok := guo.mutation.Region(); ok {
 		_spec.SetField(group.FieldRegion, field.TypeEnum, value)
+	}
+	if guo.mutation.DatabasesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   group.DatabasesTable,
+			Columns: []string{group.DatabasesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(database.FieldID, field.TypeString),
+			},
+		}
+		edge.Schema = guo.schemaConfig.Database
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := guo.mutation.RemovedDatabasesIDs(); len(nodes) > 0 && !guo.mutation.DatabasesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   group.DatabasesTable,
+			Columns: []string{group.DatabasesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(database.FieldID, field.TypeString),
+			},
+		}
+		edge.Schema = guo.schemaConfig.Database
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := guo.mutation.DatabasesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   group.DatabasesTable,
+			Columns: []string{group.DatabasesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(database.FieldID, field.TypeString),
+			},
+		}
+		edge.Schema = guo.schemaConfig.Database
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	_spec.Node.Schema = guo.schemaConfig.Group
 	ctx = internal.NewSchemaConfigContext(ctx, guo.schemaConfig)

@@ -32,6 +32,20 @@ func (d *DatabaseQuery) collectField(ctx context.Context, opCtx *graphql.Operati
 	)
 	for _, field := range graphql.CollectFields(opCtx, collected.Selections, satisfies) {
 		switch field.Name {
+		case "group":
+			var (
+				alias = field.Alias
+				path  = append(path, alias)
+				query = (&GroupClient{config: d.config}).Query()
+			)
+			if err := query.collectField(ctx, opCtx, field, path, satisfies...); err != nil {
+				return err
+			}
+			d.withGroup = query
+			if _, ok := fieldSeen[database.FieldGroupID]; !ok {
+				selectedFields = append(selectedFields, database.FieldGroupID)
+				fieldSeen[database.FieldGroupID] = struct{}{}
+			}
 		case "createdAt":
 			if _, ok := fieldSeen[database.FieldCreatedAt]; !ok {
 				selectedFields = append(selectedFields, database.FieldCreatedAt)
@@ -81,6 +95,11 @@ func (d *DatabaseQuery) collectField(ctx context.Context, opCtx *graphql.Operati
 			if _, ok := fieldSeen[database.FieldDsn]; !ok {
 				selectedFields = append(selectedFields, database.FieldDsn)
 				fieldSeen[database.FieldDsn] = struct{}{}
+			}
+		case "groupID":
+			if _, ok := fieldSeen[database.FieldGroupID]; !ok {
+				selectedFields = append(selectedFields, database.FieldGroupID)
+				fieldSeen[database.FieldGroupID] = struct{}{}
 			}
 		case "status":
 			if _, ok := fieldSeen[database.FieldStatus]; !ok {
@@ -154,6 +173,18 @@ func (gr *GroupQuery) collectField(ctx context.Context, opCtx *graphql.Operation
 	)
 	for _, field := range graphql.CollectFields(opCtx, collected.Selections, satisfies) {
 		switch field.Name {
+		case "databases":
+			var (
+				alias = field.Alias
+				path  = append(path, alias)
+				query = (&DatabaseClient{config: gr.config}).Query()
+			)
+			if err := query.collectField(ctx, opCtx, field, path, satisfies...); err != nil {
+				return err
+			}
+			gr.WithNamedDatabases(alias, func(wq *DatabaseQuery) {
+				*wq = *query
+			})
 		case "createdAt":
 			if _, ok := fieldSeen[group.FieldCreatedAt]; !ok {
 				selectedFields = append(selectedFields, group.FieldCreatedAt)

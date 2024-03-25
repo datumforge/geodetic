@@ -4,8 +4,10 @@ import (
 	"entgo.io/contrib/entgql"
 	"entgo.io/ent"
 	"entgo.io/ent/schema"
+	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
 
+	"github.com/datumforge/entx"
 	emixin "github.com/datumforge/entx/mixin"
 
 	"github.com/datumforge/geodetic/internal/ent/enums"
@@ -36,7 +38,7 @@ func (Group) Fields() []ent.Field {
 		field.String("token").
 			Sensitive().
 			Comment("the auth token used to connect to the group").
-			NotEmpty(),
+			Optional(), // optional because the token is created after the group is created
 		field.Enum("region").
 			GoType(enums.Region("")).
 			Comment("region the group").
@@ -59,6 +61,14 @@ func (Group) Hooks() []ent.Hook {
 		hooks.HookGroupCreate(),
 		hooks.HookGroupUpdate(),
 		hooks.HookGroupDelete(),
+	}
+}
+
+// Edges of the Database
+func (Group) Edges() []ent.Edge {
+	return []ent.Edge{
+		edge.To("databases", Database.Type).
+			Annotations(entx.CascadeAnnotationField("Group")),
 	}
 }
 

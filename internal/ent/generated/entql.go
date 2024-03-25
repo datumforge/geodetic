@@ -5,6 +5,7 @@ package generated
 import (
 	"github.com/datumforge/geodetic/internal/ent/generated/database"
 	"github.com/datumforge/geodetic/internal/ent/generated/group"
+	"github.com/datumforge/geodetic/internal/ent/generated/predicate"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
@@ -36,6 +37,7 @@ var schemaGraph = func() *sqlgraph.Schema {
 			database.FieldName:           {Type: field.TypeString, Column: database.FieldName},
 			database.FieldGeo:            {Type: field.TypeString, Column: database.FieldGeo},
 			database.FieldDsn:            {Type: field.TypeString, Column: database.FieldDsn},
+			database.FieldGroupID:        {Type: field.TypeString, Column: database.FieldGroupID},
 			database.FieldToken:          {Type: field.TypeString, Column: database.FieldToken},
 			database.FieldStatus:         {Type: field.TypeEnum, Column: database.FieldStatus},
 			database.FieldProvider:       {Type: field.TypeEnum, Column: database.FieldProvider},
@@ -66,6 +68,30 @@ var schemaGraph = func() *sqlgraph.Schema {
 			group.FieldRegion:          {Type: field.TypeEnum, Column: group.FieldRegion},
 		},
 	}
+	graph.MustAddE(
+		"group",
+		&sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   database.GroupTable,
+			Columns: []string{database.GroupColumn},
+			Bidi:    false,
+		},
+		"Database",
+		"Group",
+	)
+	graph.MustAddE(
+		"databases",
+		&sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   group.DatabasesTable,
+			Columns: []string{group.DatabasesColumn},
+			Bidi:    false,
+		},
+		"Group",
+		"Database",
+	)
 	return graph
 }()
 
@@ -165,6 +191,11 @@ func (f *DatabaseFilter) WhereDsn(p entql.StringP) {
 	f.Where(p.Field(database.FieldDsn))
 }
 
+// WhereGroupID applies the entql string predicate on the group_id field.
+func (f *DatabaseFilter) WhereGroupID(p entql.StringP) {
+	f.Where(p.Field(database.FieldGroupID))
+}
+
 // WhereToken applies the entql string predicate on the token field.
 func (f *DatabaseFilter) WhereToken(p entql.StringP) {
 	f.Where(p.Field(database.FieldToken))
@@ -178,6 +209,20 @@ func (f *DatabaseFilter) WhereStatus(p entql.StringP) {
 // WhereProvider applies the entql string predicate on the provider field.
 func (f *DatabaseFilter) WhereProvider(p entql.StringP) {
 	f.Where(p.Field(database.FieldProvider))
+}
+
+// WhereHasGroup applies a predicate to check if query has an edge group.
+func (f *DatabaseFilter) WhereHasGroup() {
+	f.Where(entql.HasEdge("group"))
+}
+
+// WhereHasGroupWith applies a predicate to check if query has an edge group with a given conditions (other predicates).
+func (f *DatabaseFilter) WhereHasGroupWith(preds ...predicate.Group) {
+	f.Where(entql.HasEdgeWith("group", sqlgraph.WrapFunc(func(s *sql.Selector) {
+		for _, p := range preds {
+			p(s)
+		}
+	})))
 }
 
 // addPredicate implements the predicateAdder interface.
@@ -278,4 +323,18 @@ func (f *GroupFilter) WhereToken(p entql.StringP) {
 // WhereRegion applies the entql string predicate on the region field.
 func (f *GroupFilter) WhereRegion(p entql.StringP) {
 	f.Where(p.Field(group.FieldRegion))
+}
+
+// WhereHasDatabases applies a predicate to check if query has an edge databases.
+func (f *GroupFilter) WhereHasDatabases() {
+	f.Where(entql.HasEdge("databases"))
+}
+
+// WhereHasDatabasesWith applies a predicate to check if query has an edge databases with a given conditions (other predicates).
+func (f *GroupFilter) WhereHasDatabasesWith(preds ...predicate.Database) {
+	f.Where(entql.HasEdgeWith("databases", sqlgraph.WrapFunc(func(s *sql.Selector) {
+		for _, p := range preds {
+			p(s)
+		}
+	})))
 }

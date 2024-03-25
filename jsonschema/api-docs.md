@@ -187,8 +187,8 @@ TLS settings for the server for secure connections
 |Name|Type|Description|Required|
 |----|----|-----------|--------|
 |**token**|`string`||yes|
-|**base\_url**|`string`||yes|
-|**org\_name**|`string`||yes|
+|**baseUrl**|`string`||yes|
+|**orgName**|`string`||yes|
 
 **Additional Properties:** not allowed  
 <a name="redis"></a>

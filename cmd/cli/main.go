@@ -5,6 +5,8 @@ import (
 
 	// since the cmds are no longer part of the same package
 	// they must all be imported in main
+	_ "github.com/datumforge/geodetic/cmd/cli/cmd/database"
+	_ "github.com/datumforge/geodetic/cmd/cli/cmd/group"
 	_ "github.com/datumforge/geodetic/cmd/cli/cmd/version"
 )
 

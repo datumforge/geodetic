@@ -9,7 +9,7 @@ import (
 	"github.com/datumforge/geodetic/internal/ent/enums"
 )
 
-func TestToToDatabaseProvider(t *testing.T) {
+func TestToDatabaseProvider(t *testing.T) {
 	testCases := []struct {
 		input    string
 		expected enums.DatabaseProvider

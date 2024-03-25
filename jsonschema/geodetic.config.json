@@ -383,10 +383,10 @@
         "token": {
           "type": "string"
         },
-        "base_url": {
+        "baseUrl": {
           "type": "string"
         },
-        "org_name": {
+        "orgName": {
           "type": "string"
         }
       },
@@ -394,8 +394,8 @@
       "type": "object",
       "required": [
         "token",
-        "base_url",
-        "org_name"
+        "baseUrl",
+        "orgName"
       ]
     }
   },

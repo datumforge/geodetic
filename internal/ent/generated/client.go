@@ -16,6 +16,7 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/dialect"
 	"entgo.io/ent/dialect/sql"
+	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/datumforge/fgax"
 	"github.com/datumforge/geodetic/internal/ent/generated/database"
 	"github.com/datumforge/geodetic/internal/ent/generated/group"
@@ -377,6 +378,25 @@ func (c *DatabaseClient) GetX(ctx context.Context, id string) *Database {
 	return obj
 }
 
+// QueryGroup queries the group edge of a Database.
+func (c *DatabaseClient) QueryGroup(d *Database) *GroupQuery {
+	query := (&GroupClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := d.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(database.Table, database.FieldID, id),
+			sqlgraph.To(group.Table, group.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, database.GroupTable, database.GroupColumn),
+		)
+		schemaConfig := d.schemaConfig
+		step.To.Schema = schemaConfig.Group
+		step.Edge.Schema = schemaConfig.Database
+		fromV = sqlgraph.Neighbors(d.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
 // Hooks returns the client hooks.
 func (c *DatabaseClient) Hooks() []Hook {
 	hooks := c.hooks.Database
@@ -509,6 +529,25 @@ func (c *GroupClient) GetX(ctx context.Context, id string) *Group {
 		panic(err)
 	}
 	return obj
+}
+
+// QueryDatabases queries the databases edge of a Group.
+func (c *GroupClient) QueryDatabases(gr *Group) *DatabaseQuery {
+	query := (&DatabaseClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := gr.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(group.Table, group.FieldID, id),
+			sqlgraph.To(database.Table, database.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, group.DatabasesTable, group.DatabasesColumn),
+		)
+		schemaConfig := gr.schemaConfig
+		step.To.Schema = schemaConfig.Database
+		step.Edge.Schema = schemaConfig.Database
+		fromV = sqlgraph.Neighbors(gr.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
 }
 
 // Hooks returns the client hooks.

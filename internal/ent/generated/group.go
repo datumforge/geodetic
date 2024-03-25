@@ -42,8 +42,33 @@ type Group struct {
 	// the auth token used to connect to the group
 	Token string `json:"-"`
 	// region the group
-	Region       enums.Region `json:"region,omitempty"`
+	Region enums.Region `json:"region,omitempty"`
+	// Edges holds the relations/edges for other nodes in the graph.
+	// The values are being populated by the GroupQuery when eager-loading is set.
+	Edges        GroupEdges `json:"edges"`
 	selectValues sql.SelectValues
+}
+
+// GroupEdges holds the relations/edges for other nodes in the graph.
+type GroupEdges struct {
+	// Databases holds the value of the databases edge.
+	Databases []*Database `json:"databases,omitempty"`
+	// loadedTypes holds the information for reporting if a
+	// type was loaded (or requested) in eager-loading or not.
+	loadedTypes [1]bool
+	// totalCount holds the count of the edges above.
+	totalCount [1]map[string]int
+
+	namedDatabases map[string][]*Database
+}
+
+// DatabasesOrErr returns the Databases value or an error if the edge
+// was not loaded in eager-loading.
+func (e GroupEdges) DatabasesOrErr() ([]*Database, error) {
+	if e.loadedTypes[0] {
+		return e.Databases, nil
+	}
+	return nil, &NotLoadedError{edge: "databases"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -165,6 +190,11 @@ func (gr *Group) Value(name string) (ent.Value, error) {
 	return gr.selectValues.Get(name)
 }
 
+// QueryDatabases queries the "databases" edge of the Group entity.
+func (gr *Group) QueryDatabases() *DatabaseQuery {
+	return NewGroupClient(gr.config).QueryDatabases(gr)
+}
+
 // Update returns a builder for updating this Group.
 // Note that you need to call Group.Unwrap() before calling this method if this Group
 // was returned from a transaction, and the transaction was committed or rolled back.
@@ -224,6 +254,30 @@ func (gr *Group) String() string {
 	builder.WriteString(fmt.Sprintf("%v", gr.Region))
 	builder.WriteByte(')')
 	return builder.String()
+}
+
+// NamedDatabases returns the Databases named value or an error if the edge was not
+// loaded in eager-loading with this name.
+func (gr *Group) NamedDatabases(name string) ([]*Database, error) {
+	if gr.Edges.namedDatabases == nil {
+		return nil, &NotLoadedError{edge: name}
+	}
+	nodes, ok := gr.Edges.namedDatabases[name]
+	if !ok {
+		return nil, &NotLoadedError{edge: name}
+	}
+	return nodes, nil
+}
+
+func (gr *Group) appendNamedDatabases(name string, edges ...*Database) {
+	if gr.Edges.namedDatabases == nil {
+		gr.Edges.namedDatabases = make(map[string][]*Database)
+	}
+	if len(edges) == 0 {
+		gr.Edges.namedDatabases[name] = []*Database{}
+	} else {
+		gr.Edges.namedDatabases[name] = append(gr.Edges.namedDatabases[name], edges...)
+	}
 }
 
 // Groups is a parsable slice of Group.

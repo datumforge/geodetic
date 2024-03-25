@@ -102,8 +102,6 @@ github.com/datumforge/entx v0.0.7 h1:G5DEJIa9X434OPiHRaoDEWADei+XrWD5LjeqFXDXqVk
 github.com/datumforge/entx v0.0.7/go.mod h1:zAdGGTOdOdr5EVdaB/JMO2EqqEk5K/9DEeaCJFAVABo=
 github.com/datumforge/fgax v0.1.4 h1:LKx63TQXXFbx2ULdMUz2wkdMQTePix0yWc0Lxc84EqI=
 github.com/datumforge/fgax v0.1.4/go.mod h1:UWf84kM2Tu/H2G8/IPRwMMMhwZOWYN7UQ39z+F2Lb8s=
-github.com/datumforge/go-turso v0.0.2-0.20240320212225-47f4ae63bb46 h1:yvKquitodWSlr4iKZhjeaOqfRBNL7NZzYvGOhtG6wO0=
-github.com/datumforge/go-turso v0.0.2-0.20240320212225-47f4ae63bb46/go.mod h1:s5AAVKbvEjJzMg/8ZlSZxCG/RTL+w4K0Ycwd98cZ2YE=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc h1:U9qPSI2PIWSS1VwoXQT9A3Wy9MM3WgvqSxFWenqJduM=

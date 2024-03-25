@@ -22,9 +22,14 @@ func (r *queryResolver) Nodes(ctx context.Context, ids []string) ([]generated.No
 	panic(fmt.Errorf("not implemented: Nodes - nodes"))
 }
 
+// Databases is the resolver for the databases field.
+func (r *queryResolver) Databases(ctx context.Context, after *entgql.Cursor[string], first *int, before *entgql.Cursor[string], last *int, where *generated.DatabaseWhereInput) (*generated.DatabaseConnection, error) {
+	return withTransactionalMutation(ctx).Database.Query().Paginate(ctx, after, first, before, last, generated.WithDatabaseFilter(where.Filter))
+}
+
 // Groups is the resolver for the groups field.
 func (r *queryResolver) Groups(ctx context.Context, after *entgql.Cursor[string], first *int, before *entgql.Cursor[string], last *int, where *generated.GroupWhereInput) (*generated.GroupConnection, error) {
-	panic(fmt.Errorf("not implemented: Groups - groups"))
+	return withTransactionalMutation(ctx).Group.Query().Paginate(ctx, after, first, before, last, generated.WithGroupFilter(where.Filter))
 }
 
 // Query returns QueryResolver implementation.

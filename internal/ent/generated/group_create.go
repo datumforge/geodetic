@@ -11,6 +11,7 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/datumforge/geodetic/internal/ent/enums"
+	"github.com/datumforge/geodetic/internal/ent/generated/database"
 	"github.com/datumforge/geodetic/internal/ent/generated/group"
 )
 
@@ -151,6 +152,14 @@ func (gc *GroupCreate) SetToken(s string) *GroupCreate {
 	return gc
 }
 
+// SetNillableToken sets the "token" field if the given value is not nil.
+func (gc *GroupCreate) SetNillableToken(s *string) *GroupCreate {
+	if s != nil {
+		gc.SetToken(*s)
+	}
+	return gc
+}
+
 // SetRegion sets the "region" field.
 func (gc *GroupCreate) SetRegion(e enums.Region) *GroupCreate {
 	gc.mutation.SetRegion(e)
@@ -177,6 +186,21 @@ func (gc *GroupCreate) SetNillableID(s *string) *GroupCreate {
 		gc.SetID(*s)
 	}
 	return gc
+}
+
+// AddDatabaseIDs adds the "databases" edge to the Database entity by IDs.
+func (gc *GroupCreate) AddDatabaseIDs(ids ...string) *GroupCreate {
+	gc.mutation.AddDatabaseIDs(ids...)
+	return gc
+}
+
+// AddDatabases adds the "databases" edges to the Database entity.
+func (gc *GroupCreate) AddDatabases(d ...*Database) *GroupCreate {
+	ids := make([]string, len(d))
+	for i := range d {
+		ids[i] = d[i].ID
+	}
+	return gc.AddDatabaseIDs(ids...)
 }
 
 // Mutation returns the GroupMutation object of the builder.
@@ -252,14 +276,6 @@ func (gc *GroupCreate) check() error {
 	if v, ok := gc.mutation.Name(); ok {
 		if err := group.NameValidator(v); err != nil {
 			return &ValidationError{Name: "name", err: fmt.Errorf(`generated: validator failed for field "Group.name": %w`, err)}
-		}
-	}
-	if _, ok := gc.mutation.Token(); !ok {
-		return &ValidationError{Name: "token", err: errors.New(`generated: missing required field "Group.token"`)}
-	}
-	if v, ok := gc.mutation.Token(); ok {
-		if err := group.TokenValidator(v); err != nil {
-			return &ValidationError{Name: "token", err: fmt.Errorf(`generated: validator failed for field "Group.token": %w`, err)}
 		}
 	}
 	if _, ok := gc.mutation.Region(); !ok {
@@ -353,6 +369,23 @@ func (gc *GroupCreate) createSpec() (*Group, *sqlgraph.CreateSpec) {
 	if value, ok := gc.mutation.Region(); ok {
 		_spec.SetField(group.FieldRegion, field.TypeEnum, value)
 		_node.Region = value
+	}
+	if nodes := gc.mutation.DatabasesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   group.DatabasesTable,
+			Columns: []string{group.DatabasesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(database.FieldID, field.TypeString),
+			},
+		}
+		edge.Schema = gc.schemaConfig.Database
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec
 }

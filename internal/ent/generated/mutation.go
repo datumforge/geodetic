@@ -50,6 +50,8 @@ type DatabaseMutation struct {
 	status          *enums.DatabaseStatus
 	provider        *enums.DatabaseProvider
 	clearedFields   map[string]struct{}
+	group           *string
+	clearedgroup    bool
 	done            bool
 	oldValue        func(context.Context) (*Database, error)
 	predicates      []predicate.Database
@@ -610,6 +612,42 @@ func (m *DatabaseMutation) ResetDsn() {
 	m.dsn = nil
 }
 
+// SetGroupID sets the "group_id" field.
+func (m *DatabaseMutation) SetGroupID(s string) {
+	m.group = &s
+}
+
+// GroupID returns the value of the "group_id" field in the mutation.
+func (m *DatabaseMutation) GroupID() (r string, exists bool) {
+	v := m.group
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldGroupID returns the old "group_id" field's value of the Database entity.
+// If the Database object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *DatabaseMutation) OldGroupID(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldGroupID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldGroupID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldGroupID: %w", err)
+	}
+	return oldValue.GroupID, nil
+}
+
+// ResetGroupID resets all changes to the "group_id" field.
+func (m *DatabaseMutation) ResetGroupID() {
+	m.group = nil
+}
+
 // SetToken sets the "token" field.
 func (m *DatabaseMutation) SetToken(s string) {
 	m.token = &s
@@ -641,9 +679,22 @@ func (m *DatabaseMutation) OldToken(ctx context.Context) (v string, err error) {
 	return oldValue.Token, nil
 }
 
+// ClearToken clears the value of the "token" field.
+func (m *DatabaseMutation) ClearToken() {
+	m.token = nil
+	m.clearedFields[database.FieldToken] = struct{}{}
+}
+
+// TokenCleared returns if the "token" field was cleared in this mutation.
+func (m *DatabaseMutation) TokenCleared() bool {
+	_, ok := m.clearedFields[database.FieldToken]
+	return ok
+}
+
 // ResetToken resets all changes to the "token" field.
 func (m *DatabaseMutation) ResetToken() {
 	m.token = nil
+	delete(m.clearedFields, database.FieldToken)
 }
 
 // SetStatus sets the "status" field.
@@ -718,6 +769,33 @@ func (m *DatabaseMutation) ResetProvider() {
 	m.provider = nil
 }
 
+// ClearGroup clears the "group" edge to the Group entity.
+func (m *DatabaseMutation) ClearGroup() {
+	m.clearedgroup = true
+	m.clearedFields[database.FieldGroupID] = struct{}{}
+}
+
+// GroupCleared reports if the "group" edge to the Group entity was cleared.
+func (m *DatabaseMutation) GroupCleared() bool {
+	return m.clearedgroup
+}
+
+// GroupIDs returns the "group" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// GroupID instead. It exists only for internal usage by the builders.
+func (m *DatabaseMutation) GroupIDs() (ids []string) {
+	if id := m.group; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetGroup resets all changes to the "group" edge.
+func (m *DatabaseMutation) ResetGroup() {
+	m.group = nil
+	m.clearedgroup = false
+}
+
 // Where appends a list predicates to the DatabaseMutation builder.
 func (m *DatabaseMutation) Where(ps ...predicate.Database) {
 	m.predicates = append(m.predicates, ps...)
@@ -752,7 +830,7 @@ func (m *DatabaseMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *DatabaseMutation) Fields() []string {
-	fields := make([]string, 0, 13)
+	fields := make([]string, 0, 14)
 	if m.created_at != nil {
 		fields = append(fields, database.FieldCreatedAt)
 	}
@@ -782,6 +860,9 @@ func (m *DatabaseMutation) Fields() []string {
 	}
 	if m.dsn != nil {
 		fields = append(fields, database.FieldDsn)
+	}
+	if m.group != nil {
+		fields = append(fields, database.FieldGroupID)
 	}
 	if m.token != nil {
 		fields = append(fields, database.FieldToken)
@@ -820,6 +901,8 @@ func (m *DatabaseMutation) Field(name string) (ent.Value, bool) {
 		return m.Geo()
 	case database.FieldDsn:
 		return m.Dsn()
+	case database.FieldGroupID:
+		return m.GroupID()
 	case database.FieldToken:
 		return m.Token()
 	case database.FieldStatus:
@@ -855,6 +938,8 @@ func (m *DatabaseMutation) OldField(ctx context.Context, name string) (ent.Value
 		return m.OldGeo(ctx)
 	case database.FieldDsn:
 		return m.OldDsn(ctx)
+	case database.FieldGroupID:
+		return m.OldGroupID(ctx)
 	case database.FieldToken:
 		return m.OldToken(ctx)
 	case database.FieldStatus:
@@ -940,6 +1025,13 @@ func (m *DatabaseMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetDsn(v)
 		return nil
+	case database.FieldGroupID:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetGroupID(v)
+		return nil
 	case database.FieldToken:
 		v, ok := value.(string)
 		if !ok {
@@ -1012,6 +1104,9 @@ func (m *DatabaseMutation) ClearedFields() []string {
 	if m.FieldCleared(database.FieldGeo) {
 		fields = append(fields, database.FieldGeo)
 	}
+	if m.FieldCleared(database.FieldToken) {
+		fields = append(fields, database.FieldToken)
+	}
 	return fields
 }
 
@@ -1046,6 +1141,9 @@ func (m *DatabaseMutation) ClearField(name string) error {
 		return nil
 	case database.FieldGeo:
 		m.ClearGeo()
+		return nil
+	case database.FieldToken:
+		m.ClearToken()
 		return nil
 	}
 	return fmt.Errorf("unknown Database nullable field %s", name)
@@ -1085,6 +1183,9 @@ func (m *DatabaseMutation) ResetField(name string) error {
 	case database.FieldDsn:
 		m.ResetDsn()
 		return nil
+	case database.FieldGroupID:
+		m.ResetGroupID()
+		return nil
 	case database.FieldToken:
 		m.ResetToken()
 		return nil
@@ -1100,19 +1201,28 @@ func (m *DatabaseMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *DatabaseMutation) AddedEdges() []string {
-	edges := make([]string, 0, 0)
+	edges := make([]string, 0, 1)
+	if m.group != nil {
+		edges = append(edges, database.EdgeGroup)
+	}
 	return edges
 }
 
 // AddedIDs returns all IDs (to other nodes) that were added for the given edge
 // name in this mutation.
 func (m *DatabaseMutation) AddedIDs(name string) []ent.Value {
+	switch name {
+	case database.EdgeGroup:
+		if id := m.group; id != nil {
+			return []ent.Value{*id}
+		}
+	}
 	return nil
 }
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *DatabaseMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 0)
+	edges := make([]string, 0, 1)
 	return edges
 }
 
@@ -1124,25 +1234,42 @@ func (m *DatabaseMutation) RemovedIDs(name string) []ent.Value {
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *DatabaseMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 0)
+	edges := make([]string, 0, 1)
+	if m.clearedgroup {
+		edges = append(edges, database.EdgeGroup)
+	}
 	return edges
 }
 
 // EdgeCleared returns a boolean which indicates if the edge with the given name
 // was cleared in this mutation.
 func (m *DatabaseMutation) EdgeCleared(name string) bool {
+	switch name {
+	case database.EdgeGroup:
+		return m.clearedgroup
+	}
 	return false
 }
 
 // ClearEdge clears the value of the edge with the given name. It returns an error
 // if that edge is not defined in the schema.
 func (m *DatabaseMutation) ClearEdge(name string) error {
+	switch name {
+	case database.EdgeGroup:
+		m.ClearGroup()
+		return nil
+	}
 	return fmt.Errorf("unknown Database unique edge %s", name)
 }
 
 // ResetEdge resets all changes to the edge with the given name in this mutation.
 // It returns an error if the edge is not defined in the schema.
 func (m *DatabaseMutation) ResetEdge(name string) error {
+	switch name {
+	case database.EdgeGroup:
+		m.ResetGroup()
+		return nil
+	}
 	return fmt.Errorf("unknown Database edge %s", name)
 }
 
@@ -1166,6 +1293,9 @@ type GroupMutation struct {
 	token            *string
 	region           *enums.Region
 	clearedFields    map[string]struct{}
+	databases        map[string]struct{}
+	removeddatabases map[string]struct{}
+	cleareddatabases bool
 	done             bool
 	oldValue         func(context.Context) (*Group, error)
 	predicates       []predicate.Group
@@ -1799,9 +1929,22 @@ func (m *GroupMutation) OldToken(ctx context.Context) (v string, err error) {
 	return oldValue.Token, nil
 }
 
+// ClearToken clears the value of the "token" field.
+func (m *GroupMutation) ClearToken() {
+	m.token = nil
+	m.clearedFields[group.FieldToken] = struct{}{}
+}
+
+// TokenCleared returns if the "token" field was cleared in this mutation.
+func (m *GroupMutation) TokenCleared() bool {
+	_, ok := m.clearedFields[group.FieldToken]
+	return ok
+}
+
 // ResetToken resets all changes to the "token" field.
 func (m *GroupMutation) ResetToken() {
 	m.token = nil
+	delete(m.clearedFields, group.FieldToken)
 }
 
 // SetRegion sets the "region" field.
@@ -1838,6 +1981,60 @@ func (m *GroupMutation) OldRegion(ctx context.Context) (v enums.Region, err erro
 // ResetRegion resets all changes to the "region" field.
 func (m *GroupMutation) ResetRegion() {
 	m.region = nil
+}
+
+// AddDatabaseIDs adds the "databases" edge to the Database entity by ids.
+func (m *GroupMutation) AddDatabaseIDs(ids ...string) {
+	if m.databases == nil {
+		m.databases = make(map[string]struct{})
+	}
+	for i := range ids {
+		m.databases[ids[i]] = struct{}{}
+	}
+}
+
+// ClearDatabases clears the "databases" edge to the Database entity.
+func (m *GroupMutation) ClearDatabases() {
+	m.cleareddatabases = true
+}
+
+// DatabasesCleared reports if the "databases" edge to the Database entity was cleared.
+func (m *GroupMutation) DatabasesCleared() bool {
+	return m.cleareddatabases
+}
+
+// RemoveDatabaseIDs removes the "databases" edge to the Database entity by IDs.
+func (m *GroupMutation) RemoveDatabaseIDs(ids ...string) {
+	if m.removeddatabases == nil {
+		m.removeddatabases = make(map[string]struct{})
+	}
+	for i := range ids {
+		delete(m.databases, ids[i])
+		m.removeddatabases[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedDatabases returns the removed IDs of the "databases" edge to the Database entity.
+func (m *GroupMutation) RemovedDatabasesIDs() (ids []string) {
+	for id := range m.removeddatabases {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// DatabasesIDs returns the "databases" edge IDs in the mutation.
+func (m *GroupMutation) DatabasesIDs() (ids []string) {
+	for id := range m.databases {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetDatabases resets all changes to the "databases" edge.
+func (m *GroupMutation) ResetDatabases() {
+	m.databases = nil
+	m.cleareddatabases = false
+	m.removeddatabases = nil
 }
 
 // Where appends a list predicates to the GroupMutation builder.
@@ -2126,6 +2323,9 @@ func (m *GroupMutation) ClearedFields() []string {
 	if m.FieldCleared(group.FieldLocations) {
 		fields = append(fields, group.FieldLocations)
 	}
+	if m.FieldCleared(group.FieldToken) {
+		fields = append(fields, group.FieldToken)
+	}
 	return fields
 }
 
@@ -2166,6 +2366,9 @@ func (m *GroupMutation) ClearField(name string) error {
 		return nil
 	case group.FieldLocations:
 		m.ClearLocations()
+		return nil
+	case group.FieldToken:
+		m.ClearToken()
 		return nil
 	}
 	return fmt.Errorf("unknown Group nullable field %s", name)
@@ -2217,48 +2420,84 @@ func (m *GroupMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *GroupMutation) AddedEdges() []string {
-	edges := make([]string, 0, 0)
+	edges := make([]string, 0, 1)
+	if m.databases != nil {
+		edges = append(edges, group.EdgeDatabases)
+	}
 	return edges
 }
 
 // AddedIDs returns all IDs (to other nodes) that were added for the given edge
 // name in this mutation.
 func (m *GroupMutation) AddedIDs(name string) []ent.Value {
+	switch name {
+	case group.EdgeDatabases:
+		ids := make([]ent.Value, 0, len(m.databases))
+		for id := range m.databases {
+			ids = append(ids, id)
+		}
+		return ids
+	}
 	return nil
 }
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *GroupMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 0)
+	edges := make([]string, 0, 1)
+	if m.removeddatabases != nil {
+		edges = append(edges, group.EdgeDatabases)
+	}
 	return edges
 }
 
 // RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
 // the given name in this mutation.
 func (m *GroupMutation) RemovedIDs(name string) []ent.Value {
+	switch name {
+	case group.EdgeDatabases:
+		ids := make([]ent.Value, 0, len(m.removeddatabases))
+		for id := range m.removeddatabases {
+			ids = append(ids, id)
+		}
+		return ids
+	}
 	return nil
 }
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *GroupMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 0)
+	edges := make([]string, 0, 1)
+	if m.cleareddatabases {
+		edges = append(edges, group.EdgeDatabases)
+	}
 	return edges
 }
 
 // EdgeCleared returns a boolean which indicates if the edge with the given name
 // was cleared in this mutation.
 func (m *GroupMutation) EdgeCleared(name string) bool {
+	switch name {
+	case group.EdgeDatabases:
+		return m.cleareddatabases
+	}
 	return false
 }
 
 // ClearEdge clears the value of the edge with the given name. It returns an error
 // if that edge is not defined in the schema.
 func (m *GroupMutation) ClearEdge(name string) error {
+	switch name {
+	}
 	return fmt.Errorf("unknown Group unique edge %s", name)
 }
 
 // ResetEdge resets all changes to the edge with the given name in this mutation.
 // It returns an error if the edge is not defined in the schema.
 func (m *GroupMutation) ResetEdge(name string) error {
+	switch name {
+	case group.EdgeDatabases:
+		m.ResetDatabases()
+		return nil
+	}
 	return fmt.Errorf("unknown Group edge %s", name)
 }

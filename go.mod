@@ -2,6 +2,8 @@ module github.com/datumforge/geodetic
 
 go 1.22.1
 
+replace github.com/datumforge/go-turso => /Users/sarahfunkhouser/go/src/github.com/datumforge/go-turso
+
 require (
 	ariga.io/entcache v0.1.0
 	entgo.io/contrib v0.4.5
@@ -15,7 +17,7 @@ require (
 	github.com/datumforge/echozap v0.0.0-20231205193458-b29cc54cd34c
 	github.com/datumforge/entx v0.0.7
 	github.com/datumforge/fgax v0.1.4
-	github.com/datumforge/go-turso v0.0.2-0.20240320212225-47f4ae63bb46
+	github.com/datumforge/go-turso v0.0.1
 	github.com/gorilla/websocket v1.5.1
 	github.com/hashicorp/go-multierror v1.1.1
 	github.com/invopop/jsonschema v0.12.0
