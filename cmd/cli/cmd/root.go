@@ -209,12 +209,19 @@ func GetHeaders(s interface{}, prefix string) []string {
 	headers := []string{}
 	val := reflect.Indirect(reflect.ValueOf(s))
 
-	for i := 0; i < val.NumField(); i++ {
-		if val.Type().Field(i).Type.Kind() == reflect.Struct {
-			continue
-		}
+	if val.Kind() == reflect.Struct {
+		for i := range val.NumField() { //nolint:typecheck // go 1.22+ allows this, linter is wrong
+			if val.Type().Field(i).Type.Kind() == reflect.Struct {
+				continue
+			}
 
-		headers = append(headers, fmt.Sprintf("%s%s", prefix, val.Type().Field(i).Name))
+			headers = append(headers, fmt.Sprintf("%s%s", prefix, val.Type().Field(i).Name))
+		}
+	} else {
+		// if the struct is a map, get the keys
+		for k := range val.Interface().(map[string]interface{}) {
+			headers = append(headers, fmt.Sprintf("%s%s", prefix, k))
+		}
 	}
 
 	return headers
@@ -224,25 +231,83 @@ func GetHeaders(s interface{}, prefix string) []string {
 func GetFields(i interface{}) (res []string) {
 	v := reflect.ValueOf(i)
 
-	for j := range v.NumField() { //nolint:typecheck // go 1.22+ allows this, linter is wrong
-		t := v.Field(j).Type()
-		if t.Kind() == reflect.Struct {
-			continue
+	if v.Kind() == reflect.Struct {
+		for j := range v.NumField() { //nolint:typecheck // go 1.22+ allows this, linter is wrong
+			t := v.Field(j).Type()
+			if t.Kind() == reflect.Struct {
+				continue
+			}
+
+			var val string
+
+			switch t.Kind() {
+			case reflect.Ptr:
+				val = v.Field(j).Elem().String()
+			case reflect.Slice:
+				val = fmt.Sprintf("%v", v.Field(j).Interface())
+			default:
+				val = v.Field(j).String()
+			}
+
+			res = append(res, val)
 		}
-
-		var val string
-
-		switch t.Kind() {
-		case reflect.Ptr:
-			val = v.Field(j).Elem().String()
-		case reflect.Slice:
-			val = fmt.Sprintf("%v", v.Field(j).Interface())
-		default:
-			val = v.Field(j).String()
+	} else {
+		// if the struct is a map, get the keys
+		for _, val := range v.Interface().(map[string]interface{}) {
+			res = append(res, val.(string))
 		}
-
-		res = append(res, val)
 	}
 
 	return
+}
+
+type GraphResponse struct {
+	Edges []Edge `json:"edges"`
+}
+
+type Edge struct {
+	Node interface{} `json:"node"`
+}
+
+func RowsTablePrint(resp GraphResponse) error {
+	// check if there are any groups, otherwise we have nothing to print
+	if len(resp.Edges) > 0 {
+		rows := resp.Edges
+
+		data := [][]string{}
+
+		headers := GetHeaders(rows[0].Node, "")
+
+		for _, r := range rows {
+			rowMap := r.Node.(map[string]interface{})
+			row := []string{}
+			for _, h := range headers {
+				row = append(row, rowMap[h].(string))
+			}
+
+			data = append(data, row)
+		}
+
+		// print ze data
+		return TablePrint(headers, data)
+	}
+
+	return nil
+}
+
+// SingleRowTablePrint prints a single row table to the console
+func SingleRowTablePrint(r interface{}) error {
+	// get the headers for the table for each struct
+	header := GetHeaders(r, "")
+
+	data := [][]string{}
+
+	// get the field values for each struct
+	fields := GetFields(r)
+
+	// append the fields to the data slice
+	data = append(data, fields)
+
+	// print ze data
+	return TablePrint(header, data)
 }

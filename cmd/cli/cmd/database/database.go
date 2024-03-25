@@ -21,6 +21,7 @@ func databasesTablePrint(d geodeticclient.GetAllDatabases_Databases) error {
 	// check if there are any database, otherwise we have nothing to print
 	if len(d.Edges) > 0 {
 		dbs := d.Edges
+
 		// get the headers for the table for each struct and substruct
 		header := geodetic.GetHeaders(dbs[0].Node, "")
 

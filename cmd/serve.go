@@ -85,11 +85,6 @@ func serve(ctx context.Context) error {
 		serveropts.WithReadyChecks(dbConfig, redisClient),
 	)
 
-	// add session manager
-	so.AddServerOptions(
-		serveropts.WithSessionManager(redisClient),
-	)
-
 	srv := server.NewServer(so.Config, so.Config.Logger)
 
 	// Setup Graph API Handlers

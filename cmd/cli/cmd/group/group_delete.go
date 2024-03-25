@@ -43,7 +43,7 @@ func deleteGroup(ctx context.Context) error {
 	}
 
 	if viper.GetString("output.format") == "json" {
-		s, err := json.Marshal(g)
+		s, err := json.Marshal(g.DeleteGroup)
 		if err != nil {
 			return err
 		}
@@ -51,5 +51,5 @@ func deleteGroup(ctx context.Context) error {
 		return geodetic.JSONPrint(s)
 	}
 
-	return groupTablePrint(g.DeleteGroup)
+	return geodetic.SingleRowTablePrint(g.DeleteGroup)
 }

@@ -66,7 +66,7 @@ func createDatabase(ctx context.Context) error {
 	}
 
 	if viper.GetString("output.format") == "json" {
-		s, err := json.Marshal(d)
+		s, err := json.Marshal(d.CreateDatabase.Database)
 		if err != nil {
 			return err
 		}
@@ -74,5 +74,5 @@ func createDatabase(ctx context.Context) error {
 		return geodetic.JSONPrint(s)
 	}
 
-	return databaseTablePrint(d.CreateDatabase.Database)
+	return geodetic.SingleRowTablePrint(d.CreateDatabase.Database)
 }

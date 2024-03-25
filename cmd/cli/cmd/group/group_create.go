@@ -64,7 +64,7 @@ func createGroup(ctx context.Context) error {
 	}
 
 	if viper.GetString("output.format") == "json" {
-		s, err := json.Marshal(g)
+		s, err := json.Marshal(g.CreateGroup.Group)
 		if err != nil {
 			return err
 		}
@@ -72,5 +72,5 @@ func createGroup(ctx context.Context) error {
 		return geodetic.JSONPrint(s)
 	}
 
-	return groupTablePrint(g.CreateGroup.Group)
+	return geodetic.SingleRowTablePrint(g.CreateGroup.Group)
 }

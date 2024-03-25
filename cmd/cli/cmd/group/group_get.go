@@ -48,7 +48,7 @@ func getGroup(ctx context.Context) error {
 		}
 
 		if viper.GetString("output.format") == "json" {
-			s, err := json.Marshal(group)
+			s, err := json.Marshal(group.Group)
 			if err != nil {
 				return err
 			}
@@ -56,7 +56,7 @@ func getGroup(ctx context.Context) error {
 			return geodetic.JSONPrint(s)
 		}
 
-		return groupTablePrint((*group).Group)
+		return geodetic.SingleRowTablePrint((*group).Group)
 	}
 
 	groups, err := cli.Client.GetAllGroups(ctx, cli.Interceptor)
@@ -64,14 +64,23 @@ func getGroup(ctx context.Context) error {
 		return err
 	}
 
-	if viper.GetString("output.format") == "json" {
-		s, err := json.Marshal(groups)
-		if err != nil {
-			return err
-		}
+	s, err := json.Marshal((*groups).Groups)
+	if err != nil {
+		return err
+	}
 
+	// print json output
+	if viper.GetString("output.format") == "json" {
 		return geodetic.JSONPrint(s)
 	}
 
-	return groupsTablePrint(groups.Groups)
+	// print table output
+	var resp geodetic.GraphResponse
+
+	err = json.Unmarshal(s, &resp)
+	if err != nil {
+		return err
+	}
+
+	return geodetic.RowsTablePrint(resp)
 }

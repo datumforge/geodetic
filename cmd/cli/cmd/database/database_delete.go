@@ -43,7 +43,7 @@ func deleteDatabase(ctx context.Context) error {
 	}
 
 	if viper.GetString("output.format") == "json" {
-		s, err := json.Marshal(d)
+		s, err := json.Marshal(d.DeleteDatabase)
 		if err != nil {
 			return err
 		}
@@ -51,5 +51,5 @@ func deleteDatabase(ctx context.Context) error {
 		return geodetic.JSONPrint(s)
 	}
 
-	return databaseTablePrint(d.DeleteDatabase)
+	return geodetic.SingleRowTablePrint(d.DeleteDatabase)
 }

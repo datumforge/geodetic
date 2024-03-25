@@ -48,7 +48,7 @@ func getDatabase(ctx context.Context) error {
 		}
 
 		if viper.GetString("output.format") == "json" {
-			s, err := json.Marshal(db)
+			s, err := json.Marshal(db.Database)
 			if err != nil {
 				return err
 			}
@@ -56,7 +56,7 @@ func getDatabase(ctx context.Context) error {
 			return geodetic.JSONPrint(s)
 		}
 
-		return databaseTablePrint((*db).Database)
+		return geodetic.SingleRowTablePrint((*db).Database)
 	}
 
 	dbs, err := cli.Client.GetAllDatabases(ctx, cli.Interceptor)
@@ -64,14 +64,23 @@ func getDatabase(ctx context.Context) error {
 		return err
 	}
 
-	if viper.GetString("output.format") == "json" {
-		s, err := json.Marshal(dbs)
-		if err != nil {
-			return err
-		}
+	s, err := json.Marshal(dbs.Databases)
+	if err != nil {
+		return err
+	}
 
+	// print json output
+	if viper.GetString("output.format") == "json" {
 		return geodetic.JSONPrint(s)
 	}
 
-	return databasesTablePrint(dbs.Databases)
+	// print table output
+	var resp geodetic.GraphResponse
+
+	err = json.Unmarshal(s, &resp)
+	if err != nil {
+		return err
+	}
+
+	return geodetic.RowsTablePrint(resp)
 }
