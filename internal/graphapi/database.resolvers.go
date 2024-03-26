@@ -8,27 +8,70 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/datumforge/datum/pkg/rout"
 	"github.com/datumforge/geodetic/internal/ent/generated"
+	"github.com/datumforge/geodetic/internal/ent/generated/database"
 )
 
 // CreateDatabase is the resolver for the createDatabase field.
 func (r *mutationResolver) CreateDatabase(ctx context.Context, input generated.CreateDatabaseInput) (*DatabaseCreatePayload, error) {
-	panic(fmt.Errorf("not implemented: CreateDatabase - createDatabase"))
+	db, err := withTransactionalMutation(ctx).Database.Create().SetInput(input).Save(ctx)
+	if err != nil {
+		if generated.IsConstraintError(err) {
+			constraintError := err.(*generated.ConstraintError)
+
+			r.logger.Debugw("constraint error", "error", constraintError.Error())
+
+			return nil, constraintError
+		}
+
+		if generated.IsValidationError(err) {
+			ve := err.(*generated.ValidationError)
+
+			return nil, rout.InvalidField(ve.Name)
+		}
+
+		r.logger.Errorw("failed to create database", "error", err)
+
+		return nil, err
+	}
+
+	return &DatabaseCreatePayload{Database: db}, err
 }
 
 // UpdateDatabase is the resolver for the updateDatabase field.
-func (r *mutationResolver) UpdateDatabase(ctx context.Context, id string, input generated.UpdateDatabaseInput) (*DatabaseUpdatePayload, error) {
+func (r *mutationResolver) UpdateDatabase(ctx context.Context, name string, input generated.UpdateDatabaseInput) (*DatabaseUpdatePayload, error) {
 	panic(fmt.Errorf("not implemented: UpdateDatabase - updateDatabase"))
 }
 
 // DeleteDatabase is the resolver for the deleteDatabase field.
-func (r *mutationResolver) DeleteDatabase(ctx context.Context, id string) (*DatabaseDeletePayload, error) {
-	panic(fmt.Errorf("not implemented: DeleteDatabase - deleteDatabase"))
+func (r *mutationResolver) DeleteDatabase(ctx context.Context, name string) (*DatabaseDeletePayload, error) {
+	db, err := withTransactionalMutation(ctx).Database.Query().Where(database.NameEQ(name)).Only(ctx)
+	if err != nil {
+		r.logger.Errorw("failed to get database", "error", err)
+
+		return nil, err
+	}
+
+	if err := withTransactionalMutation(ctx).Database.DeleteOneID(db.ID).Exec(ctx); err != nil {
+		r.logger.Errorw("failed to delete database", "error", err)
+
+		return nil, err
+	}
+
+	return &DatabaseDeletePayload{DeletedID: db.ID}, nil
 }
 
 // Database is the resolver for the database field.
-func (r *queryResolver) Database(ctx context.Context, id string) (*generated.Database, error) {
-	panic(fmt.Errorf("not implemented: Database - database"))
+func (r *queryResolver) Database(ctx context.Context, name string) (*generated.Database, error) {
+	db, err := withTransactionalMutation(ctx).Database.Query().Where(database.NameEQ(name)).Only(ctx)
+	if err != nil {
+		r.logger.Errorw("failed to get database", "error", err)
+
+		return nil, err
+	}
+
+	return db, err
 }
 
 // Mutation returns MutationResolver implementation.

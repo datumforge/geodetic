@@ -7,6 +7,12 @@ tasks:
       - npm install jsonschema2mk --global
 
   generate:
+    desc: generate the jsonschema and documentation
+    cmds:
+      - task: schema
+      - task: docs
+  
+  schema: 
     desc: generate a new jsonschema and corresponding config/config.example.yaml
     cmds:
       - go run jsonschema/schema_generator.go
@@ -14,7 +20,7 @@ tasks:
   docs:
     desc: generate documentation from the jsonschema
     cmds:
-      - npx jsonschema2mk --schema jsonschema/config.json > jsonschema/DOC.md
+      - npx jsonschema2mk --schema jsonschema/geodetic.config.json > jsonschema/api-docs.md
 
   ci: 
     desc: a task that runs during CI to confirm there are no changes after running generate

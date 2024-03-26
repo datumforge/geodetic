@@ -35,9 +35,9 @@ db:
 ```yaml
 db: 
   debug: true
-  driver_name: sqlite3
-  primary_db_source: "geodetic.db"
-  run_migrations: true
+  driverName: sqlite3
+  primaryDbSource: "geodetic.db"
+  runMigrations: true
 ```
 
 #### Postgres
@@ -47,9 +47,9 @@ db:
 ```yaml
 db: 
   debug: true
-  driver_name: postgres
-  primary_db_source: "postgres://postgres:password@postgres:5432?sslmode=disable"
-  run_migrations: true
+  driverName: postgres
+  primaryDbSource: "postgres://postgres:password@postgres:5432?sslmode=disable"
+  runMigrations: true
 ```
 
 #### Turso
@@ -59,7 +59,7 @@ db:
 ```yaml
 db: 
   debug: true
-  driver_name: libsql
-  primary_db_source: "https://datum-golanglemonade.turso.io?authToken=$TURSO_TOKEN"  # set TURSO_TOKEN to value
-  run_migrations: false
+  driverName: libsql
+  primaryDbSource: "https://datum-golanglemonade.turso.io?authToken=$TURSO_TOKEN"  # set TURSO_TOKEN to value
+  runMigrations: false
 ```

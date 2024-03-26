@@ -4,15 +4,22 @@ package datum
 import (
 	"encoding/json"
 	"fmt"
+	"net/http"
+	"os"
+	"reflect"
 	"strings"
+	"text/tabwriter"
 
 	"github.com/TylerBrock/colorjson"
 	"github.com/Yamashou/gqlgenc/clientv2"
+	"github.com/datumforge/datum/pkg/utils/cli/rows"
 	homedir "github.com/mitchellh/go-homedir"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
 	"go.uber.org/zap"
+
+	"github.com/datumforge/geodetic/internal/geodeticclient"
 )
 
 const (
@@ -34,6 +41,7 @@ var (
 )
 
 type CLI struct {
+	Client      geodeticclient.GeodeticClient
 	Interceptor clientv2.RequestInterceptor
 	AccessToken string
 }
@@ -58,6 +66,9 @@ func init() {
 
 	RootCmd.PersistentFlags().StringVar(&RootHost, "host", defaultRootHost, "api host url")
 	ViperBindFlag(appName+".host", RootCmd.PersistentFlags().Lookup("host"))
+
+	RootCmd.PersistentFlags().StringP("format", "f", "table", "output format (json, table)")
+	ViperBindFlag("output.format", RootCmd.PersistentFlags().Lookup("format"))
 
 	// Logging flags
 	RootCmd.PersistentFlags().Bool("debug", false, "enable debug logging")
@@ -126,6 +137,34 @@ func ViperBindFlag(name string, flag *pflag.Flag) {
 	}
 }
 
+func createClient(baseURL string) (*CLI, error) {
+	cli := CLI{}
+
+	h := http.DefaultClient
+
+	// set options
+	opt := &clientv2.Options{
+		ParseDataAlongWithErrors: false,
+	}
+
+	i := geodeticclient.WithEmptyInterceptor()
+	interceptors := []clientv2.RequestInterceptor{i}
+
+	if viper.GetBool("logging.debug") {
+		interceptors = append(interceptors, geodeticclient.WithLoggingInterceptor())
+	}
+
+	cli.Client = geodeticclient.NewClient(h, baseURL, opt, interceptors...)
+	cli.Interceptor = i
+
+	// new client with params
+	return &cli, nil
+}
+
+func GetGraphClient() (*CLI, error) {
+	return createClient(GraphAPIHost)
+}
+
 func JSONPrint(s []byte) error {
 	var obj map[string]interface{}
 
@@ -145,4 +184,131 @@ func JSONPrint(s []byte) error {
 	fmt.Println(string(o))
 
 	return nil
+}
+
+// TablePrint prints a table to the console
+func TablePrint(header []string, data [][]string) error {
+	w := rows.NewTabRowWriter(tabwriter.NewWriter(os.Stdout, 1, 0, 4, ' ', 0)) //nolint:gomnd
+	defer w.(*rows.TabRowWriter).Flush()
+
+	if err := w.Write(header); err != nil {
+		return err
+	}
+
+	for _, r := range data {
+		if err := w.Write(r); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+// GetHeaders returns the name of each field in a struct
+func GetHeaders(s interface{}, prefix string) []string {
+	headers := []string{}
+	val := reflect.Indirect(reflect.ValueOf(s))
+
+	// ensure we have a struct otherwise this will panic
+	if val.Kind() == reflect.Struct {
+		for i := range val.NumField() { //nolint:typecheck // go 1.22+ allows this, linter is wrong
+			if val.Type().Field(i).Type.Kind() == reflect.Struct {
+				continue
+			}
+
+			headers = append(headers, fmt.Sprintf("%s%s", prefix, val.Type().Field(i).Name))
+		}
+	} else {
+		// if the struct is a map, get the keys
+		for k := range val.Interface().(map[string]interface{}) {
+			headers = append(headers, fmt.Sprintf("%s%s", prefix, k))
+		}
+	}
+
+	return headers
+}
+
+// GetFields returns the value of each field in a struct
+func GetFields(i interface{}) (res []string) {
+	v := reflect.ValueOf(i)
+
+	// ensure we have a struct otherwise this will panic
+	if v.Kind() == reflect.Struct {
+		for j := range v.NumField() { //nolint:typecheck // go 1.22+ allows this, linter is wrong
+			t := v.Field(j).Type()
+			if t.Kind() == reflect.Struct {
+				continue
+			}
+
+			var val string
+
+			switch t.Kind() {
+			case reflect.Ptr:
+				val = v.Field(j).Elem().String()
+			case reflect.Slice:
+				val = fmt.Sprintf("%v", v.Field(j).Interface())
+			default:
+				val = v.Field(j).String()
+			}
+
+			res = append(res, val)
+		}
+	}
+
+	return
+}
+
+// GraphResponse is the response from the graph api containing a list of edges
+type GraphResponse struct {
+	Edges []Edge `json:"edges"`
+}
+
+// Edge is a single edge in the graph response
+type Edge struct {
+	Node interface{} `json:"node"`
+}
+
+// RowsTablePrint prints a table to the console with multiple rows using a map[string]interface{} as the row data
+func RowsTablePrint(resp GraphResponse) error {
+	// check if there are any groups, otherwise we have nothing to print
+	if len(resp.Edges) > 0 {
+		rows := resp.Edges
+
+		data := [][]string{}
+
+		headers := GetHeaders(rows[0].Node, "")
+
+		// get the field values using the header names as the key to ensure the order is correct
+		for _, r := range rows {
+			rowMap := r.Node.(map[string]interface{})
+			row := []string{}
+			for _, h := range headers {
+				row = append(row, rowMap[h].(string))
+			}
+
+			data = append(data, row)
+		}
+
+		// print ze data
+		return TablePrint(headers, data)
+	}
+
+	return nil
+}
+
+// SingleRowTablePrint prints a single row table to the console
+func SingleRowTablePrint(r interface{}) error {
+	// get the headers for the table for each struct
+	header := GetHeaders(r, "")
+
+	data := [][]string{}
+
+	// get the field values for each struct
+	fields := GetFields(r)
+
+	// append the fields to the data slice
+	data = append(data, fields)
+
+	// print ze data
+	return TablePrint(header, data)
 }

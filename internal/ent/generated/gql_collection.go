@@ -8,6 +8,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/datumforge/geodetic/internal/ent/generated/database"
+	"github.com/datumforge/geodetic/internal/ent/generated/group"
 )
 
 // CollectFields tells the query-builder to eagerly load connected nodes by resolver context.
@@ -31,6 +32,20 @@ func (d *DatabaseQuery) collectField(ctx context.Context, opCtx *graphql.Operati
 	)
 	for _, field := range graphql.CollectFields(opCtx, collected.Selections, satisfies) {
 		switch field.Name {
+		case "group":
+			var (
+				alias = field.Alias
+				path  = append(path, alias)
+				query = (&GroupClient{config: d.config}).Query()
+			)
+			if err := query.collectField(ctx, opCtx, field, path, satisfies...); err != nil {
+				return err
+			}
+			d.withGroup = query
+			if _, ok := fieldSeen[database.FieldGroupID]; !ok {
+				selectedFields = append(selectedFields, database.FieldGroupID)
+				fieldSeen[database.FieldGroupID] = struct{}{}
+			}
 		case "createdAt":
 			if _, ok := fieldSeen[database.FieldCreatedAt]; !ok {
 				selectedFields = append(selectedFields, database.FieldCreatedAt)
@@ -81,6 +96,21 @@ func (d *DatabaseQuery) collectField(ctx context.Context, opCtx *graphql.Operati
 				selectedFields = append(selectedFields, database.FieldDsn)
 				fieldSeen[database.FieldDsn] = struct{}{}
 			}
+		case "groupID":
+			if _, ok := fieldSeen[database.FieldGroupID]; !ok {
+				selectedFields = append(selectedFields, database.FieldGroupID)
+				fieldSeen[database.FieldGroupID] = struct{}{}
+			}
+		case "status":
+			if _, ok := fieldSeen[database.FieldStatus]; !ok {
+				selectedFields = append(selectedFields, database.FieldStatus)
+				fieldSeen[database.FieldStatus] = struct{}{}
+			}
+		case "provider":
+			if _, ok := fieldSeen[database.FieldProvider]; !ok {
+				selectedFields = append(selectedFields, database.FieldProvider)
+				fieldSeen[database.FieldProvider] = struct{}{}
+			}
 		case "id":
 		case "__typename":
 		default:
@@ -118,6 +148,135 @@ func newDatabasePaginateArgs(rv map[string]any) *databasePaginateArgs {
 	}
 	if v, ok := rv[whereField].(*DatabaseWhereInput); ok {
 		args.opts = append(args.opts, WithDatabaseFilter(v.Filter))
+	}
+	return args
+}
+
+// CollectFields tells the query-builder to eagerly load connected nodes by resolver context.
+func (gr *GroupQuery) CollectFields(ctx context.Context, satisfies ...string) (*GroupQuery, error) {
+	fc := graphql.GetFieldContext(ctx)
+	if fc == nil {
+		return gr, nil
+	}
+	if err := gr.collectField(ctx, graphql.GetOperationContext(ctx), fc.Field, nil, satisfies...); err != nil {
+		return nil, err
+	}
+	return gr, nil
+}
+
+func (gr *GroupQuery) collectField(ctx context.Context, opCtx *graphql.OperationContext, collected graphql.CollectedField, path []string, satisfies ...string) error {
+	path = append([]string(nil), path...)
+	var (
+		unknownSeen    bool
+		fieldSeen      = make(map[string]struct{}, len(group.Columns))
+		selectedFields = []string{group.FieldID}
+	)
+	for _, field := range graphql.CollectFields(opCtx, collected.Selections, satisfies) {
+		switch field.Name {
+		case "databases":
+			var (
+				alias = field.Alias
+				path  = append(path, alias)
+				query = (&DatabaseClient{config: gr.config}).Query()
+			)
+			if err := query.collectField(ctx, opCtx, field, path, satisfies...); err != nil {
+				return err
+			}
+			gr.WithNamedDatabases(alias, func(wq *DatabaseQuery) {
+				*wq = *query
+			})
+		case "createdAt":
+			if _, ok := fieldSeen[group.FieldCreatedAt]; !ok {
+				selectedFields = append(selectedFields, group.FieldCreatedAt)
+				fieldSeen[group.FieldCreatedAt] = struct{}{}
+			}
+		case "updatedAt":
+			if _, ok := fieldSeen[group.FieldUpdatedAt]; !ok {
+				selectedFields = append(selectedFields, group.FieldUpdatedAt)
+				fieldSeen[group.FieldUpdatedAt] = struct{}{}
+			}
+		case "createdBy":
+			if _, ok := fieldSeen[group.FieldCreatedBy]; !ok {
+				selectedFields = append(selectedFields, group.FieldCreatedBy)
+				fieldSeen[group.FieldCreatedBy] = struct{}{}
+			}
+		case "updatedBy":
+			if _, ok := fieldSeen[group.FieldUpdatedBy]; !ok {
+				selectedFields = append(selectedFields, group.FieldUpdatedBy)
+				fieldSeen[group.FieldUpdatedBy] = struct{}{}
+			}
+		case "deletedAt":
+			if _, ok := fieldSeen[group.FieldDeletedAt]; !ok {
+				selectedFields = append(selectedFields, group.FieldDeletedAt)
+				fieldSeen[group.FieldDeletedAt] = struct{}{}
+			}
+		case "deletedBy":
+			if _, ok := fieldSeen[group.FieldDeletedBy]; !ok {
+				selectedFields = append(selectedFields, group.FieldDeletedBy)
+				fieldSeen[group.FieldDeletedBy] = struct{}{}
+			}
+		case "name":
+			if _, ok := fieldSeen[group.FieldName]; !ok {
+				selectedFields = append(selectedFields, group.FieldName)
+				fieldSeen[group.FieldName] = struct{}{}
+			}
+		case "description":
+			if _, ok := fieldSeen[group.FieldDescription]; !ok {
+				selectedFields = append(selectedFields, group.FieldDescription)
+				fieldSeen[group.FieldDescription] = struct{}{}
+			}
+		case "primaryLocation":
+			if _, ok := fieldSeen[group.FieldPrimaryLocation]; !ok {
+				selectedFields = append(selectedFields, group.FieldPrimaryLocation)
+				fieldSeen[group.FieldPrimaryLocation] = struct{}{}
+			}
+		case "locations":
+			if _, ok := fieldSeen[group.FieldLocations]; !ok {
+				selectedFields = append(selectedFields, group.FieldLocations)
+				fieldSeen[group.FieldLocations] = struct{}{}
+			}
+		case "region":
+			if _, ok := fieldSeen[group.FieldRegion]; !ok {
+				selectedFields = append(selectedFields, group.FieldRegion)
+				fieldSeen[group.FieldRegion] = struct{}{}
+			}
+		case "id":
+		case "__typename":
+		default:
+			unknownSeen = true
+		}
+	}
+	if !unknownSeen {
+		gr.Select(selectedFields...)
+	}
+	return nil
+}
+
+type groupPaginateArgs struct {
+	first, last   *int
+	after, before *Cursor
+	opts          []GroupPaginateOption
+}
+
+func newGroupPaginateArgs(rv map[string]any) *groupPaginateArgs {
+	args := &groupPaginateArgs{}
+	if rv == nil {
+		return args
+	}
+	if v := rv[firstField]; v != nil {
+		args.first = v.(*int)
+	}
+	if v := rv[lastField]; v != nil {
+		args.last = v.(*int)
+	}
+	if v := rv[afterField]; v != nil {
+		args.after = v.(*Cursor)
+	}
+	if v := rv[beforeField]; v != nil {
+		args.before = v.(*Cursor)
+	}
+	if v, ok := rv[whereField].(*GroupWhereInput); ok {
+		args.opts = append(args.opts, WithGroupFilter(v.Filter))
 	}
 	return args
 }

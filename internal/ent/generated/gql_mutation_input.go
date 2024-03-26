@@ -4,6 +4,8 @@ package generated
 
 import (
 	"time"
+
+	"github.com/datumforge/geodetic/internal/ent/enums"
 )
 
 // CreateDatabaseInput represents a mutation input for creating databases.
@@ -16,6 +18,10 @@ type CreateDatabaseInput struct {
 	Name           string
 	Geo            *string
 	Dsn            string
+	Token          *string
+	Status         *enums.DatabaseStatus
+	Provider       *enums.DatabaseProvider
+	GroupID        string
 }
 
 // Mutate applies the CreateDatabaseInput on the DatabaseMutation builder.
@@ -38,6 +44,16 @@ func (i *CreateDatabaseInput) Mutate(m *DatabaseMutation) {
 		m.SetGeo(*v)
 	}
 	m.SetDsn(i.Dsn)
+	if v := i.Token; v != nil {
+		m.SetToken(*v)
+	}
+	if v := i.Status; v != nil {
+		m.SetStatus(*v)
+	}
+	if v := i.Provider; v != nil {
+		m.SetProvider(*v)
+	}
+	m.SetGroupID(i.GroupID)
 }
 
 // SetInput applies the change-set in the CreateDatabaseInput on the DatabaseCreate builder.
@@ -57,6 +73,11 @@ type UpdateDatabaseInput struct {
 	ClearGeo       bool
 	Geo            *string
 	Dsn            *string
+	ClearToken     bool
+	Token          *string
+	Status         *enums.DatabaseStatus
+	Provider       *enums.DatabaseProvider
+	GroupID        *string
 }
 
 // Mutate applies the UpdateDatabaseInput on the DatabaseMutation builder.
@@ -88,6 +109,21 @@ func (i *UpdateDatabaseInput) Mutate(m *DatabaseMutation) {
 	if v := i.Dsn; v != nil {
 		m.SetDsn(*v)
 	}
+	if i.ClearToken {
+		m.ClearToken()
+	}
+	if v := i.Token; v != nil {
+		m.SetToken(*v)
+	}
+	if v := i.Status; v != nil {
+		m.SetStatus(*v)
+	}
+	if v := i.Provider; v != nil {
+		m.SetProvider(*v)
+	}
+	if v := i.GroupID; v != nil {
+		m.SetGroupID(*v)
+	}
 }
 
 // SetInput applies the change-set in the UpdateDatabaseInput on the DatabaseUpdate builder.
@@ -98,6 +134,148 @@ func (c *DatabaseUpdate) SetInput(i UpdateDatabaseInput) *DatabaseUpdate {
 
 // SetInput applies the change-set in the UpdateDatabaseInput on the DatabaseUpdateOne builder.
 func (c *DatabaseUpdateOne) SetInput(i UpdateDatabaseInput) *DatabaseUpdateOne {
+	i.Mutate(c.Mutation())
+	return c
+}
+
+// CreateGroupInput represents a mutation input for creating groups.
+type CreateGroupInput struct {
+	CreatedAt       *time.Time
+	UpdatedAt       *time.Time
+	CreatedBy       *string
+	UpdatedBy       *string
+	Name            string
+	Description     *string
+	PrimaryLocation string
+	Locations       []string
+	Token           *string
+	Region          *enums.Region
+	DatabaseIDs     []string
+}
+
+// Mutate applies the CreateGroupInput on the GroupMutation builder.
+func (i *CreateGroupInput) Mutate(m *GroupMutation) {
+	if v := i.CreatedAt; v != nil {
+		m.SetCreatedAt(*v)
+	}
+	if v := i.UpdatedAt; v != nil {
+		m.SetUpdatedAt(*v)
+	}
+	if v := i.CreatedBy; v != nil {
+		m.SetCreatedBy(*v)
+	}
+	if v := i.UpdatedBy; v != nil {
+		m.SetUpdatedBy(*v)
+	}
+	m.SetName(i.Name)
+	if v := i.Description; v != nil {
+		m.SetDescription(*v)
+	}
+	m.SetPrimaryLocation(i.PrimaryLocation)
+	if v := i.Locations; v != nil {
+		m.SetLocations(v)
+	}
+	if v := i.Token; v != nil {
+		m.SetToken(*v)
+	}
+	if v := i.Region; v != nil {
+		m.SetRegion(*v)
+	}
+	if v := i.DatabaseIDs; len(v) > 0 {
+		m.AddDatabaseIDs(v...)
+	}
+}
+
+// SetInput applies the change-set in the CreateGroupInput on the GroupCreate builder.
+func (c *GroupCreate) SetInput(i CreateGroupInput) *GroupCreate {
+	i.Mutate(c.Mutation())
+	return c
+}
+
+// UpdateGroupInput represents a mutation input for updating groups.
+type UpdateGroupInput struct {
+	ClearUpdatedAt    bool
+	UpdatedAt         *time.Time
+	ClearUpdatedBy    bool
+	UpdatedBy         *string
+	Name              *string
+	ClearDescription  bool
+	Description       *string
+	PrimaryLocation   *string
+	ClearLocations    bool
+	Locations         []string
+	AppendLocations   []string
+	ClearToken        bool
+	Token             *string
+	Region            *enums.Region
+	ClearDatabases    bool
+	AddDatabaseIDs    []string
+	RemoveDatabaseIDs []string
+}
+
+// Mutate applies the UpdateGroupInput on the GroupMutation builder.
+func (i *UpdateGroupInput) Mutate(m *GroupMutation) {
+	if i.ClearUpdatedAt {
+		m.ClearUpdatedAt()
+	}
+	if v := i.UpdatedAt; v != nil {
+		m.SetUpdatedAt(*v)
+	}
+	if i.ClearUpdatedBy {
+		m.ClearUpdatedBy()
+	}
+	if v := i.UpdatedBy; v != nil {
+		m.SetUpdatedBy(*v)
+	}
+	if v := i.Name; v != nil {
+		m.SetName(*v)
+	}
+	if i.ClearDescription {
+		m.ClearDescription()
+	}
+	if v := i.Description; v != nil {
+		m.SetDescription(*v)
+	}
+	if v := i.PrimaryLocation; v != nil {
+		m.SetPrimaryLocation(*v)
+	}
+	if i.ClearLocations {
+		m.ClearLocations()
+	}
+	if v := i.Locations; v != nil {
+		m.SetLocations(v)
+	}
+	if i.AppendLocations != nil {
+		m.AppendLocations(i.Locations)
+	}
+	if i.ClearToken {
+		m.ClearToken()
+	}
+	if v := i.Token; v != nil {
+		m.SetToken(*v)
+	}
+	if v := i.Region; v != nil {
+		m.SetRegion(*v)
+	}
+	if i.ClearDatabases {
+		m.ClearDatabases()
+	}
+	if v := i.AddDatabaseIDs; len(v) > 0 {
+		m.AddDatabaseIDs(v...)
+	}
+	if v := i.RemoveDatabaseIDs; len(v) > 0 {
+		m.RemoveDatabaseIDs(v...)
+	}
+}
+
+// SetInput applies the change-set in the UpdateGroupInput on the GroupUpdate builder.
+func (c *GroupUpdate) SetInput(i UpdateGroupInput) *GroupUpdate {
+	i.Mutate(c.Mutation())
+	return c
+}
+
+// SetInput applies the change-set in the UpdateGroupInput on the GroupUpdateOne builder.
+func (c *GroupUpdateOne) SetInput(i UpdateGroupInput) *GroupUpdateOne {
 	i.Mutate(c.Mutation())
 	return c
 }

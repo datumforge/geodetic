@@ -3,10 +3,14 @@
 package database
 
 import (
+	"fmt"
 	"time"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
+	"entgo.io/ent/dialect/sql/sqlgraph"
+	"github.com/99designs/gqlgen/graphql"
+	"github.com/datumforge/geodetic/internal/ent/enums"
 )
 
 const (
@@ -34,8 +38,25 @@ const (
 	FieldGeo = "geo"
 	// FieldDsn holds the string denoting the dsn field in the database.
 	FieldDsn = "dsn"
+	// FieldGroupID holds the string denoting the group_id field in the database.
+	FieldGroupID = "group_id"
+	// FieldToken holds the string denoting the token field in the database.
+	FieldToken = "token"
+	// FieldStatus holds the string denoting the status field in the database.
+	FieldStatus = "status"
+	// FieldProvider holds the string denoting the provider field in the database.
+	FieldProvider = "provider"
+	// EdgeGroup holds the string denoting the group edge name in mutations.
+	EdgeGroup = "group"
 	// Table holds the table name of the database in the database.
 	Table = "databases"
+	// GroupTable is the table that holds the group relation/edge.
+	GroupTable = "databases"
+	// GroupInverseTable is the table name for the Group entity.
+	// It exists in this package in order to avoid circular dependency with the "group" package.
+	GroupInverseTable = "groups"
+	// GroupColumn is the table column denoting the group relation/edge.
+	GroupColumn = "group_id"
 )
 
 // Columns holds all SQL columns for database fields.
@@ -51,6 +72,10 @@ var Columns = []string{
 	FieldName,
 	FieldGeo,
 	FieldDsn,
+	FieldGroupID,
+	FieldToken,
+	FieldStatus,
+	FieldProvider,
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -69,7 +94,7 @@ func ValidColumn(column string) bool {
 //
 //	import _ "github.com/datumforge/geodetic/internal/ent/generated/runtime"
 var (
-	Hooks [1]ent.Hook
+	Hooks [3]ent.Hook
 	// DefaultCreatedAt holds the default value on creation for the "created_at" field.
 	DefaultCreatedAt func() time.Time
 	// DefaultUpdatedAt holds the default value on creation for the "updated_at" field.
@@ -85,6 +110,30 @@ var (
 	// DefaultID holds the default value on creation for the "id" field.
 	DefaultID func() string
 )
+
+const DefaultStatus enums.DatabaseStatus = "CREATING"
+
+// StatusValidator is a validator for the "status" field enum values. It is called by the builders before save.
+func StatusValidator(s enums.DatabaseStatus) error {
+	switch s.String() {
+	case "ACTIVE", "CREATING", "DELETING", "DELETED":
+		return nil
+	default:
+		return fmt.Errorf("database: invalid enum value for status field: %q", s)
+	}
+}
+
+const DefaultProvider enums.DatabaseProvider = "LOCAL"
+
+// ProviderValidator is a validator for the "provider" field enum values. It is called by the builders before save.
+func ProviderValidator(pr enums.DatabaseProvider) error {
+	switch pr.String() {
+	case "LOCAL", "TURSO":
+		return nil
+	default:
+		return fmt.Errorf("database: invalid enum value for provider field: %q", pr)
+	}
+}
 
 // OrderOption defines the ordering options for the Database queries.
 type OrderOption func(*sql.Selector)
@@ -143,3 +192,51 @@ func ByGeo(opts ...sql.OrderTermOption) OrderOption {
 func ByDsn(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldDsn, opts...).ToFunc()
 }
+
+// ByGroupID orders the results by the group_id field.
+func ByGroupID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldGroupID, opts...).ToFunc()
+}
+
+// ByToken orders the results by the token field.
+func ByToken(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldToken, opts...).ToFunc()
+}
+
+// ByStatus orders the results by the status field.
+func ByStatus(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldStatus, opts...).ToFunc()
+}
+
+// ByProvider orders the results by the provider field.
+func ByProvider(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldProvider, opts...).ToFunc()
+}
+
+// ByGroupField orders the results by group field.
+func ByGroupField(field string, opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newGroupStep(), sql.OrderByField(field, opts...))
+	}
+}
+func newGroupStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(GroupInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2O, true, GroupTable, GroupColumn),
+	)
+}
+
+var (
+	// enums.DatabaseStatus must implement graphql.Marshaler.
+	_ graphql.Marshaler = (*enums.DatabaseStatus)(nil)
+	// enums.DatabaseStatus must implement graphql.Unmarshaler.
+	_ graphql.Unmarshaler = (*enums.DatabaseStatus)(nil)
+)
+
+var (
+	// enums.DatabaseProvider must implement graphql.Marshaler.
+	_ graphql.Marshaler = (*enums.DatabaseProvider)(nil)
+	// enums.DatabaseProvider must implement graphql.Unmarshaler.
+	_ graphql.Unmarshaler = (*enums.DatabaseProvider)(nil)
+)

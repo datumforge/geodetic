@@ -2,19 +2,29 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"os"
 	"reflect"
 
 	"github.com/datumforge/geodetic/config"
+	"github.com/datumforge/geodetic/jsonschema/envparse"
 	"github.com/invopop/jsonschema"
 	"github.com/invopop/yaml"
+	"github.com/mcuadros/go-defaults"
 )
 
 // const values used for the schema generator
 const (
 	repoName       = "github.com/datumforge/geodetic/"
-	jsonSchemaPath = "./jsonschema/config.json"
+	tagName        = "koanf"
+	skipper        = "-"
+	defaultTag     = "default"
+	jsonSchemaPath = "./jsonschema/geodetic.config.json"
 	yamlConfigPath = "./config/config.example.yaml"
+	envConfigPath  = "./config/.env.example"
+	configMapPath  = "./config/configmap.yaml"
+	varPrefix      = "GEODETIC"
+	ownerReadWrite = 0600
 )
 
 // includedPackages is a list of packages to include in the schema generation
@@ -22,6 +32,8 @@ const (
 // any external packages must use the jsonschema description tags to add comments
 var includedPackages = []string{
 	"./config",
+	"./internal/entdb",
+	"./internal/httpserve/handlers",
 }
 
 // schemaConfig represents the configuration for the schema generator
@@ -30,12 +42,18 @@ type schemaConfig struct {
 	jsonSchemaPath string
 	// yamlConfigPath is the file path to the YAML configuration to be generated
 	yamlConfigPath string
+	// envConfigPath is the file path to the environment variable configuration to be generated
+	envConfigPath string
+	// configMapPath is the file path to the kubernetes config map configuration to be generated
+	configMapPath string
 }
 
 func main() {
 	c := schemaConfig{
 		jsonSchemaPath: jsonSchemaPath,
 		yamlConfigPath: yamlConfigPath,
+		envConfigPath:  envConfigPath,
+		configMapPath:  configMapPath,
 	}
 
 	if err := generateSchema(c, &config.Config{}); err != nil {
@@ -51,7 +69,7 @@ func generateSchema(c schemaConfig, structure interface{}) error {
 	// set `jsonschema:required` tag to true to generate required fields
 	r.RequiredFromJSONSchemaTags = true
 	// set the tag name to `koanf` for the koanf struct tags
-	r.FieldNameTag = "koanf"
+	r.FieldNameTag = tagName
 
 	// add go comments to the schema
 	for _, pkg := range includedPackages {
@@ -68,19 +86,70 @@ func generateSchema(c schemaConfig, structure interface{}) error {
 		panic(err.Error())
 	}
 
-	err = os.WriteFile(c.jsonSchemaPath, data, 0600) // nolint: gomnd
+	if err = os.WriteFile(c.jsonSchemaPath, data, ownerReadWrite); err != nil {
+		panic(err.Error())
+	}
+
+	// generate yaml schema with default
+	yamlConfig := &config.Config{}
+	defaults.SetDefaults(yamlConfig)
+
+	// this uses the `json` tag to generate the yaml schema
+	yamlSchema, err := yaml.Marshal(yamlConfig)
 	if err != nil {
 		panic(err.Error())
 	}
 
-	// generate yaml schema
-	var yamlConfig config.Config
+	if err = os.WriteFile(c.yamlConfigPath, yamlSchema, ownerReadWrite); err != nil {
+		panic(err.Error())
+	}
 
-	// this uses the `json` tag to generate the yaml schema
-	yamlSchema, err := yaml.Marshal(yamlConfig)
+	cp := envparse.Config{
+		FieldTagName: tagName,
+		Skipper:      skipper,
+	}
 
-	err = os.WriteFile(c.yamlConfigPath, yamlSchema, 0600) // nolint: gomnd
+	out, err := cp.GatherEnvInfo(varPrefix, &config.Config{})
 	if err != nil {
+		panic(err.Error())
+	}
+
+	// generate the environment variables from the config
+	envSchema := ""
+	configMapSchema := "\n"
+	for _, k := range out {
+		defaultVal := k.Tags.Get(defaultTag)
+
+		envSchema += fmt.Sprintf("%s=\"%s\"\n", k.Key, defaultVal)
+
+		// if the default value is empty, use the value from the values.yaml
+		if defaultVal == "" {
+			configMapSchema += fmt.Sprintf("  %s: {{ .Values.%s }}\n", k.Key, k.FullPath)
+		} else {
+			if k.Type.Kind() == reflect.String {
+				defaultVal = "\"" + defaultVal + "\"" // add quotes to the string
+			}
+
+			configMapSchema += fmt.Sprintf("  %s: {{ .Values.%s | %s }}\n", k.Key, k.FullPath, defaultVal)
+		}
+	}
+
+	// write the environment variables to a file
+	if err = os.WriteFile(c.envConfigPath, []byte(envSchema), ownerReadWrite); err != nil {
+		panic(err.Error())
+	}
+
+	// Get the configmap header
+	cm, err := os.ReadFile("./jsonschema/templates/configmap.tmpl")
+	if err != nil {
+		panic(err.Error())
+	}
+
+	// append the configmap schema to the header
+	cm = append(cm, []byte(configMapSchema)...)
+
+	// write the configmap to a file
+	if err = os.WriteFile(c.configMapPath, cm, ownerReadWrite); err != nil {
 		panic(err.Error())
 	}
 

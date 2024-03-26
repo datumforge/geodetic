@@ -13,13 +13,13 @@ import (
 	"entgo.io/contrib/entoas"
 	"entgo.io/ent/entc"
 	"entgo.io/ent/entc/gen"
+	"github.com/datumforge/entx"
 	"github.com/datumforge/fgax"
 	"github.com/datumforge/fgax/entfga"
+	"github.com/datumforge/go-turso"
 	"github.com/ogen-go/ogen"
 	"go.uber.org/zap"
 	"gocloud.dev/secrets"
-
-	"github.com/datumforge/entx"
 )
 
 var (
@@ -114,8 +114,13 @@ func main() {
 			entc.DependencyType(zap.SugaredLogger{}),
 		),
 		entc.Dependency(
+			entc.DependencyName("Turso"),
+			entc.DependencyType(&turso.Client{}),
+		),
+		entc.Dependency(
 			entc.DependencyType(&http.Client{}),
 		),
+		entc.TemplateDir("./internal/ent/templates"),
 		entc.Extensions(
 			gqlExt,
 			ex,

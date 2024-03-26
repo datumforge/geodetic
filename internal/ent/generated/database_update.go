@@ -11,7 +11,9 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/datumforge/geodetic/internal/ent/enums"
 	"github.com/datumforge/geodetic/internal/ent/generated/database"
+	"github.com/datumforge/geodetic/internal/ent/generated/group"
 	"github.com/datumforge/geodetic/internal/ent/generated/predicate"
 
 	"github.com/datumforge/geodetic/internal/ent/generated/internal"
@@ -164,9 +166,82 @@ func (du *DatabaseUpdate) SetNillableDsn(s *string) *DatabaseUpdate {
 	return du
 }
 
+// SetGroupID sets the "group_id" field.
+func (du *DatabaseUpdate) SetGroupID(s string) *DatabaseUpdate {
+	du.mutation.SetGroupID(s)
+	return du
+}
+
+// SetNillableGroupID sets the "group_id" field if the given value is not nil.
+func (du *DatabaseUpdate) SetNillableGroupID(s *string) *DatabaseUpdate {
+	if s != nil {
+		du.SetGroupID(*s)
+	}
+	return du
+}
+
+// SetToken sets the "token" field.
+func (du *DatabaseUpdate) SetToken(s string) *DatabaseUpdate {
+	du.mutation.SetToken(s)
+	return du
+}
+
+// SetNillableToken sets the "token" field if the given value is not nil.
+func (du *DatabaseUpdate) SetNillableToken(s *string) *DatabaseUpdate {
+	if s != nil {
+		du.SetToken(*s)
+	}
+	return du
+}
+
+// ClearToken clears the value of the "token" field.
+func (du *DatabaseUpdate) ClearToken() *DatabaseUpdate {
+	du.mutation.ClearToken()
+	return du
+}
+
+// SetStatus sets the "status" field.
+func (du *DatabaseUpdate) SetStatus(es enums.DatabaseStatus) *DatabaseUpdate {
+	du.mutation.SetStatus(es)
+	return du
+}
+
+// SetNillableStatus sets the "status" field if the given value is not nil.
+func (du *DatabaseUpdate) SetNillableStatus(es *enums.DatabaseStatus) *DatabaseUpdate {
+	if es != nil {
+		du.SetStatus(*es)
+	}
+	return du
+}
+
+// SetProvider sets the "provider" field.
+func (du *DatabaseUpdate) SetProvider(ep enums.DatabaseProvider) *DatabaseUpdate {
+	du.mutation.SetProvider(ep)
+	return du
+}
+
+// SetNillableProvider sets the "provider" field if the given value is not nil.
+func (du *DatabaseUpdate) SetNillableProvider(ep *enums.DatabaseProvider) *DatabaseUpdate {
+	if ep != nil {
+		du.SetProvider(*ep)
+	}
+	return du
+}
+
+// SetGroup sets the "group" edge to the Group entity.
+func (du *DatabaseUpdate) SetGroup(g *Group) *DatabaseUpdate {
+	return du.SetGroupID(g.ID)
+}
+
 // Mutation returns the DatabaseMutation object of the builder.
 func (du *DatabaseUpdate) Mutation() *DatabaseMutation {
 	return du.mutation
+}
+
+// ClearGroup clears the "group" edge to the Group entity.
+func (du *DatabaseUpdate) ClearGroup() *DatabaseUpdate {
+	du.mutation.ClearGroup()
+	return du
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -228,6 +303,19 @@ func (du *DatabaseUpdate) check() error {
 			return &ValidationError{Name: "dsn", err: fmt.Errorf(`generated: validator failed for field "Database.dsn": %w`, err)}
 		}
 	}
+	if v, ok := du.mutation.Status(); ok {
+		if err := database.StatusValidator(v); err != nil {
+			return &ValidationError{Name: "status", err: fmt.Errorf(`generated: validator failed for field "Database.status": %w`, err)}
+		}
+	}
+	if v, ok := du.mutation.Provider(); ok {
+		if err := database.ProviderValidator(v); err != nil {
+			return &ValidationError{Name: "provider", err: fmt.Errorf(`generated: validator failed for field "Database.provider": %w`, err)}
+		}
+	}
+	if _, ok := du.mutation.GroupID(); du.mutation.GroupCleared() && !ok {
+		return errors.New(`generated: clearing a required unique edge "Database.group"`)
+	}
 	return nil
 }
 
@@ -287,6 +375,49 @@ func (du *DatabaseUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if value, ok := du.mutation.Dsn(); ok {
 		_spec.SetField(database.FieldDsn, field.TypeString, value)
+	}
+	if value, ok := du.mutation.Token(); ok {
+		_spec.SetField(database.FieldToken, field.TypeString, value)
+	}
+	if du.mutation.TokenCleared() {
+		_spec.ClearField(database.FieldToken, field.TypeString)
+	}
+	if value, ok := du.mutation.Status(); ok {
+		_spec.SetField(database.FieldStatus, field.TypeEnum, value)
+	}
+	if value, ok := du.mutation.Provider(); ok {
+		_spec.SetField(database.FieldProvider, field.TypeEnum, value)
+	}
+	if du.mutation.GroupCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   database.GroupTable,
+			Columns: []string{database.GroupColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(group.FieldID, field.TypeString),
+			},
+		}
+		edge.Schema = du.schemaConfig.Database
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := du.mutation.GroupIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   database.GroupTable,
+			Columns: []string{database.GroupColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(group.FieldID, field.TypeString),
+			},
+		}
+		edge.Schema = du.schemaConfig.Database
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	_spec.Node.Schema = du.schemaConfig.Database
 	ctx = internal.NewSchemaConfigContext(ctx, du.schemaConfig)
@@ -444,9 +575,82 @@ func (duo *DatabaseUpdateOne) SetNillableDsn(s *string) *DatabaseUpdateOne {
 	return duo
 }
 
+// SetGroupID sets the "group_id" field.
+func (duo *DatabaseUpdateOne) SetGroupID(s string) *DatabaseUpdateOne {
+	duo.mutation.SetGroupID(s)
+	return duo
+}
+
+// SetNillableGroupID sets the "group_id" field if the given value is not nil.
+func (duo *DatabaseUpdateOne) SetNillableGroupID(s *string) *DatabaseUpdateOne {
+	if s != nil {
+		duo.SetGroupID(*s)
+	}
+	return duo
+}
+
+// SetToken sets the "token" field.
+func (duo *DatabaseUpdateOne) SetToken(s string) *DatabaseUpdateOne {
+	duo.mutation.SetToken(s)
+	return duo
+}
+
+// SetNillableToken sets the "token" field if the given value is not nil.
+func (duo *DatabaseUpdateOne) SetNillableToken(s *string) *DatabaseUpdateOne {
+	if s != nil {
+		duo.SetToken(*s)
+	}
+	return duo
+}
+
+// ClearToken clears the value of the "token" field.
+func (duo *DatabaseUpdateOne) ClearToken() *DatabaseUpdateOne {
+	duo.mutation.ClearToken()
+	return duo
+}
+
+// SetStatus sets the "status" field.
+func (duo *DatabaseUpdateOne) SetStatus(es enums.DatabaseStatus) *DatabaseUpdateOne {
+	duo.mutation.SetStatus(es)
+	return duo
+}
+
+// SetNillableStatus sets the "status" field if the given value is not nil.
+func (duo *DatabaseUpdateOne) SetNillableStatus(es *enums.DatabaseStatus) *DatabaseUpdateOne {
+	if es != nil {
+		duo.SetStatus(*es)
+	}
+	return duo
+}
+
+// SetProvider sets the "provider" field.
+func (duo *DatabaseUpdateOne) SetProvider(ep enums.DatabaseProvider) *DatabaseUpdateOne {
+	duo.mutation.SetProvider(ep)
+	return duo
+}
+
+// SetNillableProvider sets the "provider" field if the given value is not nil.
+func (duo *DatabaseUpdateOne) SetNillableProvider(ep *enums.DatabaseProvider) *DatabaseUpdateOne {
+	if ep != nil {
+		duo.SetProvider(*ep)
+	}
+	return duo
+}
+
+// SetGroup sets the "group" edge to the Group entity.
+func (duo *DatabaseUpdateOne) SetGroup(g *Group) *DatabaseUpdateOne {
+	return duo.SetGroupID(g.ID)
+}
+
 // Mutation returns the DatabaseMutation object of the builder.
 func (duo *DatabaseUpdateOne) Mutation() *DatabaseMutation {
 	return duo.mutation
+}
+
+// ClearGroup clears the "group" edge to the Group entity.
+func (duo *DatabaseUpdateOne) ClearGroup() *DatabaseUpdateOne {
+	duo.mutation.ClearGroup()
+	return duo
 }
 
 // Where appends a list predicates to the DatabaseUpdate builder.
@@ -520,6 +724,19 @@ func (duo *DatabaseUpdateOne) check() error {
 		if err := database.DsnValidator(v); err != nil {
 			return &ValidationError{Name: "dsn", err: fmt.Errorf(`generated: validator failed for field "Database.dsn": %w`, err)}
 		}
+	}
+	if v, ok := duo.mutation.Status(); ok {
+		if err := database.StatusValidator(v); err != nil {
+			return &ValidationError{Name: "status", err: fmt.Errorf(`generated: validator failed for field "Database.status": %w`, err)}
+		}
+	}
+	if v, ok := duo.mutation.Provider(); ok {
+		if err := database.ProviderValidator(v); err != nil {
+			return &ValidationError{Name: "provider", err: fmt.Errorf(`generated: validator failed for field "Database.provider": %w`, err)}
+		}
+	}
+	if _, ok := duo.mutation.GroupID(); duo.mutation.GroupCleared() && !ok {
+		return errors.New(`generated: clearing a required unique edge "Database.group"`)
 	}
 	return nil
 }
@@ -597,6 +814,49 @@ func (duo *DatabaseUpdateOne) sqlSave(ctx context.Context) (_node *Database, err
 	}
 	if value, ok := duo.mutation.Dsn(); ok {
 		_spec.SetField(database.FieldDsn, field.TypeString, value)
+	}
+	if value, ok := duo.mutation.Token(); ok {
+		_spec.SetField(database.FieldToken, field.TypeString, value)
+	}
+	if duo.mutation.TokenCleared() {
+		_spec.ClearField(database.FieldToken, field.TypeString)
+	}
+	if value, ok := duo.mutation.Status(); ok {
+		_spec.SetField(database.FieldStatus, field.TypeEnum, value)
+	}
+	if value, ok := duo.mutation.Provider(); ok {
+		_spec.SetField(database.FieldProvider, field.TypeEnum, value)
+	}
+	if duo.mutation.GroupCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   database.GroupTable,
+			Columns: []string{database.GroupColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(group.FieldID, field.TypeString),
+			},
+		}
+		edge.Schema = duo.schemaConfig.Database
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := duo.mutation.GroupIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   database.GroupTable,
+			Columns: []string{database.GroupColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(group.FieldID, field.TypeString),
+			},
+		}
+		edge.Schema = duo.schemaConfig.Database
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	_spec.Node.Schema = duo.schemaConfig.Database
 	ctx = internal.NewSchemaConfigContext(ctx, duo.schemaConfig)

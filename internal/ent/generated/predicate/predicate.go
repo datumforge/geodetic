@@ -8,3 +8,6 @@ import (
 
 // Database is the predicate function for database builders.
 type Database func(*sql.Selector)
+
+// Group is the predicate function for group builders.
+type Group func(*sql.Selector)

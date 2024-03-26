@@ -4,9 +4,9 @@ extend type Query {
     """
      database(
         """
-        ID of the database
+        Name of the database
         """
-        id: ID!
+        name: String!
     ):  Database!
 }
 
@@ -25,9 +25,9 @@ extend type Mutation{
     """
     updateDatabase(
         """
-        ID of the database
+        Name of the database
         """
-        id: ID!
+        name: String!
         """
         New values for the database
         """
@@ -38,9 +38,9 @@ extend type Mutation{
     """
     deleteDatabase(
         """
-        ID of the database
+        Name of the database
         """
-        id: ID!
+        name: String!
     ): DatabaseDeletePayload!
 }
 
