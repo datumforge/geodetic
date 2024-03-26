@@ -218,6 +218,11 @@ func GetHeaders(s interface{}, prefix string) []string {
 
 			headers = append(headers, fmt.Sprintf("%s%s", prefix, val.Type().Field(i).Name))
 		}
+	} else {
+		// if the struct is a map, get the keys
+		for k := range val.Interface().(map[string]interface{}) {
+			headers = append(headers, fmt.Sprintf("%s%s", prefix, k))
+		}
 	}
 
 	return headers
