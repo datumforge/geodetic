@@ -120,6 +120,7 @@ func main() {
 		entc.Dependency(
 			entc.DependencyType(&http.Client{}),
 		),
+		entc.TemplateDir("./internal/ent/templates"),
 		entc.Extensions(
 			gqlExt,
 			ex,

@@ -71,6 +71,10 @@ func (r *mutationResolver) DeleteGroup(ctx context.Context, name string) (*Group
 		return nil, err
 	}
 
+	if err := generated.GroupEdgeCleanup(ctx, group.ID); err != nil {
+		return nil, newCascadeDeleteError(err)
+	}
+
 	if err := withTransactionalMutation(ctx).Group.DeleteOneID(group.ID).Exec(ctx); err != nil {
 		r.logger.Errorw("failed to delete group", "error", err)
 
