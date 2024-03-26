@@ -78,6 +78,8 @@ func (suite *GraphTestSuite) TestListGroups() {
 func (suite *GraphTestSuite) TestCreateGroup() {
 	t := suite.T()
 
+	groupIDs := []string{}
+
 	testCases := []struct {
 		name      string
 		groupName string
@@ -131,7 +133,14 @@ func (suite *GraphTestSuite) TestCreateGroup() {
 			require.NotNil(t, resp.CreateGroup)
 
 			assert.Equal(t, tc.groupName, resp.CreateGroup.Group.Name)
+
+			groupIDs = append(groupIDs, resp.CreateGroup.Group.ID)
 		})
+	}
+
+	// Cleanup groups
+	for _, id := range groupIDs {
+		(&GroupCleanup{client: suite.client, GroupID: id}).MustDelete(context.Background(), t)
 	}
 }
 
