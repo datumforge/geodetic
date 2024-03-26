@@ -73,6 +73,7 @@ func (suite *GraphTestSuite) TestListGroups() {
 
 		group1Found := false
 		group2Found := false
+
 		for _, g := range resp.Groups.Edges {
 			if g.Node.Name == group1.Name {
 				group1Found = true

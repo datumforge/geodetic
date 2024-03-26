@@ -2,11 +2,11 @@ package hooks
 
 import (
 	"context"
-	"fmt"
 
 	"entgo.io/ent"
 
 	"github.com/99designs/gqlgen/graphql"
+	"github.com/datumforge/datum/pkg/rout"
 	"github.com/datumforge/go-turso"
 
 	"github.com/datumforge/geodetic/internal/ent/generated"
@@ -83,7 +83,7 @@ func HookGroupDelete() ent.Hook {
 				if name == "" {
 					mutation.Logger.Errorw("unable to delete group, no name provided")
 
-					return nil, fmt.Errorf("no name provided") //nolint:goerr113
+					return nil, rout.InvalidField("name")
 				}
 
 				group, err := mutation.Turso.Group.DeleteGroup(ctx, name)

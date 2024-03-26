@@ -13,7 +13,7 @@ import (
 
 var groupGetCmd = &cobra.Command{
 	Use:   "get",
-	Short: "get an existing new geodetic group",
+	Short: "get an existing geodetic group",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		return getGroup(cmd.Context())
 	},

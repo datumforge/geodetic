@@ -8,6 +8,7 @@ import (
 	"entgo.io/ent"
 
 	"github.com/99designs/gqlgen/graphql"
+	"github.com/datumforge/datum/pkg/rout"
 	"github.com/datumforge/go-turso"
 
 	"github.com/datumforge/geodetic/internal/ent/enums"
@@ -76,7 +77,7 @@ func HookDatabaseDelete() ent.Hook {
 				if name == "" {
 					mutation.Logger.Errorw("unable to delete database, no name provided")
 
-					return nil, fmt.Errorf("no name provided") //nolint:goerr113
+					return nil, rout.InvalidField("name")
 				}
 
 				db, err := mutation.Turso.Database.DeleteDatabase(ctx, name)
