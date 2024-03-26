@@ -69,6 +69,7 @@ func HookDatabaseDelete() ent.Hook {
 	return hook.On(func(next ent.Mutator) ent.Mutator {
 		return hook.DatabaseFunc(func(ctx context.Context, mutation *generated.DatabaseMutation) (generated.Value, error) {
 			if ok := graphql.HasOperationContext(ctx); ok {
+				// TODO: this only works for a delete database and not on a cascade delete
 				gtx := graphql.GetOperationContext(ctx)
 				name := gtx.Variables["name"].(string)
 

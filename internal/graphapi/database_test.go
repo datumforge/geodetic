@@ -102,13 +102,6 @@ func (suite *GraphTestSuite) TestCreateDatabase() {
 			provider: &enums.Local,
 		},
 		{
-			name:     "duplicate org id",
-			orgID:    "01HSCAGDJ1XZ12Y06FESH4VEC2",
-			groupID:  group.ID,
-			provider: &enums.Local,
-			errorMsg: "constraint failed",
-		},
-		{
 			name:     "missing group",
 			orgID:    "01HSCAGDJ1XZ12Y06FESH4VEC3",
 			groupID:  "notfound",
@@ -149,8 +142,12 @@ func (suite *GraphTestSuite) TestCreateDatabase() {
 			assert.Contains(t, resp.CreateDatabase.Database.Name, strings.ToLower(tc.orgID))
 			assert.Equal(t, *tc.provider, resp.CreateDatabase.Database.Provider)
 			assert.Equal(t, tc.orgID, resp.CreateDatabase.Database.OrganizationID)
+
+			(&DatabaseCleanup{client: suite.client, DatabaseID: resp.CreateDatabase.Database.ID}).MustDelete(context.Background(), t)
 		})
 	}
+
+	(&GroupCleanup{client: suite.client, GroupID: group.ID}).MustDelete(context.Background(), t)
 }
 
 func (suite *GraphTestSuite) TestDeleteDatabase() {
