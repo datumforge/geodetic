@@ -56,7 +56,7 @@ func getDatabase(ctx context.Context) error {
 			return geodetic.JSONPrint(s)
 		}
 
-		return geodetic.SingleRowTablePrint((*db).Database)
+		return geodetic.SingleRowTablePrint(db.Database)
 	}
 
 	dbs, err := cli.Client.GetAllDatabases(ctx, cli.Interceptor)

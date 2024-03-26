@@ -6,11 +6,12 @@ import (
 	"os"
 	"reflect"
 
-	"github.com/datumforge/geodetic/config"
-	"github.com/datumforge/geodetic/jsonschema/envparse"
 	"github.com/invopop/jsonschema"
 	"github.com/invopop/yaml"
 	"github.com/mcuadros/go-defaults"
+
+	"github.com/datumforge/geodetic/config"
+	"github.com/datumforge/geodetic/jsonschema/envparse"
 )
 
 // const values used for the schema generator
@@ -117,6 +118,7 @@ func generateSchema(c schemaConfig, structure interface{}) error {
 	// generate the environment variables from the config
 	envSchema := ""
 	configMapSchema := "\n"
+
 	for _, k := range out {
 		defaultVal := k.Tags.Get(defaultTag)
 
