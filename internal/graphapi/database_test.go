@@ -56,6 +56,7 @@ func (suite *GraphTestSuite) TestQueryDatabase() {
 	}
 
 	(&DatabaseCleanup{client: suite.client, DatabaseID: db.ID}).MustDelete(context.Background(), t)
+	(&GroupCleanup{client: suite.client, GroupID: db.GroupID}).MustDelete(context.Background(), t)
 }
 
 func (suite *GraphTestSuite) TestListDatabases() {
@@ -75,6 +76,8 @@ func (suite *GraphTestSuite) TestListDatabases() {
 
 	(&DatabaseCleanup{client: suite.client, DatabaseID: db1.ID}).MustDelete(context.Background(), t)
 	(&DatabaseCleanup{client: suite.client, DatabaseID: db2.ID}).MustDelete(context.Background(), t)
+	(&GroupCleanup{client: suite.client, GroupID: db1.GroupID}).MustDelete(context.Background(), t)
+	(&GroupCleanup{client: suite.client, GroupID: db2.GroupID}).MustDelete(context.Background(), t)
 }
 
 func (suite *GraphTestSuite) TestCreateDatabase() {
@@ -190,4 +193,6 @@ func (suite *GraphTestSuite) TestDeleteDatabase() {
 			assert.NotEmpty(t, resp.DeleteDatabase.DeletedID)
 		})
 	}
+
+	(&GroupCleanup{client: suite.client, GroupID: db.GroupID}).MustDelete(context.Background(), t)
 }

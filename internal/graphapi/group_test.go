@@ -68,7 +68,21 @@ func (suite *GraphTestSuite) TestListGroups() {
 		require.NoError(t, err)
 		require.NotNil(t, resp)
 		require.NotNil(t, resp.Groups)
-		require.Len(t, resp.Groups.Edges, 2)
+
+		assert.Len(t, resp.Groups.Edges, 2)
+
+		group1Found := false
+		group2Found := false
+		for _, g := range resp.Groups.Edges {
+			if g.Node.Name == group1.Name {
+				group1Found = true
+			} else if g.Node.Name == group2.Name {
+				group2Found = true
+			}
+		}
+
+		assert.True(t, group1Found)
+		assert.True(t, group2Found)
 	})
 
 	(&GroupCleanup{client: suite.client, GroupID: group1.ID}).MustDelete(context.Background(), t)
