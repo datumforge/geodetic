@@ -52,13 +52,15 @@ func (suite *GraphTestSuite) TestQueryGroup() {
 			require.NotNil(t, resp.Group)
 		})
 	}
+
+	(&GroupCleanup{client: suite.client, GroupID: group.ID}).MustDelete(context.Background(), t)
 }
 
 func (suite *GraphTestSuite) TestListGroups() {
 	t := suite.T()
 
-	_ = (&GroupBuilder{client: suite.client}).MustNew(context.Background(), t)
-	_ = (&GroupBuilder{client: suite.client}).MustNew(context.Background(), t)
+	group1 := (&GroupBuilder{client: suite.client}).MustNew(context.Background(), t)
+	group2 := (&GroupBuilder{client: suite.client}).MustNew(context.Background(), t)
 
 	t.Run("List Groups", func(t *testing.T) {
 		resp, err := suite.client.geodetic.GetAllGroups(context.Background())
@@ -68,6 +70,9 @@ func (suite *GraphTestSuite) TestListGroups() {
 		require.NotNil(t, resp.Groups)
 		require.Len(t, resp.Groups.Edges, 2)
 	})
+
+	(&GroupCleanup{client: suite.client, GroupID: group1.ID}).MustDelete(context.Background(), t)
+	(&GroupCleanup{client: suite.client, GroupID: group2.ID}).MustDelete(context.Background(), t)
 }
 
 func (suite *GraphTestSuite) TestCreateGroup() {

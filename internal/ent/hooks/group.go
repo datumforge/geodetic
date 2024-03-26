@@ -76,21 +76,23 @@ func HookGroupUpdate() ent.Hook {
 func HookGroupDelete() ent.Hook {
 	return hook.On(func(next ent.Mutator) ent.Mutator {
 		return hook.GroupFunc(func(ctx context.Context, mutation *generated.GroupMutation) (generated.Value, error) {
-			gtx := graphql.GetOperationContext(ctx)
-			name := gtx.Variables["name"].(string)
+			if ok := graphql.HasOperationContext(ctx); ok {
+				gtx := graphql.GetOperationContext(ctx)
+				name := gtx.Variables["name"].(string)
 
-			if name == "" {
-				mutation.Logger.Errorw("unable to delete group, no name provided")
+				if name == "" {
+					mutation.Logger.Errorw("unable to delete group, no name provided")
 
-				return nil, fmt.Errorf("no name provided") //nolint:goerr113
+					return nil, fmt.Errorf("no name provided") //nolint:goerr113
+				}
+
+				group, err := mutation.Turso.Group.DeleteGroup(ctx, name)
+				if err != nil {
+					return nil, err
+				}
+
+				mutation.Logger.Infow("deleted turso group", "group", group.Group)
 			}
-
-			group, err := mutation.Turso.Group.DeleteGroup(ctx, name)
-			if err != nil {
-				return nil, err
-			}
-
-			mutation.Logger.Infow("deleted turso group", "group", group.Group)
 
 			// write things that we need to the database
 			return next.Mutate(ctx, mutation)

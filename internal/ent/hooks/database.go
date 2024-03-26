@@ -68,21 +68,23 @@ func HookCreateDatabase() ent.Hook {
 func HookDatabaseDelete() ent.Hook {
 	return hook.On(func(next ent.Mutator) ent.Mutator {
 		return hook.DatabaseFunc(func(ctx context.Context, mutation *generated.DatabaseMutation) (generated.Value, error) {
-			gtx := graphql.GetOperationContext(ctx)
-			name := gtx.Variables["name"].(string)
+			if ok := graphql.HasOperationContext(ctx); ok {
+				gtx := graphql.GetOperationContext(ctx)
+				name := gtx.Variables["name"].(string)
 
-			if name == "" {
-				mutation.Logger.Errorw("unable to delete database, no name provided")
+				if name == "" {
+					mutation.Logger.Errorw("unable to delete database, no name provided")
 
-				return nil, fmt.Errorf("no name provided") //nolint:goerr113
+					return nil, fmt.Errorf("no name provided") //nolint:goerr113
+				}
+
+				db, err := mutation.Turso.Database.DeleteDatabase(ctx, name)
+				if err != nil {
+					return nil, err
+				}
+
+				mutation.Logger.Infow("deleted turso database", "database", db.Database)
 			}
-
-			db, err := mutation.Turso.Database.DeleteDatabase(ctx, name)
-			if err != nil {
-				return nil, err
-			}
-
-			mutation.Logger.Infow("deleted turso database", "database", db.Database)
 
 			// write things that we need to the database
 			return next.Mutate(ctx, mutation)

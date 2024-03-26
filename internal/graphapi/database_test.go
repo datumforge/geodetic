@@ -54,13 +54,15 @@ func (suite *GraphTestSuite) TestQueryDatabase() {
 			require.NotNil(t, resp.Database)
 		})
 	}
+
+	(&DatabaseCleanup{client: suite.client, DatabaseID: db.ID}).MustDelete(context.Background(), t)
 }
 
 func (suite *GraphTestSuite) TestListDatabases() {
 	t := suite.T()
 
-	_ = (&DatabaseBuilder{client: suite.client}).MustNew(context.Background(), t)
-	_ = (&DatabaseBuilder{client: suite.client}).MustNew(context.Background(), t)
+	db1 := (&DatabaseBuilder{client: suite.client}).MustNew(context.Background(), t)
+	db2 := (&DatabaseBuilder{client: suite.client}).MustNew(context.Background(), t)
 
 	t.Run("List Databases", func(t *testing.T) {
 		resp, err := suite.client.geodetic.GetAllDatabases(context.Background())
@@ -70,6 +72,9 @@ func (suite *GraphTestSuite) TestListDatabases() {
 		require.NotNil(t, resp.Databases)
 		require.Len(t, resp.Databases.Edges, 2)
 	})
+
+	(&DatabaseCleanup{client: suite.client, DatabaseID: db1.ID}).MustDelete(context.Background(), t)
+	(&DatabaseCleanup{client: suite.client, DatabaseID: db2.ID}).MustDelete(context.Background(), t)
 }
 
 func (suite *GraphTestSuite) TestCreateDatabase() {
