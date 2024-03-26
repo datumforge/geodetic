@@ -282,6 +282,7 @@ func RowsTablePrint(resp GraphResponse) error {
 		for _, r := range rows {
 			rowMap := r.Node.(map[string]interface{})
 			row := []string{}
+
 			for _, h := range headers {
 				row = append(row, rowMap[h].(string))
 			}

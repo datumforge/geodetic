@@ -56,7 +56,7 @@ func getGroup(ctx context.Context) error {
 			return geodetic.JSONPrint(s)
 		}
 
-		return geodetic.SingleRowTablePrint((*group).Group)
+		return geodetic.SingleRowTablePrint(group.Group)
 	}
 
 	groups, err := cli.Client.GetAllGroups(ctx, cli.Interceptor)
@@ -64,7 +64,7 @@ func getGroup(ctx context.Context) error {
 		return err
 	}
 
-	s, err := json.Marshal((*groups).Groups)
+	s, err := json.Marshal(groups.Groups)
 	if err != nil {
 		return err
 	}
