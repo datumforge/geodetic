@@ -918,7 +918,7 @@ input CreateGroupInput {
   """
   the primary of the group
   """
-  primaryLocation: String
+  primaryLocation: String!
   """
   the replica locations of the group
   """
@@ -1257,7 +1257,7 @@ type Group implements Node {
   """
   the primary of the group
   """
-  primaryLocation: String
+  primaryLocation: String!
   """
   the replica locations of the group
   """
@@ -1468,8 +1468,6 @@ input GroupWhereInput {
   primaryLocationContains: String
   primaryLocationHasPrefix: String
   primaryLocationHasSuffix: String
-  primaryLocationIsNil: Boolean
-  primaryLocationNotNil: Boolean
   primaryLocationEqualFold: String
   primaryLocationContainsFold: String
   """
@@ -1673,7 +1671,6 @@ input UpdateGroupInput {
   the primary of the group
   """
   primaryLocation: String
-  clearPrimaryLocation: Boolean
   """
   the replica locations of the group
   """
@@ -3620,11 +3617,14 @@ func (ec *executionContext) _Group_primaryLocation(ctx context.Context, field gr
 		return graphql.Null
 	}
 	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
 		return graphql.Null
 	}
 	res := resTmp.(string)
 	fc.Result = res
-	return ec.marshalOString2string(ctx, field.Selections, res)
+	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Group_primaryLocation(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -7235,7 +7235,7 @@ func (ec *executionContext) unmarshalInputCreateGroupInput(ctx context.Context, 
 			it.Description = data
 		case "primaryLocation":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("primaryLocation"))
-			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			data, err := ec.unmarshalNString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -8456,7 +8456,7 @@ func (ec *executionContext) unmarshalInputGroupWhereInput(ctx context.Context, o
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"not", "and", "or", "id", "idNEQ", "idIn", "idNotIn", "idGT", "idGTE", "idLT", "idLTE", "idEqualFold", "idContainsFold", "createdAt", "createdAtNEQ", "createdAtIn", "createdAtNotIn", "createdAtGT", "createdAtGTE", "createdAtLT", "createdAtLTE", "createdAtIsNil", "createdAtNotNil", "updatedAt", "updatedAtNEQ", "updatedAtIn", "updatedAtNotIn", "updatedAtGT", "updatedAtGTE", "updatedAtLT", "updatedAtLTE", "updatedAtIsNil", "updatedAtNotNil", "createdBy", "createdByNEQ", "createdByIn", "createdByNotIn", "createdByGT", "createdByGTE", "createdByLT", "createdByLTE", "createdByContains", "createdByHasPrefix", "createdByHasSuffix", "createdByIsNil", "createdByNotNil", "createdByEqualFold", "createdByContainsFold", "updatedBy", "updatedByNEQ", "updatedByIn", "updatedByNotIn", "updatedByGT", "updatedByGTE", "updatedByLT", "updatedByLTE", "updatedByContains", "updatedByHasPrefix", "updatedByHasSuffix", "updatedByIsNil", "updatedByNotNil", "updatedByEqualFold", "updatedByContainsFold", "deletedAt", "deletedAtNEQ", "deletedAtIn", "deletedAtNotIn", "deletedAtGT", "deletedAtGTE", "deletedAtLT", "deletedAtLTE", "deletedAtIsNil", "deletedAtNotNil", "deletedBy", "deletedByNEQ", "deletedByIn", "deletedByNotIn", "deletedByGT", "deletedByGTE", "deletedByLT", "deletedByLTE", "deletedByContains", "deletedByHasPrefix", "deletedByHasSuffix", "deletedByIsNil", "deletedByNotNil", "deletedByEqualFold", "deletedByContainsFold", "name", "nameNEQ", "nameIn", "nameNotIn", "nameGT", "nameGTE", "nameLT", "nameLTE", "nameContains", "nameHasPrefix", "nameHasSuffix", "nameEqualFold", "nameContainsFold", "description", "descriptionNEQ", "descriptionIn", "descriptionNotIn", "descriptionGT", "descriptionGTE", "descriptionLT", "descriptionLTE", "descriptionContains", "descriptionHasPrefix", "descriptionHasSuffix", "descriptionIsNil", "descriptionNotNil", "descriptionEqualFold", "descriptionContainsFold", "primaryLocation", "primaryLocationNEQ", "primaryLocationIn", "primaryLocationNotIn", "primaryLocationGT", "primaryLocationGTE", "primaryLocationLT", "primaryLocationLTE", "primaryLocationContains", "primaryLocationHasPrefix", "primaryLocationHasSuffix", "primaryLocationIsNil", "primaryLocationNotNil", "primaryLocationEqualFold", "primaryLocationContainsFold", "region", "regionNEQ", "regionIn", "regionNotIn", "hasDatabases", "hasDatabasesWith"}
+	fieldsInOrder := [...]string{"not", "and", "or", "id", "idNEQ", "idIn", "idNotIn", "idGT", "idGTE", "idLT", "idLTE", "idEqualFold", "idContainsFold", "createdAt", "createdAtNEQ", "createdAtIn", "createdAtNotIn", "createdAtGT", "createdAtGTE", "createdAtLT", "createdAtLTE", "createdAtIsNil", "createdAtNotNil", "updatedAt", "updatedAtNEQ", "updatedAtIn", "updatedAtNotIn", "updatedAtGT", "updatedAtGTE", "updatedAtLT", "updatedAtLTE", "updatedAtIsNil", "updatedAtNotNil", "createdBy", "createdByNEQ", "createdByIn", "createdByNotIn", "createdByGT", "createdByGTE", "createdByLT", "createdByLTE", "createdByContains", "createdByHasPrefix", "createdByHasSuffix", "createdByIsNil", "createdByNotNil", "createdByEqualFold", "createdByContainsFold", "updatedBy", "updatedByNEQ", "updatedByIn", "updatedByNotIn", "updatedByGT", "updatedByGTE", "updatedByLT", "updatedByLTE", "updatedByContains", "updatedByHasPrefix", "updatedByHasSuffix", "updatedByIsNil", "updatedByNotNil", "updatedByEqualFold", "updatedByContainsFold", "deletedAt", "deletedAtNEQ", "deletedAtIn", "deletedAtNotIn", "deletedAtGT", "deletedAtGTE", "deletedAtLT", "deletedAtLTE", "deletedAtIsNil", "deletedAtNotNil", "deletedBy", "deletedByNEQ", "deletedByIn", "deletedByNotIn", "deletedByGT", "deletedByGTE", "deletedByLT", "deletedByLTE", "deletedByContains", "deletedByHasPrefix", "deletedByHasSuffix", "deletedByIsNil", "deletedByNotNil", "deletedByEqualFold", "deletedByContainsFold", "name", "nameNEQ", "nameIn", "nameNotIn", "nameGT", "nameGTE", "nameLT", "nameLTE", "nameContains", "nameHasPrefix", "nameHasSuffix", "nameEqualFold", "nameContainsFold", "description", "descriptionNEQ", "descriptionIn", "descriptionNotIn", "descriptionGT", "descriptionGTE", "descriptionLT", "descriptionLTE", "descriptionContains", "descriptionHasPrefix", "descriptionHasSuffix", "descriptionIsNil", "descriptionNotNil", "descriptionEqualFold", "descriptionContainsFold", "primaryLocation", "primaryLocationNEQ", "primaryLocationIn", "primaryLocationNotIn", "primaryLocationGT", "primaryLocationGTE", "primaryLocationLT", "primaryLocationLTE", "primaryLocationContains", "primaryLocationHasPrefix", "primaryLocationHasSuffix", "primaryLocationEqualFold", "primaryLocationContainsFold", "region", "regionNEQ", "regionIn", "regionNotIn", "hasDatabases", "hasDatabasesWith"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -9352,20 +9352,6 @@ func (ec *executionContext) unmarshalInputGroupWhereInput(ctx context.Context, o
 				return it, err
 			}
 			it.PrimaryLocationHasSuffix = data
-		case "primaryLocationIsNil":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("primaryLocationIsNil"))
-			data, err := ec.unmarshalOBoolean2bool(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.PrimaryLocationIsNil = data
-		case "primaryLocationNotNil":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("primaryLocationNotNil"))
-			data, err := ec.unmarshalOBoolean2bool(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.PrimaryLocationNotNil = data
 		case "primaryLocationEqualFold":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("primaryLocationEqualFold"))
 			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
@@ -9553,7 +9539,7 @@ func (ec *executionContext) unmarshalInputUpdateGroupInput(ctx context.Context, 
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"updatedAt", "clearUpdatedAt", "updatedBy", "clearUpdatedBy", "name", "description", "clearDescription", "primaryLocation", "clearPrimaryLocation", "locations", "appendLocations", "clearLocations", "token", "clearToken", "region", "addDatabaseIDs", "removeDatabaseIDs", "clearDatabases"}
+	fieldsInOrder := [...]string{"updatedAt", "clearUpdatedAt", "updatedBy", "clearUpdatedBy", "name", "description", "clearDescription", "primaryLocation", "locations", "appendLocations", "clearLocations", "token", "clearToken", "region", "addDatabaseIDs", "removeDatabaseIDs", "clearDatabases"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -9616,13 +9602,6 @@ func (ec *executionContext) unmarshalInputUpdateGroupInput(ctx context.Context, 
 				return it, err
 			}
 			it.PrimaryLocation = data
-		case "clearPrimaryLocation":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("clearPrimaryLocation"))
-			data, err := ec.unmarshalOBoolean2bool(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.ClearPrimaryLocation = data
 		case "locations":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("locations"))
 			data, err := ec.unmarshalOString2ᚕstringᚄ(ctx, v)
@@ -10079,6 +10058,9 @@ func (ec *executionContext) _Group(ctx context.Context, sel ast.SelectionSet, ob
 			out.Values[i] = ec._Group_description(ctx, field, obj)
 		case "primaryLocation":
 			out.Values[i] = ec._Group_primaryLocation(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&out.Invalids, 1)
+			}
 		case "locations":
 			out.Values[i] = ec._Group_locations(ctx, field, obj)
 		case "region":

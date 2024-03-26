@@ -56,8 +56,10 @@ func (Database) Fields() []ent.Field {
 // Indexes of the Database
 func (Database) Indexes() []ent.Index {
 	return []ent.Index{
-		// organization_id should be unique
+		// organization_id should be unique, this will also create a unique name
 		index.Fields("organization_id").
+			Unique().Annotations(entsql.IndexWhere("deleted_at is NULL")),
+		index.Fields("name").
 			Unique().Annotations(entsql.IndexWhere("deleted_at is NULL")),
 	}
 }

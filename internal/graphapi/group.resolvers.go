@@ -7,6 +7,7 @@ package graphapi
 import (
 	"context"
 
+	"github.com/datumforge/datum/pkg/rout"
 	"github.com/datumforge/geodetic/internal/ent/generated"
 	"github.com/datumforge/geodetic/internal/ent/generated/group"
 )
@@ -15,6 +16,20 @@ import (
 func (r *mutationResolver) CreateGroup(ctx context.Context, input generated.CreateGroupInput) (*GroupCreatePayload, error) {
 	group, err := withTransactionalMutation(ctx).Group.Create().SetInput(input).Save(ctx)
 	if err != nil {
+		if generated.IsConstraintError(err) {
+			constraintError := err.(*generated.ConstraintError)
+
+			r.logger.Debugw("constraint error", "error", constraintError.Error())
+
+			return nil, constraintError
+		}
+
+		if generated.IsValidationError(err) {
+			ve := err.(*generated.ValidationError)
+
+			return nil, rout.InvalidField(ve.Name)
+		}
+
 		r.logger.Errorw("failed to create group", "error", err)
 
 		return nil, err

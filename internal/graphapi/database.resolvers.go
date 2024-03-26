@@ -8,6 +8,7 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/datumforge/datum/pkg/rout"
 	"github.com/datumforge/geodetic/internal/ent/generated"
 	"github.com/datumforge/geodetic/internal/ent/generated/database"
 )
@@ -16,6 +17,20 @@ import (
 func (r *mutationResolver) CreateDatabase(ctx context.Context, input generated.CreateDatabaseInput) (*DatabaseCreatePayload, error) {
 	db, err := withTransactionalMutation(ctx).Database.Create().SetInput(input).Save(ctx)
 	if err != nil {
+		if generated.IsConstraintError(err) {
+			constraintError := err.(*generated.ConstraintError)
+
+			r.logger.Debugw("constraint error", "error", constraintError.Error())
+
+			return nil, constraintError
+		}
+
+		if generated.IsValidationError(err) {
+			ve := err.(*generated.ValidationError)
+
+			return nil, rout.InvalidField(ve.Name)
+		}
+
 		r.logger.Errorw("failed to create database", "error", err)
 
 		return nil, err

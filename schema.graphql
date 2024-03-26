@@ -59,7 +59,7 @@ input CreateGroupInput {
 	"""
 	the primary of the group
 	"""
-	primaryLocation: String
+	primaryLocation: String!
 	"""
 	the replica locations of the group
 	"""
@@ -425,7 +425,7 @@ type Group implements Node {
 	"""
 	the primary of the group
 	"""
-	primaryLocation: String
+	primaryLocation: String!
 	"""
 	the replica locations of the group
 	"""
@@ -663,8 +663,6 @@ input GroupWhereInput {
 	primaryLocationContains: String
 	primaryLocationHasPrefix: String
 	primaryLocationHasSuffix: String
-	primaryLocationIsNil: Boolean
-	primaryLocationNotNil: Boolean
 	primaryLocationEqualFold: String
 	primaryLocationContainsFold: String
 	"""
@@ -952,7 +950,6 @@ input UpdateGroupInput {
 	the primary of the group
 	"""
 	primaryLocation: String
-	clearPrimaryLocation: Boolean
 	"""
 	the replica locations of the group
 	"""

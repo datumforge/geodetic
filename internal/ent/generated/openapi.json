@@ -502,6 +502,7 @@
                 },
                 "required": [
                   "name",
+                  "primary_location",
                   "region"
                 ]
               }
@@ -911,6 +912,7 @@
         "required": [
           "id",
           "name",
+          "primary_location",
           "region"
         ]
       }

@@ -79,6 +79,10 @@ func init() {
 	groupDescName := groupFields[0].Descriptor()
 	// group.NameValidator is a validator for the "name" field. It is called by the builders before save.
 	group.NameValidator = groupDescName.Validators[0].(func(string) error)
+	// groupDescPrimaryLocation is the schema descriptor for primary_location field.
+	groupDescPrimaryLocation := groupFields[2].Descriptor()
+	// group.PrimaryLocationValidator is a validator for the "primary_location" field. It is called by the builders before save.
+	group.PrimaryLocationValidator = groupDescPrimaryLocation.Validators[0].(func(string) error)
 	// groupDescID is the schema descriptor for id field.
 	groupDescID := groupMixinFields1[0].Descriptor()
 	// group.DefaultID holds the default value on creation for the id field.

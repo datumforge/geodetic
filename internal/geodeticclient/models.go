@@ -47,7 +47,7 @@ type CreateGroupInput struct {
 	// the description of the group
 	Description *string `json:"description,omitempty"`
 	// the primary of the group
-	PrimaryLocation *string `json:"primaryLocation,omitempty"`
+	PrimaryLocation string `json:"primaryLocation"`
 	// the replica locations of the group
 	Locations []string `json:"locations,omitempty"`
 	// the auth token used to connect to the group
@@ -318,7 +318,7 @@ type Group struct {
 	// the description of the group
 	Description *string `json:"description,omitempty"`
 	// the primary of the group
-	PrimaryLocation *string `json:"primaryLocation,omitempty"`
+	PrimaryLocation string `json:"primaryLocation"`
 	// the replica locations of the group
 	Locations []string `json:"locations,omitempty"`
 	// region the group
@@ -504,8 +504,6 @@ type GroupWhereInput struct {
 	PrimaryLocationContains     *string  `json:"primaryLocationContains,omitempty"`
 	PrimaryLocationHasPrefix    *string  `json:"primaryLocationHasPrefix,omitempty"`
 	PrimaryLocationHasSuffix    *string  `json:"primaryLocationHasSuffix,omitempty"`
-	PrimaryLocationIsNil        *bool    `json:"primaryLocationIsNil,omitempty"`
-	PrimaryLocationNotNil       *bool    `json:"primaryLocationNotNil,omitempty"`
 	PrimaryLocationEqualFold    *string  `json:"primaryLocationEqualFold,omitempty"`
 	PrimaryLocationContainsFold *string  `json:"primaryLocationContainsFold,omitempty"`
 	// region field predicates
@@ -576,8 +574,7 @@ type UpdateGroupInput struct {
 	Description      *string `json:"description,omitempty"`
 	ClearDescription *bool   `json:"clearDescription,omitempty"`
 	// the primary of the group
-	PrimaryLocation      *string `json:"primaryLocation,omitempty"`
-	ClearPrimaryLocation *bool   `json:"clearPrimaryLocation,omitempty"`
+	PrimaryLocation *string `json:"primaryLocation,omitempty"`
 	// the replica locations of the group
 	Locations       []string `json:"locations,omitempty"`
 	AppendLocations []string `json:"appendLocations,omitempty"`

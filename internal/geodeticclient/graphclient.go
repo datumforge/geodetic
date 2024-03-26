@@ -236,7 +236,7 @@ type GetGroup_Group struct {
 	ID              string       "json:\"id\" graphql:\"id\""
 	Name            string       "json:\"name\" graphql:\"name\""
 	Description     *string      "json:\"description,omitempty\" graphql:\"description\""
-	PrimaryLocation *string      "json:\"primaryLocation,omitempty\" graphql:\"primaryLocation\""
+	PrimaryLocation string       "json:\"primaryLocation\" graphql:\"primaryLocation\""
 	Locations       []string     "json:\"locations,omitempty\" graphql:\"locations\""
 	Region          enums.Region "json:\"region\" graphql:\"region\""
 }
@@ -259,7 +259,7 @@ func (t *GetGroup_Group) GetDescription() *string {
 	}
 	return t.Description
 }
-func (t *GetGroup_Group) GetPrimaryLocation() *string {
+func (t *GetGroup_Group) GetPrimaryLocation() string {
 	if t == nil {
 		t = &GetGroup_Group{}
 	}
@@ -282,7 +282,7 @@ type GetAllGroups_Groups_Edges_Node struct {
 	ID              string       "json:\"id\" graphql:\"id\""
 	Name            string       "json:\"name\" graphql:\"name\""
 	Description     *string      "json:\"description,omitempty\" graphql:\"description\""
-	PrimaryLocation *string      "json:\"primaryLocation,omitempty\" graphql:\"primaryLocation\""
+	PrimaryLocation string       "json:\"primaryLocation\" graphql:\"primaryLocation\""
 	Locations       []string     "json:\"locations,omitempty\" graphql:\"locations\""
 	Region          enums.Region "json:\"region\" graphql:\"region\""
 }
@@ -305,7 +305,7 @@ func (t *GetAllGroups_Groups_Edges_Node) GetDescription() *string {
 	}
 	return t.Description
 }
-func (t *GetAllGroups_Groups_Edges_Node) GetPrimaryLocation() *string {
+func (t *GetAllGroups_Groups_Edges_Node) GetPrimaryLocation() string {
 	if t == nil {
 		t = &GetAllGroups_Groups_Edges_Node{}
 	}
@@ -350,7 +350,7 @@ type CreateGroup_CreateGroup_Group struct {
 	ID              string       "json:\"id\" graphql:\"id\""
 	Name            string       "json:\"name\" graphql:\"name\""
 	Description     *string      "json:\"description,omitempty\" graphql:\"description\""
-	PrimaryLocation *string      "json:\"primaryLocation,omitempty\" graphql:\"primaryLocation\""
+	PrimaryLocation string       "json:\"primaryLocation\" graphql:\"primaryLocation\""
 	Locations       []string     "json:\"locations,omitempty\" graphql:\"locations\""
 	Region          enums.Region "json:\"region\" graphql:\"region\""
 }
@@ -373,7 +373,7 @@ func (t *CreateGroup_CreateGroup_Group) GetDescription() *string {
 	}
 	return t.Description
 }
-func (t *CreateGroup_CreateGroup_Group) GetPrimaryLocation() *string {
+func (t *CreateGroup_CreateGroup_Group) GetPrimaryLocation() string {
 	if t == nil {
 		t = &CreateGroup_CreateGroup_Group{}
 	}

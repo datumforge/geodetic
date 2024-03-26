@@ -688,16 +688,6 @@ func PrimaryLocationHasSuffix(v string) predicate.Group {
 	return predicate.Group(sql.FieldHasSuffix(FieldPrimaryLocation, v))
 }
 
-// PrimaryLocationIsNil applies the IsNil predicate on the "primary_location" field.
-func PrimaryLocationIsNil() predicate.Group {
-	return predicate.Group(sql.FieldIsNull(FieldPrimaryLocation))
-}
-
-// PrimaryLocationNotNil applies the NotNil predicate on the "primary_location" field.
-func PrimaryLocationNotNil() predicate.Group {
-	return predicate.Group(sql.FieldNotNull(FieldPrimaryLocation))
-}
-
 // PrimaryLocationEqualFold applies the EqualFold predicate on the "primary_location" field.
 func PrimaryLocationEqualFold(v string) predicate.Group {
 	return predicate.Group(sql.FieldEqualFold(FieldPrimaryLocation, v))

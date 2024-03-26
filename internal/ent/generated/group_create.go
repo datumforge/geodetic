@@ -132,14 +132,6 @@ func (gc *GroupCreate) SetPrimaryLocation(s string) *GroupCreate {
 	return gc
 }
 
-// SetNillablePrimaryLocation sets the "primary_location" field if the given value is not nil.
-func (gc *GroupCreate) SetNillablePrimaryLocation(s *string) *GroupCreate {
-	if s != nil {
-		gc.SetPrimaryLocation(*s)
-	}
-	return gc
-}
-
 // SetLocations sets the "locations" field.
 func (gc *GroupCreate) SetLocations(s []string) *GroupCreate {
 	gc.mutation.SetLocations(s)
@@ -276,6 +268,14 @@ func (gc *GroupCreate) check() error {
 	if v, ok := gc.mutation.Name(); ok {
 		if err := group.NameValidator(v); err != nil {
 			return &ValidationError{Name: "name", err: fmt.Errorf(`generated: validator failed for field "Group.name": %w`, err)}
+		}
+	}
+	if _, ok := gc.mutation.PrimaryLocation(); !ok {
+		return &ValidationError{Name: "primary_location", err: errors.New(`generated: missing required field "Group.primary_location"`)}
+	}
+	if v, ok := gc.mutation.PrimaryLocation(); ok {
+		if err := group.PrimaryLocationValidator(v); err != nil {
+			return &ValidationError{Name: "primary_location", err: fmt.Errorf(`generated: validator failed for field "Group.primary_location": %w`, err)}
 		}
 	}
 	if _, ok := gc.mutation.Region(); !ok {

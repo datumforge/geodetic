@@ -1815,22 +1815,9 @@ func (m *GroupMutation) OldPrimaryLocation(ctx context.Context) (v string, err e
 	return oldValue.PrimaryLocation, nil
 }
 
-// ClearPrimaryLocation clears the value of the "primary_location" field.
-func (m *GroupMutation) ClearPrimaryLocation() {
-	m.primary_location = nil
-	m.clearedFields[group.FieldPrimaryLocation] = struct{}{}
-}
-
-// PrimaryLocationCleared returns if the "primary_location" field was cleared in this mutation.
-func (m *GroupMutation) PrimaryLocationCleared() bool {
-	_, ok := m.clearedFields[group.FieldPrimaryLocation]
-	return ok
-}
-
 // ResetPrimaryLocation resets all changes to the "primary_location" field.
 func (m *GroupMutation) ResetPrimaryLocation() {
 	m.primary_location = nil
-	delete(m.clearedFields, group.FieldPrimaryLocation)
 }
 
 // SetLocations sets the "locations" field.
@@ -2317,9 +2304,6 @@ func (m *GroupMutation) ClearedFields() []string {
 	if m.FieldCleared(group.FieldDescription) {
 		fields = append(fields, group.FieldDescription)
 	}
-	if m.FieldCleared(group.FieldPrimaryLocation) {
-		fields = append(fields, group.FieldPrimaryLocation)
-	}
 	if m.FieldCleared(group.FieldLocations) {
 		fields = append(fields, group.FieldLocations)
 	}
@@ -2360,9 +2344,6 @@ func (m *GroupMutation) ClearField(name string) error {
 		return nil
 	case group.FieldDescription:
 		m.ClearDescription()
-		return nil
-	case group.FieldPrimaryLocation:
-		m.ClearPrimaryLocation()
 		return nil
 	case group.FieldLocations:
 		m.ClearLocations()

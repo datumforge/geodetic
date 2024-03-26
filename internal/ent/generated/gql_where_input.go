@@ -1005,8 +1005,6 @@ type GroupWhereInput struct {
 	PrimaryLocationContains     *string  `json:"primaryLocationContains,omitempty"`
 	PrimaryLocationHasPrefix    *string  `json:"primaryLocationHasPrefix,omitempty"`
 	PrimaryLocationHasSuffix    *string  `json:"primaryLocationHasSuffix,omitempty"`
-	PrimaryLocationIsNil        bool     `json:"primaryLocationIsNil,omitempty"`
-	PrimaryLocationNotNil       bool     `json:"primaryLocationNotNil,omitempty"`
 	PrimaryLocationEqualFold    *string  `json:"primaryLocationEqualFold,omitempty"`
 	PrimaryLocationContainsFold *string  `json:"primaryLocationContainsFold,omitempty"`
 
@@ -1480,12 +1478,6 @@ func (i *GroupWhereInput) P() (predicate.Group, error) {
 	}
 	if i.PrimaryLocationHasSuffix != nil {
 		predicates = append(predicates, group.PrimaryLocationHasSuffix(*i.PrimaryLocationHasSuffix))
-	}
-	if i.PrimaryLocationIsNil {
-		predicates = append(predicates, group.PrimaryLocationIsNil())
-	}
-	if i.PrimaryLocationNotNil {
-		predicates = append(predicates, group.PrimaryLocationNotNil())
 	}
 	if i.PrimaryLocationEqualFold != nil {
 		predicates = append(predicates, group.PrimaryLocationEqualFold(*i.PrimaryLocationEqualFold))

@@ -3,9 +3,11 @@ package schema
 import (
 	"entgo.io/contrib/entgql"
 	"entgo.io/ent"
+	"entgo.io/ent/dialect/entsql"
 	"entgo.io/ent/schema"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
+	"entgo.io/ent/schema/index"
 
 	"github.com/datumforge/entx"
 	emixin "github.com/datumforge/entx/mixin"
@@ -31,7 +33,7 @@ func (Group) Fields() []ent.Field {
 			Optional(),
 		field.String("primary_location").
 			Comment("the primary of the group").
-			Optional(),
+			NotEmpty(),
 		field.Strings("locations").
 			Comment("the replica locations of the group").
 			Optional(),
@@ -69,6 +71,14 @@ func (Group) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.To("databases", Database.Type).
 			Annotations(entx.CascadeAnnotationField("Group")),
+	}
+}
+
+func (Group) Indexes() []ent.Index {
+	return []ent.Index{
+		// names should be unique, but ignore deleted names
+		index.Fields("name").
+			Unique().Annotations(entsql.IndexWhere("deleted_at is NULL")),
 	}
 }
 

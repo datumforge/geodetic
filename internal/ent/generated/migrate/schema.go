@@ -49,6 +49,14 @@ var (
 					Where: "deleted_at is NULL",
 				},
 			},
+			{
+				Name:    "database_name",
+				Unique:  true,
+				Columns: []*schema.Column{DatabasesColumns[8]},
+				Annotation: &entsql.IndexAnnotation{
+					Where: "deleted_at is NULL",
+				},
+			},
 		},
 	}
 	// GroupsColumns holds the columns for the "groups" table.
@@ -62,7 +70,7 @@ var (
 		{Name: "deleted_by", Type: field.TypeString, Nullable: true},
 		{Name: "name", Type: field.TypeString},
 		{Name: "description", Type: field.TypeString, Nullable: true},
-		{Name: "primary_location", Type: field.TypeString, Nullable: true},
+		{Name: "primary_location", Type: field.TypeString},
 		{Name: "locations", Type: field.TypeJSON, Nullable: true},
 		{Name: "token", Type: field.TypeString, Nullable: true},
 		{Name: "region", Type: field.TypeEnum, Enums: []string{"AMER", "EMEA", "APAC"}, Default: "AMER"},
@@ -72,6 +80,16 @@ var (
 		Name:       "groups",
 		Columns:    GroupsColumns,
 		PrimaryKey: []*schema.Column{GroupsColumns[0]},
+		Indexes: []*schema.Index{
+			{
+				Name:    "group_name",
+				Unique:  true,
+				Columns: []*schema.Column{GroupsColumns[7]},
+				Annotation: &entsql.IndexAnnotation{
+					Where: "deleted_at is NULL",
+				},
+			},
+		},
 	}
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{

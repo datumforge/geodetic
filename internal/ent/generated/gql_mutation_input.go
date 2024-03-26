@@ -146,7 +146,7 @@ type CreateGroupInput struct {
 	UpdatedBy       *string
 	Name            string
 	Description     *string
-	PrimaryLocation *string
+	PrimaryLocation string
 	Locations       []string
 	Token           *string
 	Region          *enums.Region
@@ -171,9 +171,7 @@ func (i *CreateGroupInput) Mutate(m *GroupMutation) {
 	if v := i.Description; v != nil {
 		m.SetDescription(*v)
 	}
-	if v := i.PrimaryLocation; v != nil {
-		m.SetPrimaryLocation(*v)
-	}
+	m.SetPrimaryLocation(i.PrimaryLocation)
 	if v := i.Locations; v != nil {
 		m.SetLocations(v)
 	}
@@ -196,24 +194,23 @@ func (c *GroupCreate) SetInput(i CreateGroupInput) *GroupCreate {
 
 // UpdateGroupInput represents a mutation input for updating groups.
 type UpdateGroupInput struct {
-	ClearUpdatedAt       bool
-	UpdatedAt            *time.Time
-	ClearUpdatedBy       bool
-	UpdatedBy            *string
-	Name                 *string
-	ClearDescription     bool
-	Description          *string
-	ClearPrimaryLocation bool
-	PrimaryLocation      *string
-	ClearLocations       bool
-	Locations            []string
-	AppendLocations      []string
-	ClearToken           bool
-	Token                *string
-	Region               *enums.Region
-	ClearDatabases       bool
-	AddDatabaseIDs       []string
-	RemoveDatabaseIDs    []string
+	ClearUpdatedAt    bool
+	UpdatedAt         *time.Time
+	ClearUpdatedBy    bool
+	UpdatedBy         *string
+	Name              *string
+	ClearDescription  bool
+	Description       *string
+	PrimaryLocation   *string
+	ClearLocations    bool
+	Locations         []string
+	AppendLocations   []string
+	ClearToken        bool
+	Token             *string
+	Region            *enums.Region
+	ClearDatabases    bool
+	AddDatabaseIDs    []string
+	RemoveDatabaseIDs []string
 }
 
 // Mutate applies the UpdateGroupInput on the GroupMutation builder.
@@ -238,9 +235,6 @@ func (i *UpdateGroupInput) Mutate(m *GroupMutation) {
 	}
 	if v := i.Description; v != nil {
 		m.SetDescription(*v)
-	}
-	if i.ClearPrimaryLocation {
-		m.ClearPrimaryLocation()
 	}
 	if v := i.PrimaryLocation; v != nil {
 		m.SetPrimaryLocation(*v)

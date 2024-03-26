@@ -54,7 +54,7 @@ func createGroup(ctx context.Context) error {
 	input := geodeticclient.CreateGroupInput{
 		Name:            name,
 		Description:     &description,
-		PrimaryLocation: &location,
+		PrimaryLocation: location,
 		Region:          enums.ToRegion(region),
 	}
 

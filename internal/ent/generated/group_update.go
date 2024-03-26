@@ -153,12 +153,6 @@ func (gu *GroupUpdate) SetNillablePrimaryLocation(s *string) *GroupUpdate {
 	return gu
 }
 
-// ClearPrimaryLocation clears the value of the "primary_location" field.
-func (gu *GroupUpdate) ClearPrimaryLocation() *GroupUpdate {
-	gu.mutation.ClearPrimaryLocation()
-	return gu
-}
-
 // SetLocations sets the "locations" field.
 func (gu *GroupUpdate) SetLocations(s []string) *GroupUpdate {
 	gu.mutation.SetLocations(s)
@@ -301,6 +295,11 @@ func (gu *GroupUpdate) check() error {
 			return &ValidationError{Name: "name", err: fmt.Errorf(`generated: validator failed for field "Group.name": %w`, err)}
 		}
 	}
+	if v, ok := gu.mutation.PrimaryLocation(); ok {
+		if err := group.PrimaryLocationValidator(v); err != nil {
+			return &ValidationError{Name: "primary_location", err: fmt.Errorf(`generated: validator failed for field "Group.primary_location": %w`, err)}
+		}
+	}
 	if v, ok := gu.mutation.Region(); ok {
 		if err := group.RegionValidator(v); err != nil {
 			return &ValidationError{Name: "region", err: fmt.Errorf(`generated: validator failed for field "Group.region": %w`, err)}
@@ -362,9 +361,6 @@ func (gu *GroupUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if value, ok := gu.mutation.PrimaryLocation(); ok {
 		_spec.SetField(group.FieldPrimaryLocation, field.TypeString, value)
-	}
-	if gu.mutation.PrimaryLocationCleared() {
-		_spec.ClearField(group.FieldPrimaryLocation, field.TypeString)
 	}
 	if value, ok := gu.mutation.Locations(); ok {
 		_spec.SetField(group.FieldLocations, field.TypeJSON, value)
@@ -576,12 +572,6 @@ func (guo *GroupUpdateOne) SetNillablePrimaryLocation(s *string) *GroupUpdateOne
 	return guo
 }
 
-// ClearPrimaryLocation clears the value of the "primary_location" field.
-func (guo *GroupUpdateOne) ClearPrimaryLocation() *GroupUpdateOne {
-	guo.mutation.ClearPrimaryLocation()
-	return guo
-}
-
 // SetLocations sets the "locations" field.
 func (guo *GroupUpdateOne) SetLocations(s []string) *GroupUpdateOne {
 	guo.mutation.SetLocations(s)
@@ -737,6 +727,11 @@ func (guo *GroupUpdateOne) check() error {
 			return &ValidationError{Name: "name", err: fmt.Errorf(`generated: validator failed for field "Group.name": %w`, err)}
 		}
 	}
+	if v, ok := guo.mutation.PrimaryLocation(); ok {
+		if err := group.PrimaryLocationValidator(v); err != nil {
+			return &ValidationError{Name: "primary_location", err: fmt.Errorf(`generated: validator failed for field "Group.primary_location": %w`, err)}
+		}
+	}
 	if v, ok := guo.mutation.Region(); ok {
 		if err := group.RegionValidator(v); err != nil {
 			return &ValidationError{Name: "region", err: fmt.Errorf(`generated: validator failed for field "Group.region": %w`, err)}
@@ -815,9 +810,6 @@ func (guo *GroupUpdateOne) sqlSave(ctx context.Context) (_node *Group, err error
 	}
 	if value, ok := guo.mutation.PrimaryLocation(); ok {
 		_spec.SetField(group.FieldPrimaryLocation, field.TypeString, value)
-	}
-	if guo.mutation.PrimaryLocationCleared() {
-		_spec.ClearField(group.FieldPrimaryLocation, field.TypeString)
 	}
 	if value, ok := guo.mutation.Locations(); ok {
 		_spec.SetField(group.FieldLocations, field.TypeJSON, value)

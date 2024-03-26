@@ -52,6 +52,9 @@ func HookCreateDatabase() ent.Hook {
 				mutation.Logger.Infow("created turso db", "db", db.Database.DatabaseID, "hostname", db.Database.Hostname)
 
 				mutation.SetDsn(db.Database.Hostname)
+			} else {
+				// set the dsn to the name
+				mutation.SetDsn(fmt.Sprintf("file:%s.db", name))
 			}
 
 			mutation.SetStatus(enums.Active)

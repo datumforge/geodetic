@@ -97,6 +97,8 @@ var (
 	UpdateDefaultUpdatedAt func() time.Time
 	// NameValidator is a validator for the "name" field. It is called by the builders before save.
 	NameValidator func(string) error
+	// PrimaryLocationValidator is a validator for the "primary_location" field. It is called by the builders before save.
+	PrimaryLocationValidator func(string) error
 	// DefaultID holds the default value on creation for the "id" field.
 	DefaultID func() string
 )
