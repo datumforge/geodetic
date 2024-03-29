@@ -8,7 +8,7 @@ import (
 	"github.com/spf13/viper"
 
 	geodetic "github.com/datumforge/geodetic/cmd/cli/cmd"
-	"github.com/datumforge/geodetic/internal/ent/enums"
+	"github.com/datumforge/geodetic/pkg/enums"
 	"github.com/datumforge/geodetic/pkg/geodeticclient"
 )
 

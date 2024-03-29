@@ -11,9 +11,9 @@ import (
 
 	emixin "github.com/datumforge/entx/mixin"
 
-	"github.com/datumforge/geodetic/internal/ent/enums"
 	"github.com/datumforge/geodetic/internal/ent/hooks"
 	"github.com/datumforge/geodetic/internal/ent/mixin"
+	"github.com/datumforge/geodetic/pkg/enums"
 )
 
 // Database holds the example schema definition for the Database entity

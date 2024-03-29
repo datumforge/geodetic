@@ -12,9 +12,9 @@ import (
 	"github.com/datumforge/entx"
 	emixin "github.com/datumforge/entx/mixin"
 
-	"github.com/datumforge/geodetic/internal/ent/enums"
 	"github.com/datumforge/geodetic/internal/ent/hooks"
 	"github.com/datumforge/geodetic/internal/ent/mixin"
+	"github.com/datumforge/geodetic/pkg/enums"
 )
 
 // Group holds the schema definition for the Group entity

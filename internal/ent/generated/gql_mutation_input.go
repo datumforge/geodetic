@@ -5,7 +5,7 @@ package generated
 import (
 	"time"
 
-	"github.com/datumforge/geodetic/internal/ent/enums"
+	"github.com/datumforge/geodetic/pkg/enums"
 )
 
 // CreateDatabaseInput represents a mutation input for creating databases.

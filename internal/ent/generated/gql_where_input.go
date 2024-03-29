@@ -7,10 +7,10 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/datumforge/geodetic/internal/ent/enums"
 	"github.com/datumforge/geodetic/internal/ent/generated/database"
 	"github.com/datumforge/geodetic/internal/ent/generated/group"
 	"github.com/datumforge/geodetic/internal/ent/generated/predicate"
+	"github.com/datumforge/geodetic/pkg/enums"
 )
 
 // DatabaseWhereInput represents a where input for filtering Database queries.

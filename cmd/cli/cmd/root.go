@@ -4,7 +4,6 @@ package datum
 import (
 	"encoding/json"
 	"fmt"
-	"net/http"
 	"os"
 	"reflect"
 	"strings"
@@ -140,11 +139,9 @@ func ViperBindFlag(name string, flag *pflag.Flag) {
 func createClient(baseURL string) (*CLI, error) {
 	cli := CLI{}
 
-	h := http.DefaultClient
-
-	// set options
-	opt := &clientv2.Options{
-		ParseDataAlongWithErrors: false,
+	c := geodeticclient.Config{
+		BaseURL: baseURL,
+		Debug:   viper.GetBool("logging.debug"),
 	}
 
 	i := geodeticclient.WithEmptyInterceptor()
@@ -154,7 +151,7 @@ func createClient(baseURL string) (*CLI, error) {
 		interceptors = append(interceptors, geodeticclient.WithLoggingInterceptor())
 	}
 
-	cli.Client = geodeticclient.NewClient(h, baseURL, opt, interceptors...)
+	cli.Client = c.NewClientWithInterceptors(interceptors)
 	cli.Interceptor = i
 
 	// new client with params

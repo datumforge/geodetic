@@ -11,11 +11,13 @@ import (
 	"github.com/datumforge/datum/pkg/rout"
 	"github.com/datumforge/go-turso"
 
-	"github.com/datumforge/geodetic/internal/ent/enums"
 	"github.com/datumforge/geodetic/internal/ent/generated"
+	"github.com/datumforge/geodetic/internal/ent/generated/group"
 	"github.com/datumforge/geodetic/internal/ent/generated/hook"
+	"github.com/datumforge/geodetic/pkg/enums"
 )
 
+// HookCreateDatabase creates sets the name of the database and creates the database in turso, if the provider is turso
 func HookCreateDatabase() ent.Hook {
 	return hook.On(func(next ent.Mutator) ent.Mutator {
 		return hook.DatabaseFunc(func(ctx context.Context, mutation *generated.DatabaseMutation) (generated.Value, error) {
@@ -30,21 +32,18 @@ func HookCreateDatabase() ent.Hook {
 			// if the provider is turso, create a database
 			if provider == enums.Turso {
 				// get the group to assign the database to
-				groupID, _ := mutation.GroupID()
-
-				group, err := mutation.Client().Group.Get(ctx, groupID)
+				groupName, err := getGroupName(ctx, mutation)
 				if err != nil {
-					mutation.Logger.Errorw("unable to get group", "error", err)
-
 					return nil, err
 				}
 
 				// create a turso db
 				body := turso.CreateDatabaseRequest{
-					Group: group.Name,
+					Group: groupName,
 					Name:  name,
 				}
 
+				// create the database in turso
 				db, err := mutation.Turso.Database.CreateDatabase(ctx, body)
 				if err != nil {
 					return nil, err
@@ -58,6 +57,7 @@ func HookCreateDatabase() ent.Hook {
 				mutation.SetDsn(fmt.Sprintf("file:%s.db", name))
 			}
 
+			// set the status of the database to active
 			mutation.SetStatus(enums.Active)
 
 			// write things that we need to the database
@@ -66,6 +66,7 @@ func HookCreateDatabase() ent.Hook {
 	}, ent.OpCreate)
 }
 
+// HookDatabaseDelete deletes the database in turso
 func HookDatabaseDelete() ent.Hook {
 	return hook.On(func(next ent.Mutator) ent.Mutator {
 		return hook.DatabaseFunc(func(ctx context.Context, mutation *generated.DatabaseMutation) (generated.Value, error) {
@@ -92,4 +93,48 @@ func HookDatabaseDelete() ent.Hook {
 			return next.Mutate(ctx, mutation)
 		})
 	}, ent.OpDelete|ent.OpDeleteOne)
+}
+
+// getGroupName gets the group name associated with the geo or group id
+func getGroupName(ctx context.Context, mutation *generated.DatabaseMutation) (string, error) {
+	groupID, ok := mutation.GroupID()
+
+	// if the group id is set, get the group by the group id
+	if ok && groupID != "" {
+		g, err := mutation.Client().Group.Get(ctx, groupID)
+		if err != nil {
+			mutation.Logger.Errorw("unable to get group, invalid group ID", "error", err)
+
+			return "", err
+		}
+
+		return g.Name, nil
+	}
+
+	// else get the group by the geo
+	geo, ok := mutation.Geo()
+
+	if !ok || geo == "" {
+		mutation.Logger.Errorw("unable to get geo or group id, cannot create database")
+
+		return "", rout.InvalidField("geo")
+	}
+
+	g, err := mutation.Client().Group.Query().Where(group.RegionEQ(enums.Region(geo))).Only(ctx)
+	if err != nil {
+		mutation.Logger.Errorw("unable to get associated group", "error", err)
+
+		return "", err
+	}
+
+	if g == nil {
+		mutation.Logger.Errorw("unable to get associated group", "geo", geo)
+
+		return "", rout.InvalidField("geo")
+	}
+
+	// set the group id on the mutation
+	mutation.SetGroupID(g.ID)
+
+	return g.Name, nil
 }

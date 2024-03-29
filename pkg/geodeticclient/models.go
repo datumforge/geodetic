@@ -8,7 +8,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/datumforge/geodetic/internal/ent/enums"
+	"github.com/datumforge/geodetic/pkg/enums"
 )
 
 // CreateDatabaseInput is used for create Database object.

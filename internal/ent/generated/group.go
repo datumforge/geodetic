@@ -10,8 +10,8 @@ import (
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
-	"github.com/datumforge/geodetic/internal/ent/enums"
 	"github.com/datumforge/geodetic/internal/ent/generated/group"
+	"github.com/datumforge/geodetic/pkg/enums"
 )
 
 // Group is the model entity for the Group schema.

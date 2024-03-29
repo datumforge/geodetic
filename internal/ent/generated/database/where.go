@@ -7,8 +7,8 @@ import (
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
-	"github.com/datumforge/geodetic/internal/ent/enums"
 	"github.com/datumforge/geodetic/internal/ent/generated/predicate"
+	"github.com/datumforge/geodetic/pkg/enums"
 
 	"github.com/datumforge/geodetic/internal/ent/generated/internal"
 )

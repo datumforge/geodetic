@@ -10,6 +10,7 @@ import (
 	"github.com/datumforge/datum/pkg/utils/ulids"
 
 	ent "github.com/datumforge/geodetic/internal/ent/generated"
+	"github.com/datumforge/geodetic/pkg/enums"
 )
 
 type GroupBuilder struct {
@@ -18,6 +19,7 @@ type GroupBuilder struct {
 	// Fields
 	Name     string
 	Location string
+	Region   enums.Region
 }
 
 type GroupCleanup struct {
@@ -54,9 +56,14 @@ func (g *GroupBuilder) MustNew(ctx context.Context, t *testing.T) *ent.Group {
 		g.Location = "den"
 	}
 
+	if g.Region == "" {
+		g.Region = enums.Amer
+	}
+
 	group := g.client.db.Group.Create().
 		SetName(g.Name).
 		SetPrimaryLocation(g.Location).
+		SetRegion(g.Region).
 		SaveX(ctx)
 
 	return group
