@@ -19,7 +19,7 @@ import (
 	"github.com/spf13/viper"
 	"go.uber.org/zap"
 
-	"github.com/datumforge/geodetic/internal/geodeticclient"
+	"github.com/datumforge/geodetic/pkg/geodeticclient"
 )
 
 const (
