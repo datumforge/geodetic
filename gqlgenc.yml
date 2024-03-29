@@ -1,9 +1,9 @@
 model:
   package: geodeticclient
-  filename: ./internal/geodeticclient/models.go
+  filename: ./pkg/geodeticclient/models.go
 client:
   package: geodeticclient
-  filename: ./internal/geodeticclient/graphclient.go
+  filename: ./pkg/geodeticclient/graphclient.go
 models:
   Int:
     model: github.com/99designs/gqlgen/graphql.Int64

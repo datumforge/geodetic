@@ -10,7 +10,7 @@ import (
 
 	"github.com/datumforge/geodetic/internal/ent/enums"
 	ent "github.com/datumforge/geodetic/internal/ent/generated"
-	"github.com/datumforge/geodetic/internal/geodeticclient"
+	"github.com/datumforge/geodetic/pkg/geodeticclient"
 )
 
 func (suite *GraphTestSuite) TestQueryDatabase() {

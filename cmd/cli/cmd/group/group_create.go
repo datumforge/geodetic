@@ -9,7 +9,7 @@ import (
 
 	geodetic "github.com/datumforge/geodetic/cmd/cli/cmd"
 	"github.com/datumforge/geodetic/internal/ent/enums"
-	"github.com/datumforge/geodetic/internal/geodeticclient"
+	"github.com/datumforge/geodetic/pkg/geodeticclient"
 )
 
 var groupCreateCmd = &cobra.Command{

@@ -19,8 +19,8 @@ import (
 
 	ent "github.com/datumforge/geodetic/internal/ent/generated"
 	"github.com/datumforge/geodetic/internal/entdb"
-	"github.com/datumforge/geodetic/internal/geodeticclient"
 	"github.com/datumforge/geodetic/internal/graphapi"
+	"github.com/datumforge/geodetic/pkg/geodeticclient"
 )
 
 // TestGraphTestSuite runs all the tests in the GraphTestSuite

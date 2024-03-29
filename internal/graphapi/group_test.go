@@ -8,7 +8,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	ent "github.com/datumforge/geodetic/internal/ent/generated"
-	"github.com/datumforge/geodetic/internal/geodeticclient"
+	"github.com/datumforge/geodetic/pkg/geodeticclient"
 )
 
 func (suite *GraphTestSuite) TestQueryGroup() {
