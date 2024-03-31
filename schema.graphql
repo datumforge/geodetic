@@ -146,14 +146,14 @@ type DatabaseCreatePayload {
 """
 DatabaseDatabaseProvider is enum for the field provider
 """
-enum DatabaseDatabaseProvider @goModel(model: "github.com/datumforge/geodetic/internal/ent/enums.DatabaseProvider") {
+enum DatabaseDatabaseProvider @goModel(model: "github.com/datumforge/geodetic/pkg/enums.DatabaseProvider") {
 	LOCAL
 	TURSO
 }
 """
 DatabaseDatabaseStatus is enum for the field status
 """
-enum DatabaseDatabaseStatus @goModel(model: "github.com/datumforge/geodetic/internal/ent/enums.DatabaseStatus") {
+enum DatabaseDatabaseStatus @goModel(model: "github.com/datumforge/geodetic/pkg/enums.DatabaseStatus") {
 	ACTIVE
 	CREATING
 	DELETING
@@ -487,7 +487,7 @@ type GroupEdge {
 """
 GroupRegion is enum for the field region
 """
-enum GroupRegion @goModel(model: "github.com/datumforge/geodetic/internal/ent/enums.Region") {
+enum GroupRegion @goModel(model: "github.com/datumforge/geodetic/pkg/enums.Region") {
 	AMER
 	EMEA
 	APAC

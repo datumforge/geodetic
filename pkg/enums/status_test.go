@@ -6,7 +6,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/datumforge/geodetic/internal/ent/enums"
+	"github.com/datumforge/geodetic/pkg/enums"
 )
 
 func TestToToDatabaseStatus(t *testing.T) {

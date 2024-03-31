@@ -5,11 +5,12 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/samber/lo"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/datumforge/geodetic/internal/ent/enums"
 	ent "github.com/datumforge/geodetic/internal/ent/generated"
+	"github.com/datumforge/geodetic/pkg/enums"
 	"github.com/datumforge/geodetic/pkg/geodeticclient"
 )
 
@@ -89,6 +90,7 @@ func (suite *GraphTestSuite) TestCreateDatabase() {
 		name     string
 		orgID    string
 		groupID  string
+		region   enums.Region
 		provider *enums.DatabaseProvider
 		errorMsg string
 	}{
@@ -96,6 +98,12 @@ func (suite *GraphTestSuite) TestCreateDatabase() {
 			name:     "happy path, turso database",
 			orgID:    "01HSCAGDJ1XZ12Y06FESH4VEC1",
 			groupID:  group.ID,
+			provider: &enums.Turso,
+		},
+		{
+			name:     "happy path, turso database with region",
+			orgID:    "01HSCAGDJ1XZ12Y06FESH4VEC1",
+			region:   enums.Amer,
 			provider: &enums.Turso,
 		},
 		{
@@ -126,6 +134,10 @@ func (suite *GraphTestSuite) TestCreateDatabase() {
 				OrganizationID: tc.orgID,
 				Provider:       tc.provider,
 				GroupID:        tc.groupID,
+			}
+
+			if tc.region != "" {
+				g.Geo = lo.ToPtr(tc.region.String())
 			}
 
 			resp, err := suite.client.geodetic.CreateDatabase(context.Background(), g)

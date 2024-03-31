@@ -7,7 +7,7 @@ import (
 	"net/http"
 
 	"github.com/Yamashou/gqlgenc/clientv2"
-	"github.com/datumforge/geodetic/internal/ent/enums"
+	"github.com/datumforge/geodetic/pkg/enums"
 )
 
 type GeodeticClient interface {

@@ -15,8 +15,8 @@ import (
 	"entgo.io/contrib/entgql"
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/99designs/gqlgen/graphql/introspection"
-	"github.com/datumforge/geodetic/internal/ent/enums"
 	"github.com/datumforge/geodetic/internal/ent/generated"
+	"github.com/datumforge/geodetic/pkg/enums"
 	gqlparser "github.com/vektah/gqlparser/v2"
 	"github.com/vektah/gqlparser/v2/ast"
 )
@@ -996,14 +996,14 @@ type DatabaseConnection {
 """
 DatabaseDatabaseProvider is enum for the field provider
 """
-enum DatabaseDatabaseProvider @goModel(model: "github.com/datumforge/geodetic/internal/ent/enums.DatabaseProvider") {
+enum DatabaseDatabaseProvider @goModel(model: "github.com/datumforge/geodetic/pkg/enums.DatabaseProvider") {
   LOCAL
   TURSO
 }
 """
 DatabaseDatabaseStatus is enum for the field status
 """
-enum DatabaseDatabaseStatus @goModel(model: "github.com/datumforge/geodetic/internal/ent/enums.DatabaseStatus") {
+enum DatabaseDatabaseStatus @goModel(model: "github.com/datumforge/geodetic/pkg/enums.DatabaseStatus") {
   ACTIVE
   CREATING
   DELETING
@@ -1301,7 +1301,7 @@ type GroupEdge {
 """
 GroupRegion is enum for the field region
 """
-enum GroupRegion @goModel(model: "github.com/datumforge/geodetic/internal/ent/enums.Region") {
+enum GroupRegion @goModel(model: "github.com/datumforge/geodetic/pkg/enums.Region") {
   AMER
   EMEA
   APAC
@@ -2631,7 +2631,7 @@ func (ec *executionContext) _Database_status(ctx context.Context, field graphql.
 	}
 	res := resTmp.(enums.DatabaseStatus)
 	fc.Result = res
-	return ec.marshalNDatabaseDatabaseStatus2githubᚗcomᚋdatumforgeᚋgeodeticᚋinternalᚋentᚋenumsᚐDatabaseStatus(ctx, field.Selections, res)
+	return ec.marshalNDatabaseDatabaseStatus2githubᚗcomᚋdatumforgeᚋgeodeticᚋpkgᚋenumsᚐDatabaseStatus(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Database_status(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -2675,7 +2675,7 @@ func (ec *executionContext) _Database_provider(ctx context.Context, field graphq
 	}
 	res := resTmp.(enums.DatabaseProvider)
 	fc.Result = res
-	return ec.marshalNDatabaseDatabaseProvider2githubᚗcomᚋdatumforgeᚋgeodeticᚋinternalᚋentᚋenumsᚐDatabaseProvider(ctx, field.Selections, res)
+	return ec.marshalNDatabaseDatabaseProvider2githubᚗcomᚋdatumforgeᚋgeodeticᚋpkgᚋenumsᚐDatabaseProvider(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Database_provider(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -3709,7 +3709,7 @@ func (ec *executionContext) _Group_region(ctx context.Context, field graphql.Col
 	}
 	res := resTmp.(enums.Region)
 	fc.Result = res
-	return ec.marshalNGroupRegion2githubᚗcomᚋdatumforgeᚋgeodeticᚋinternalᚋentᚋenumsᚐRegion(ctx, field.Selections, res)
+	return ec.marshalNGroupRegion2githubᚗcomᚋdatumforgeᚋgeodeticᚋpkgᚋenumsᚐRegion(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Group_region(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -7152,14 +7152,14 @@ func (ec *executionContext) unmarshalInputCreateDatabaseInput(ctx context.Contex
 			it.Token = data
 		case "status":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("status"))
-			data, err := ec.unmarshalODatabaseDatabaseStatus2ᚖgithubᚗcomᚋdatumforgeᚋgeodeticᚋinternalᚋentᚋenumsᚐDatabaseStatus(ctx, v)
+			data, err := ec.unmarshalODatabaseDatabaseStatus2ᚖgithubᚗcomᚋdatumforgeᚋgeodeticᚋpkgᚋenumsᚐDatabaseStatus(ctx, v)
 			if err != nil {
 				return it, err
 			}
 			it.Status = data
 		case "provider":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("provider"))
-			data, err := ec.unmarshalODatabaseDatabaseProvider2ᚖgithubᚗcomᚋdatumforgeᚋgeodeticᚋinternalᚋentᚋenumsᚐDatabaseProvider(ctx, v)
+			data, err := ec.unmarshalODatabaseDatabaseProvider2ᚖgithubᚗcomᚋdatumforgeᚋgeodeticᚋpkgᚋenumsᚐDatabaseProvider(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -7256,7 +7256,7 @@ func (ec *executionContext) unmarshalInputCreateGroupInput(ctx context.Context, 
 			it.Token = data
 		case "region":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("region"))
-			data, err := ec.unmarshalOGroupRegion2ᚖgithubᚗcomᚋdatumforgeᚋgeodeticᚋinternalᚋentᚋenumsᚐRegion(ctx, v)
+			data, err := ec.unmarshalOGroupRegion2ᚖgithubᚗcomᚋdatumforgeᚋgeodeticᚋpkgᚋenumsᚐRegion(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -8375,56 +8375,56 @@ func (ec *executionContext) unmarshalInputDatabaseWhereInput(ctx context.Context
 			it.GroupIDContainsFold = data
 		case "status":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("status"))
-			data, err := ec.unmarshalODatabaseDatabaseStatus2ᚖgithubᚗcomᚋdatumforgeᚋgeodeticᚋinternalᚋentᚋenumsᚐDatabaseStatus(ctx, v)
+			data, err := ec.unmarshalODatabaseDatabaseStatus2ᚖgithubᚗcomᚋdatumforgeᚋgeodeticᚋpkgᚋenumsᚐDatabaseStatus(ctx, v)
 			if err != nil {
 				return it, err
 			}
 			it.Status = data
 		case "statusNEQ":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("statusNEQ"))
-			data, err := ec.unmarshalODatabaseDatabaseStatus2ᚖgithubᚗcomᚋdatumforgeᚋgeodeticᚋinternalᚋentᚋenumsᚐDatabaseStatus(ctx, v)
+			data, err := ec.unmarshalODatabaseDatabaseStatus2ᚖgithubᚗcomᚋdatumforgeᚋgeodeticᚋpkgᚋenumsᚐDatabaseStatus(ctx, v)
 			if err != nil {
 				return it, err
 			}
 			it.StatusNEQ = data
 		case "statusIn":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("statusIn"))
-			data, err := ec.unmarshalODatabaseDatabaseStatus2ᚕgithubᚗcomᚋdatumforgeᚋgeodeticᚋinternalᚋentᚋenumsᚐDatabaseStatusᚄ(ctx, v)
+			data, err := ec.unmarshalODatabaseDatabaseStatus2ᚕgithubᚗcomᚋdatumforgeᚋgeodeticᚋpkgᚋenumsᚐDatabaseStatusᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
 			it.StatusIn = data
 		case "statusNotIn":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("statusNotIn"))
-			data, err := ec.unmarshalODatabaseDatabaseStatus2ᚕgithubᚗcomᚋdatumforgeᚋgeodeticᚋinternalᚋentᚋenumsᚐDatabaseStatusᚄ(ctx, v)
+			data, err := ec.unmarshalODatabaseDatabaseStatus2ᚕgithubᚗcomᚋdatumforgeᚋgeodeticᚋpkgᚋenumsᚐDatabaseStatusᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
 			it.StatusNotIn = data
 		case "provider":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("provider"))
-			data, err := ec.unmarshalODatabaseDatabaseProvider2ᚖgithubᚗcomᚋdatumforgeᚋgeodeticᚋinternalᚋentᚋenumsᚐDatabaseProvider(ctx, v)
+			data, err := ec.unmarshalODatabaseDatabaseProvider2ᚖgithubᚗcomᚋdatumforgeᚋgeodeticᚋpkgᚋenumsᚐDatabaseProvider(ctx, v)
 			if err != nil {
 				return it, err
 			}
 			it.Provider = data
 		case "providerNEQ":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("providerNEQ"))
-			data, err := ec.unmarshalODatabaseDatabaseProvider2ᚖgithubᚗcomᚋdatumforgeᚋgeodeticᚋinternalᚋentᚋenumsᚐDatabaseProvider(ctx, v)
+			data, err := ec.unmarshalODatabaseDatabaseProvider2ᚖgithubᚗcomᚋdatumforgeᚋgeodeticᚋpkgᚋenumsᚐDatabaseProvider(ctx, v)
 			if err != nil {
 				return it, err
 			}
 			it.ProviderNEQ = data
 		case "providerIn":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("providerIn"))
-			data, err := ec.unmarshalODatabaseDatabaseProvider2ᚕgithubᚗcomᚋdatumforgeᚋgeodeticᚋinternalᚋentᚋenumsᚐDatabaseProviderᚄ(ctx, v)
+			data, err := ec.unmarshalODatabaseDatabaseProvider2ᚕgithubᚗcomᚋdatumforgeᚋgeodeticᚋpkgᚋenumsᚐDatabaseProviderᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
 			it.ProviderIn = data
 		case "providerNotIn":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("providerNotIn"))
-			data, err := ec.unmarshalODatabaseDatabaseProvider2ᚕgithubᚗcomᚋdatumforgeᚋgeodeticᚋinternalᚋentᚋenumsᚐDatabaseProviderᚄ(ctx, v)
+			data, err := ec.unmarshalODatabaseDatabaseProvider2ᚕgithubᚗcomᚋdatumforgeᚋgeodeticᚋpkgᚋenumsᚐDatabaseProviderᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -9368,28 +9368,28 @@ func (ec *executionContext) unmarshalInputGroupWhereInput(ctx context.Context, o
 			it.PrimaryLocationContainsFold = data
 		case "region":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("region"))
-			data, err := ec.unmarshalOGroupRegion2ᚖgithubᚗcomᚋdatumforgeᚋgeodeticᚋinternalᚋentᚋenumsᚐRegion(ctx, v)
+			data, err := ec.unmarshalOGroupRegion2ᚖgithubᚗcomᚋdatumforgeᚋgeodeticᚋpkgᚋenumsᚐRegion(ctx, v)
 			if err != nil {
 				return it, err
 			}
 			it.Region = data
 		case "regionNEQ":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("regionNEQ"))
-			data, err := ec.unmarshalOGroupRegion2ᚖgithubᚗcomᚋdatumforgeᚋgeodeticᚋinternalᚋentᚋenumsᚐRegion(ctx, v)
+			data, err := ec.unmarshalOGroupRegion2ᚖgithubᚗcomᚋdatumforgeᚋgeodeticᚋpkgᚋenumsᚐRegion(ctx, v)
 			if err != nil {
 				return it, err
 			}
 			it.RegionNEQ = data
 		case "regionIn":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("regionIn"))
-			data, err := ec.unmarshalOGroupRegion2ᚕgithubᚗcomᚋdatumforgeᚋgeodeticᚋinternalᚋentᚋenumsᚐRegionᚄ(ctx, v)
+			data, err := ec.unmarshalOGroupRegion2ᚕgithubᚗcomᚋdatumforgeᚋgeodeticᚋpkgᚋenumsᚐRegionᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
 			it.RegionIn = data
 		case "regionNotIn":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("regionNotIn"))
-			data, err := ec.unmarshalOGroupRegion2ᚕgithubᚗcomᚋdatumforgeᚋgeodeticᚋinternalᚋentᚋenumsᚐRegionᚄ(ctx, v)
+			data, err := ec.unmarshalOGroupRegion2ᚕgithubᚗcomᚋdatumforgeᚋgeodeticᚋpkgᚋenumsᚐRegionᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -9507,14 +9507,14 @@ func (ec *executionContext) unmarshalInputUpdateDatabaseInput(ctx context.Contex
 			it.ClearToken = data
 		case "status":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("status"))
-			data, err := ec.unmarshalODatabaseDatabaseStatus2ᚖgithubᚗcomᚋdatumforgeᚋgeodeticᚋinternalᚋentᚋenumsᚐDatabaseStatus(ctx, v)
+			data, err := ec.unmarshalODatabaseDatabaseStatus2ᚖgithubᚗcomᚋdatumforgeᚋgeodeticᚋpkgᚋenumsᚐDatabaseStatus(ctx, v)
 			if err != nil {
 				return it, err
 			}
 			it.Status = data
 		case "provider":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("provider"))
-			data, err := ec.unmarshalODatabaseDatabaseProvider2ᚖgithubᚗcomᚋdatumforgeᚋgeodeticᚋinternalᚋentᚋenumsᚐDatabaseProvider(ctx, v)
+			data, err := ec.unmarshalODatabaseDatabaseProvider2ᚖgithubᚗcomᚋdatumforgeᚋgeodeticᚋpkgᚋenumsᚐDatabaseProvider(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -9639,7 +9639,7 @@ func (ec *executionContext) unmarshalInputUpdateGroupInput(ctx context.Context, 
 			it.ClearToken = data
 		case "region":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("region"))
-			data, err := ec.unmarshalOGroupRegion2ᚖgithubᚗcomᚋdatumforgeᚋgeodeticᚋinternalᚋentᚋenumsᚐRegion(ctx, v)
+			data, err := ec.unmarshalOGroupRegion2ᚖgithubᚗcomᚋdatumforgeᚋgeodeticᚋpkgᚋenumsᚐRegion(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -11042,23 +11042,23 @@ func (ec *executionContext) marshalNDatabaseCreatePayload2ᚖgithubᚗcomᚋdatu
 	return ec._DatabaseCreatePayload(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalNDatabaseDatabaseProvider2githubᚗcomᚋdatumforgeᚋgeodeticᚋinternalᚋentᚋenumsᚐDatabaseProvider(ctx context.Context, v interface{}) (enums.DatabaseProvider, error) {
+func (ec *executionContext) unmarshalNDatabaseDatabaseProvider2githubᚗcomᚋdatumforgeᚋgeodeticᚋpkgᚋenumsᚐDatabaseProvider(ctx context.Context, v interface{}) (enums.DatabaseProvider, error) {
 	var res enums.DatabaseProvider
 	err := res.UnmarshalGQL(v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalNDatabaseDatabaseProvider2githubᚗcomᚋdatumforgeᚋgeodeticᚋinternalᚋentᚋenumsᚐDatabaseProvider(ctx context.Context, sel ast.SelectionSet, v enums.DatabaseProvider) graphql.Marshaler {
+func (ec *executionContext) marshalNDatabaseDatabaseProvider2githubᚗcomᚋdatumforgeᚋgeodeticᚋpkgᚋenumsᚐDatabaseProvider(ctx context.Context, sel ast.SelectionSet, v enums.DatabaseProvider) graphql.Marshaler {
 	return v
 }
 
-func (ec *executionContext) unmarshalNDatabaseDatabaseStatus2githubᚗcomᚋdatumforgeᚋgeodeticᚋinternalᚋentᚋenumsᚐDatabaseStatus(ctx context.Context, v interface{}) (enums.DatabaseStatus, error) {
+func (ec *executionContext) unmarshalNDatabaseDatabaseStatus2githubᚗcomᚋdatumforgeᚋgeodeticᚋpkgᚋenumsᚐDatabaseStatus(ctx context.Context, v interface{}) (enums.DatabaseStatus, error) {
 	var res enums.DatabaseStatus
 	err := res.UnmarshalGQL(v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalNDatabaseDatabaseStatus2githubᚗcomᚋdatumforgeᚋgeodeticᚋinternalᚋentᚋenumsᚐDatabaseStatus(ctx context.Context, sel ast.SelectionSet, v enums.DatabaseStatus) graphql.Marshaler {
+func (ec *executionContext) marshalNDatabaseDatabaseStatus2githubᚗcomᚋdatumforgeᚋgeodeticᚋpkgᚋenumsᚐDatabaseStatus(ctx context.Context, sel ast.SelectionSet, v enums.DatabaseStatus) graphql.Marshaler {
 	return v
 }
 
@@ -11151,13 +11151,13 @@ func (ec *executionContext) marshalNGroupDeletePayload2ᚖgithubᚗcomᚋdatumfo
 	return ec._GroupDeletePayload(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalNGroupRegion2githubᚗcomᚋdatumforgeᚋgeodeticᚋinternalᚋentᚋenumsᚐRegion(ctx context.Context, v interface{}) (enums.Region, error) {
+func (ec *executionContext) unmarshalNGroupRegion2githubᚗcomᚋdatumforgeᚋgeodeticᚋpkgᚋenumsᚐRegion(ctx context.Context, v interface{}) (enums.Region, error) {
 	var res enums.Region
 	err := res.UnmarshalGQL(v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalNGroupRegion2githubᚗcomᚋdatumforgeᚋgeodeticᚋinternalᚋentᚋenumsᚐRegion(ctx context.Context, sel ast.SelectionSet, v enums.Region) graphql.Marshaler {
+func (ec *executionContext) marshalNGroupRegion2githubᚗcomᚋdatumforgeᚋgeodeticᚋpkgᚋenumsᚐRegion(ctx context.Context, sel ast.SelectionSet, v enums.Region) graphql.Marshaler {
 	return v
 }
 
@@ -11673,7 +11673,7 @@ func (ec *executionContext) marshalODatabase2ᚖgithubᚗcomᚋdatumforgeᚋgeod
 	return ec._Database(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalODatabaseDatabaseProvider2ᚕgithubᚗcomᚋdatumforgeᚋgeodeticᚋinternalᚋentᚋenumsᚐDatabaseProviderᚄ(ctx context.Context, v interface{}) ([]enums.DatabaseProvider, error) {
+func (ec *executionContext) unmarshalODatabaseDatabaseProvider2ᚕgithubᚗcomᚋdatumforgeᚋgeodeticᚋpkgᚋenumsᚐDatabaseProviderᚄ(ctx context.Context, v interface{}) ([]enums.DatabaseProvider, error) {
 	if v == nil {
 		return nil, nil
 	}
@@ -11685,7 +11685,7 @@ func (ec *executionContext) unmarshalODatabaseDatabaseProvider2ᚕgithubᚗcom�
 	res := make([]enums.DatabaseProvider, len(vSlice))
 	for i := range vSlice {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
-		res[i], err = ec.unmarshalNDatabaseDatabaseProvider2githubᚗcomᚋdatumforgeᚋgeodeticᚋinternalᚋentᚋenumsᚐDatabaseProvider(ctx, vSlice[i])
+		res[i], err = ec.unmarshalNDatabaseDatabaseProvider2githubᚗcomᚋdatumforgeᚋgeodeticᚋpkgᚋenumsᚐDatabaseProvider(ctx, vSlice[i])
 		if err != nil {
 			return nil, err
 		}
@@ -11693,7 +11693,7 @@ func (ec *executionContext) unmarshalODatabaseDatabaseProvider2ᚕgithubᚗcom�
 	return res, nil
 }
 
-func (ec *executionContext) marshalODatabaseDatabaseProvider2ᚕgithubᚗcomᚋdatumforgeᚋgeodeticᚋinternalᚋentᚋenumsᚐDatabaseProviderᚄ(ctx context.Context, sel ast.SelectionSet, v []enums.DatabaseProvider) graphql.Marshaler {
+func (ec *executionContext) marshalODatabaseDatabaseProvider2ᚕgithubᚗcomᚋdatumforgeᚋgeodeticᚋpkgᚋenumsᚐDatabaseProviderᚄ(ctx context.Context, sel ast.SelectionSet, v []enums.DatabaseProvider) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
@@ -11720,7 +11720,7 @@ func (ec *executionContext) marshalODatabaseDatabaseProvider2ᚕgithubᚗcomᚋd
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalNDatabaseDatabaseProvider2githubᚗcomᚋdatumforgeᚋgeodeticᚋinternalᚋentᚋenumsᚐDatabaseProvider(ctx, sel, v[i])
+			ret[i] = ec.marshalNDatabaseDatabaseProvider2githubᚗcomᚋdatumforgeᚋgeodeticᚋpkgᚋenumsᚐDatabaseProvider(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -11740,7 +11740,7 @@ func (ec *executionContext) marshalODatabaseDatabaseProvider2ᚕgithubᚗcomᚋd
 	return ret
 }
 
-func (ec *executionContext) unmarshalODatabaseDatabaseProvider2ᚖgithubᚗcomᚋdatumforgeᚋgeodeticᚋinternalᚋentᚋenumsᚐDatabaseProvider(ctx context.Context, v interface{}) (*enums.DatabaseProvider, error) {
+func (ec *executionContext) unmarshalODatabaseDatabaseProvider2ᚖgithubᚗcomᚋdatumforgeᚋgeodeticᚋpkgᚋenumsᚐDatabaseProvider(ctx context.Context, v interface{}) (*enums.DatabaseProvider, error) {
 	if v == nil {
 		return nil, nil
 	}
@@ -11749,14 +11749,14 @@ func (ec *executionContext) unmarshalODatabaseDatabaseProvider2ᚖgithubᚗcom�
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalODatabaseDatabaseProvider2ᚖgithubᚗcomᚋdatumforgeᚋgeodeticᚋinternalᚋentᚋenumsᚐDatabaseProvider(ctx context.Context, sel ast.SelectionSet, v *enums.DatabaseProvider) graphql.Marshaler {
+func (ec *executionContext) marshalODatabaseDatabaseProvider2ᚖgithubᚗcomᚋdatumforgeᚋgeodeticᚋpkgᚋenumsᚐDatabaseProvider(ctx context.Context, sel ast.SelectionSet, v *enums.DatabaseProvider) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
 	return v
 }
 
-func (ec *executionContext) unmarshalODatabaseDatabaseStatus2ᚕgithubᚗcomᚋdatumforgeᚋgeodeticᚋinternalᚋentᚋenumsᚐDatabaseStatusᚄ(ctx context.Context, v interface{}) ([]enums.DatabaseStatus, error) {
+func (ec *executionContext) unmarshalODatabaseDatabaseStatus2ᚕgithubᚗcomᚋdatumforgeᚋgeodeticᚋpkgᚋenumsᚐDatabaseStatusᚄ(ctx context.Context, v interface{}) ([]enums.DatabaseStatus, error) {
 	if v == nil {
 		return nil, nil
 	}
@@ -11768,7 +11768,7 @@ func (ec *executionContext) unmarshalODatabaseDatabaseStatus2ᚕgithubᚗcomᚋd
 	res := make([]enums.DatabaseStatus, len(vSlice))
 	for i := range vSlice {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
-		res[i], err = ec.unmarshalNDatabaseDatabaseStatus2githubᚗcomᚋdatumforgeᚋgeodeticᚋinternalᚋentᚋenumsᚐDatabaseStatus(ctx, vSlice[i])
+		res[i], err = ec.unmarshalNDatabaseDatabaseStatus2githubᚗcomᚋdatumforgeᚋgeodeticᚋpkgᚋenumsᚐDatabaseStatus(ctx, vSlice[i])
 		if err != nil {
 			return nil, err
 		}
@@ -11776,7 +11776,7 @@ func (ec *executionContext) unmarshalODatabaseDatabaseStatus2ᚕgithubᚗcomᚋd
 	return res, nil
 }
 
-func (ec *executionContext) marshalODatabaseDatabaseStatus2ᚕgithubᚗcomᚋdatumforgeᚋgeodeticᚋinternalᚋentᚋenumsᚐDatabaseStatusᚄ(ctx context.Context, sel ast.SelectionSet, v []enums.DatabaseStatus) graphql.Marshaler {
+func (ec *executionContext) marshalODatabaseDatabaseStatus2ᚕgithubᚗcomᚋdatumforgeᚋgeodeticᚋpkgᚋenumsᚐDatabaseStatusᚄ(ctx context.Context, sel ast.SelectionSet, v []enums.DatabaseStatus) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
@@ -11803,7 +11803,7 @@ func (ec *executionContext) marshalODatabaseDatabaseStatus2ᚕgithubᚗcomᚋdat
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalNDatabaseDatabaseStatus2githubᚗcomᚋdatumforgeᚋgeodeticᚋinternalᚋentᚋenumsᚐDatabaseStatus(ctx, sel, v[i])
+			ret[i] = ec.marshalNDatabaseDatabaseStatus2githubᚗcomᚋdatumforgeᚋgeodeticᚋpkgᚋenumsᚐDatabaseStatus(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -11823,7 +11823,7 @@ func (ec *executionContext) marshalODatabaseDatabaseStatus2ᚕgithubᚗcomᚋdat
 	return ret
 }
 
-func (ec *executionContext) unmarshalODatabaseDatabaseStatus2ᚖgithubᚗcomᚋdatumforgeᚋgeodeticᚋinternalᚋentᚋenumsᚐDatabaseStatus(ctx context.Context, v interface{}) (*enums.DatabaseStatus, error) {
+func (ec *executionContext) unmarshalODatabaseDatabaseStatus2ᚖgithubᚗcomᚋdatumforgeᚋgeodeticᚋpkgᚋenumsᚐDatabaseStatus(ctx context.Context, v interface{}) (*enums.DatabaseStatus, error) {
 	if v == nil {
 		return nil, nil
 	}
@@ -11832,7 +11832,7 @@ func (ec *executionContext) unmarshalODatabaseDatabaseStatus2ᚖgithubᚗcomᚋd
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalODatabaseDatabaseStatus2ᚖgithubᚗcomᚋdatumforgeᚋgeodeticᚋinternalᚋentᚋenumsᚐDatabaseStatus(ctx context.Context, sel ast.SelectionSet, v *enums.DatabaseStatus) graphql.Marshaler {
+func (ec *executionContext) marshalODatabaseDatabaseStatus2ᚖgithubᚗcomᚋdatumforgeᚋgeodeticᚋpkgᚋenumsᚐDatabaseStatus(ctx context.Context, sel ast.SelectionSet, v *enums.DatabaseStatus) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
@@ -11970,7 +11970,7 @@ func (ec *executionContext) marshalOGroupEdge2ᚖgithubᚗcomᚋdatumforgeᚋgeo
 	return ec._GroupEdge(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalOGroupRegion2ᚕgithubᚗcomᚋdatumforgeᚋgeodeticᚋinternalᚋentᚋenumsᚐRegionᚄ(ctx context.Context, v interface{}) ([]enums.Region, error) {
+func (ec *executionContext) unmarshalOGroupRegion2ᚕgithubᚗcomᚋdatumforgeᚋgeodeticᚋpkgᚋenumsᚐRegionᚄ(ctx context.Context, v interface{}) ([]enums.Region, error) {
 	if v == nil {
 		return nil, nil
 	}
@@ -11982,7 +11982,7 @@ func (ec *executionContext) unmarshalOGroupRegion2ᚕgithubᚗcomᚋdatumforge�
 	res := make([]enums.Region, len(vSlice))
 	for i := range vSlice {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
-		res[i], err = ec.unmarshalNGroupRegion2githubᚗcomᚋdatumforgeᚋgeodeticᚋinternalᚋentᚋenumsᚐRegion(ctx, vSlice[i])
+		res[i], err = ec.unmarshalNGroupRegion2githubᚗcomᚋdatumforgeᚋgeodeticᚋpkgᚋenumsᚐRegion(ctx, vSlice[i])
 		if err != nil {
 			return nil, err
 		}
@@ -11990,7 +11990,7 @@ func (ec *executionContext) unmarshalOGroupRegion2ᚕgithubᚗcomᚋdatumforge�
 	return res, nil
 }
 
-func (ec *executionContext) marshalOGroupRegion2ᚕgithubᚗcomᚋdatumforgeᚋgeodeticᚋinternalᚋentᚋenumsᚐRegionᚄ(ctx context.Context, sel ast.SelectionSet, v []enums.Region) graphql.Marshaler {
+func (ec *executionContext) marshalOGroupRegion2ᚕgithubᚗcomᚋdatumforgeᚋgeodeticᚋpkgᚋenumsᚐRegionᚄ(ctx context.Context, sel ast.SelectionSet, v []enums.Region) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
@@ -12017,7 +12017,7 @@ func (ec *executionContext) marshalOGroupRegion2ᚕgithubᚗcomᚋdatumforgeᚋg
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalNGroupRegion2githubᚗcomᚋdatumforgeᚋgeodeticᚋinternalᚋentᚋenumsᚐRegion(ctx, sel, v[i])
+			ret[i] = ec.marshalNGroupRegion2githubᚗcomᚋdatumforgeᚋgeodeticᚋpkgᚋenumsᚐRegion(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -12037,7 +12037,7 @@ func (ec *executionContext) marshalOGroupRegion2ᚕgithubᚗcomᚋdatumforgeᚋg
 	return ret
 }
 
-func (ec *executionContext) unmarshalOGroupRegion2ᚖgithubᚗcomᚋdatumforgeᚋgeodeticᚋinternalᚋentᚋenumsᚐRegion(ctx context.Context, v interface{}) (*enums.Region, error) {
+func (ec *executionContext) unmarshalOGroupRegion2ᚖgithubᚗcomᚋdatumforgeᚋgeodeticᚋpkgᚋenumsᚐRegion(ctx context.Context, v interface{}) (*enums.Region, error) {
 	if v == nil {
 		return nil, nil
 	}
@@ -12046,7 +12046,7 @@ func (ec *executionContext) unmarshalOGroupRegion2ᚖgithubᚗcomᚋdatumforge�
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalOGroupRegion2ᚖgithubᚗcomᚋdatumforgeᚋgeodeticᚋinternalᚋentᚋenumsᚐRegion(ctx context.Context, sel ast.SelectionSet, v *enums.Region) graphql.Marshaler {
+func (ec *executionContext) marshalOGroupRegion2ᚖgithubᚗcomᚋdatumforgeᚋgeodeticᚋpkgᚋenumsᚐRegion(ctx context.Context, sel ast.SelectionSet, v *enums.Region) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
