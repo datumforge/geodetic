@@ -10,7 +10,7 @@ type Config struct {
 	// Enabled is a flag to enable the geodetic client
 	Enabled bool `json:"enabled" koanf:"enabled" jsonschema:"description=Enable the geodetic client" default:"true"`
 	// BaseURL is the base url for the geodetic service
-	BaseURL string `json:"baseUrl" koanf:"baseUrl" jsonschema:"description=Base URL for the geodetic service" default:"http://localhost:1337/"`
+	BaseURL string `json:"baseUrl" koanf:"baseUrl" jsonschema:"description=Base URL for the geodetic service" default:"http://localhost:1337"`
 	// Endpoint is the endpoint for the graphql api
 	Endpoint string `json:"endpoint" koanf:"endpoint" jsonschema:"description=Endpoint for the graphql api" default:"query"`
 	// Debug is a flag to enable debug mode
@@ -38,7 +38,7 @@ func (c Config) NewClientWithInterceptors(i []clientv2.RequestInterceptor) Geode
 		ParseDataAlongWithErrors: false,
 	}
 
-	gc := NewClient(h, c.BaseURL+c.Endpoint, opts, i...)
+	gc := NewClient(h, c.BaseURL+"/"+c.Endpoint, opts, i...)
 
 	return gc
 }
