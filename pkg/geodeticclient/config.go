@@ -7,6 +7,8 @@ import (
 )
 
 type Config struct {
+	// Enabled is a flag to enable the geodetic client
+	Enabled bool `json:"enabled" koanf:"enabled" jsonschema:"description=Enable the geodetic client" default:"true"`
 	// BaseURL is the base url for the geodetic service
 	BaseURL string `json:"baseUrl" koanf:"baseUrl" jsonschema:"description=Base URL for the geodetic service" default:"http://localhost:1337/"`
 	// Endpoint is the endpoint for the graphql api
