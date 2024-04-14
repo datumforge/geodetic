@@ -17,6 +17,7 @@ import (
 	"entgo.io/ent/dialect/sql/schema"
 
 	atlas "ariga.io/atlas/sql/migrate"
+	"ariga.io/atlas/sql/sqltool"
 	"github.com/datumforge/geodetic/internal/ent/generated/migrate"
 )
 
@@ -24,20 +25,29 @@ func main() {
 	ctx := context.Background()
 
 	// Create a local migration directory able to understand Atlas migration file format for replay.
-	dir, err := atlas.NewLocalDir("migrations")
+	atlasDir, err := atlas.NewLocalDir("migrations")
 	if err != nil {
 		log.Fatalf("failed creating atlas migration directory: %v", err)
 	}
 
+	gooseDir, err := sqltool.NewGooseDir("migrations-goose")
+	if err != nil {
+		log.Fatalf("failed creating goose migration directory: %v", err)
+	}
+
 	// Migrate diff options.
-	opts := []schema.MigrateOption{
-		schema.WithDir(dir),                         // provide migration directory
+	baseOpts := []schema.MigrateOption{
+		schema.WithDir(atlasDir),                    // provide migration directory
 		schema.WithMigrationMode(schema.ModeReplay), // provide migration mode
 		schema.WithDialect(dialect.SQLite),          // Ent dialect to use
-		schema.WithFormatter(atlas.DefaultFormatter),
 		schema.WithDropColumn(true),
 		schema.WithDropIndex(true),
 	}
+
+	atlasOpts := append(baseOpts,
+		schema.WithDir(atlasDir),
+		schema.WithFormatter(atlas.DefaultFormatter),
+	)
 
 	if len(os.Args) != 2 {
 		log.Fatalln("migration name is required. Use: 'go run -mod=mod create_migration.go <name>'")
@@ -49,8 +59,14 @@ func main() {
 	}
 
 	// Generate migrations using Atlas support for sqlite (note the Ent dialect option passed above).
-	err = migrate.NamedDiff(ctx, dbURI, os.Args[1], opts...)
-	if err != nil {
-		log.Fatalf("failed generating migration file: %v", err)
+	if err := migrate.NamedDiff(ctx, dbURI, os.Args[1], atlasOpts...); err != nil {
+		log.Fatalf("failed generating atlas migration file: %v", err)
+	}
+
+	// Generate migrations using Goose support for sqlite
+	gooseOpts := append(baseOpts, schema.WithDir(gooseDir))
+
+	if err = migrate.NamedDiff(ctx, dbURI, os.Args[1], gooseOpts...); err != nil {
+		log.Fatalf("failed generating goose migration file: %v", err)
 	}
 }
