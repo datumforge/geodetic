@@ -37,7 +37,6 @@ func main() {
 
 	// Migrate diff options.
 	baseOpts := []schema.MigrateOption{
-		schema.WithDir(atlasDir),                    // provide migration directory
 		schema.WithMigrationMode(schema.ModeReplay), // provide migration mode
 		schema.WithDialect(dialect.SQLite),          // Ent dialect to use
 		schema.WithDropColumn(true),
