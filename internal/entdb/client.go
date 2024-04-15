@@ -2,16 +2,20 @@ package entdb
 
 import (
 	"context"
+	"database/sql"
+	"fmt"
 	"os"
 	"time"
 
 	"ariga.io/entcache"
 	entsql "entgo.io/ent/dialect/sql"
 	"github.com/datumforge/entx"
+	"github.com/pressly/goose/v3"
 	"go.uber.org/zap"
 
 	"github.com/datumforge/datum/pkg/testutils"
 
+	migratedb "github.com/datumforge/geodetic/db"
 	ent "github.com/datumforge/geodetic/internal/ent/generated"
 )
 
@@ -52,8 +56,8 @@ func NewMultiDriverDBClient(ctx context.Context, c entx.Config, l *zap.SugaredLo
 	client.pc = client.createEntDBClient(entConfig.GetPrimaryDB())
 
 	if c.RunMigrations {
-		if err := client.createSchema(ctx); err != nil {
-			client.logger.Errorf("failed creating schema resources", zap.Error(err))
+		if err := client.runMigrations(ctx); err != nil {
+			client.logger.Errorf("failed running migrations", zap.Error(err))
 
 			return nil, nil, err
 		}
@@ -71,8 +75,8 @@ func NewMultiDriverDBClient(ctx context.Context, c entx.Config, l *zap.SugaredLo
 		client.sc = client.createEntDBClient(entConfig.GetSecondaryDB())
 
 		if c.RunMigrations {
-			if err := client.createSchema(ctx); err != nil {
-				client.logger.Errorf("failed creating schema resources", zap.Error(err))
+			if err := client.runMigrations(ctx); err != nil {
+				client.logger.Errorf("failed running migrations", zap.Error(err))
 
 				return nil, nil, err
 			}
@@ -100,18 +104,6 @@ func NewMultiDriverDBClient(ctx context.Context, c entx.Config, l *zap.SugaredLo
 	ec.WithAuthz()
 
 	return ec, entConfig, nil
-}
-
-func (c *client) createSchema(ctx context.Context) error {
-	// Run the automatic migration tool to create all schema resources.
-	// entcache.Driver will skip the caching layer when running the schema migration
-	if err := c.pc.Schema.Create(entcache.Skip(ctx)); err != nil {
-		c.logger.Errorf("failed creating schema resources", zap.Error(err))
-
-		return err
-	}
-
-	return nil
 }
 
 // createEntDBClient creates a new ent client with configured options
@@ -159,4 +151,66 @@ func NewTestClient(ctx context.Context, ctr *testutils.TC, entOpts []ent.Option)
 	}
 
 	return db, nil
+}
+
+// runMigrations runs the migrations based on the configured migration provider on startup
+func (c *client) runMigrations(ctx context.Context) error {
+	switch c.config.MigrationProvider {
+	case "goose":
+		return c.runGooseMigrations()
+	default: // atlas
+		return c.runAtlasMigrations(ctx)
+	}
+}
+
+// runGooseMigrations runs the goose migrations
+func (c *client) runGooseMigrations() error {
+	driver, err := entx.CheckEntDialect(c.config.DriverName)
+	if err != nil {
+		return err
+	}
+
+	drv, err := sql.Open(c.config.DriverName, c.config.PrimaryDBSource)
+	if err != nil {
+		return err
+	}
+	defer drv.Close()
+
+	if _, err := drv.Exec("PRAGMA foreign_keys = off;", nil); err != nil {
+		drv.Close()
+
+		return fmt.Errorf("failed to disable foreign keys: %w", err)
+	}
+
+	goose.SetBaseFS(migratedb.GooseMigrations)
+
+	if err := goose.SetDialect(driver); err != nil {
+		return err
+	}
+
+	if err := goose.Up(drv, "migrations-goose"); err != nil {
+		return err
+	}
+
+	if _, err := drv.Exec("PRAGMA foreign_keys = on;", nil); err != nil {
+		drv.Close()
+
+		return fmt.Errorf("failed to enable foreign keys: %w", err)
+	}
+
+	return nil
+}
+
+// runAtlasMigrations runs the atlas auto-migrations
+// this do not use the generated versioned migrations files from ent
+func (c *client) runAtlasMigrations(ctx context.Context) error {
+	// Run the automatic migration tool to create all schema resources.
+	// entcache.Driver will skip the caching layer when running the schema migration
+	if err := c.pc.Schema.Create(entcache.Skip(ctx)); err != nil {
+		c.logger.Errorf("failed creating schema resources", zap.Error(err))
+
+		return err
+	}
+
+	return nil
 }
