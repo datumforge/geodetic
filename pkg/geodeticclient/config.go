@@ -38,7 +38,7 @@ func (c Config) NewClientWithInterceptors(i []clientv2.RequestInterceptor) Geode
 		ParseDataAlongWithErrors: false,
 	}
 
-	gc := NewClient(h, c.BaseURL+"/"+c.Endpoint, opts, i...)
+	gc := NewClient(h, c.BaseURL, opts, i...)
 
 	return gc
 }
