@@ -516,7 +516,7 @@ const GetDatabaseDocument = `query GetDatabase ($name: String!) {
 `
 
 func (c *Client) GetDatabase(ctx context.Context, name string, interceptors ...clientv2.RequestInterceptor) (*GetDatabase, error) {
-	vars := map[string]interface{}{
+	vars := map[string]any{
 		"name": name,
 	}
 
@@ -550,7 +550,7 @@ const GetAllDatabasesDocument = `query GetAllDatabases {
 `
 
 func (c *Client) GetAllDatabases(ctx context.Context, interceptors ...clientv2.RequestInterceptor) (*GetAllDatabases, error) {
-	vars := map[string]interface{}{}
+	vars := map[string]any{}
 
 	var res GetAllDatabases
 	if err := c.Client.Post(ctx, "GetAllDatabases", GetAllDatabasesDocument, &res, vars, interceptors...); err != nil {
@@ -580,7 +580,7 @@ const CreateDatabaseDocument = `mutation CreateDatabase ($input: CreateDatabaseI
 `
 
 func (c *Client) CreateDatabase(ctx context.Context, input CreateDatabaseInput, interceptors ...clientv2.RequestInterceptor) (*CreateDatabase, error) {
-	vars := map[string]interface{}{
+	vars := map[string]any{
 		"input": input,
 	}
 
@@ -604,7 +604,7 @@ const DeleteDatabaseDocument = `mutation DeleteDatabase ($name: String!) {
 `
 
 func (c *Client) DeleteDatabase(ctx context.Context, name string, interceptors ...clientv2.RequestInterceptor) (*DeleteDatabase, error) {
-	vars := map[string]interface{}{
+	vars := map[string]any{
 		"name": name,
 	}
 
@@ -633,7 +633,7 @@ const GetGroupDocument = `query GetGroup ($name: String!) {
 `
 
 func (c *Client) GetGroup(ctx context.Context, name string, interceptors ...clientv2.RequestInterceptor) (*GetGroup, error) {
-	vars := map[string]interface{}{
+	vars := map[string]any{
 		"name": name,
 	}
 
@@ -666,7 +666,7 @@ const GetAllGroupsDocument = `query GetAllGroups {
 `
 
 func (c *Client) GetAllGroups(ctx context.Context, interceptors ...clientv2.RequestInterceptor) (*GetAllGroups, error) {
-	vars := map[string]interface{}{}
+	vars := map[string]any{}
 
 	var res GetAllGroups
 	if err := c.Client.Post(ctx, "GetAllGroups", GetAllGroupsDocument, &res, vars, interceptors...); err != nil {
@@ -695,7 +695,7 @@ const CreateGroupDocument = `mutation CreateGroup ($input: CreateGroupInput!) {
 `
 
 func (c *Client) CreateGroup(ctx context.Context, input CreateGroupInput, interceptors ...clientv2.RequestInterceptor) (*CreateGroup, error) {
-	vars := map[string]interface{}{
+	vars := map[string]any{
 		"input": input,
 	}
 
@@ -719,7 +719,7 @@ const DeleteGroupDocument = `mutation DeleteGroup ($name: String!) {
 `
 
 func (c *Client) DeleteGroup(ctx context.Context, name string, interceptors ...clientv2.RequestInterceptor) (*DeleteGroup, error) {
-	vars := map[string]interface{}{
+	vars := map[string]any{
 		"name": name,
 	}
 
