@@ -54,6 +54,7 @@ data:
   GEODETIC_DB_CACHETTL: {{ .Values.geodetic.db.cacheTTL | 1s }}
   GEODETIC_DB_RUNMIGRATIONS: {{ .Values.geodetic.db.runMigrations | true }}
   GEODETIC_DB_MIGRATIONPROVIDER: {{ .Values.geodetic.db.migrationProvider | "atlas" }}
+  GEODETIC_DB_ENABLEHISTORY: {{ .Values.geodetic.db.enableHistory | false }}
   GEODETIC_TURSO_TOKEN: {{ .Values.geodetic.turso.token }}
   GEODETIC_TURSO_BASEURL: {{ .Values.geodetic.turso.baseUrl | "https://api.turso.tech" }}
   GEODETIC_TURSO_ORGNAME: {{ .Values.geodetic.turso.orgName }}
