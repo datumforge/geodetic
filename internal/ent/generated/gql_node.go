@@ -18,11 +18,15 @@ type Noder interface {
 	IsNode()
 }
 
-// IsNode implements the Node interface check for GQLGen.
-func (n *Database) IsNode() {}
+var databaseImplementors = []string{"Database", "Node"}
 
 // IsNode implements the Node interface check for GQLGen.
-func (n *Group) IsNode() {}
+func (*Database) IsNode() {}
+
+var groupImplementors = []string{"Group", "Node"}
+
+// IsNode implements the Node interface check for GQLGen.
+func (*Group) IsNode() {}
 
 var errNodeInvalidID = &NotFoundError{"node"}
 
@@ -85,27 +89,21 @@ func (c *Client) noder(ctx context.Context, table string, id string) (Noder, err
 	case database.Table:
 		query := c.Database.Query().
 			Where(database.ID(id))
-		query, err := query.CollectFields(ctx, "Database")
-		if err != nil {
-			return nil, err
+		if fc := graphql.GetFieldContext(ctx); fc != nil {
+			if err := query.collectField(ctx, true, graphql.GetOperationContext(ctx), fc.Field, nil, databaseImplementors...); err != nil {
+				return nil, err
+			}
 		}
-		n, err := query.Only(ctx)
-		if err != nil {
-			return nil, err
-		}
-		return n, nil
+		return query.Only(ctx)
 	case group.Table:
 		query := c.Group.Query().
 			Where(group.ID(id))
-		query, err := query.CollectFields(ctx, "Group")
-		if err != nil {
-			return nil, err
+		if fc := graphql.GetFieldContext(ctx); fc != nil {
+			if err := query.collectField(ctx, true, graphql.GetOperationContext(ctx), fc.Field, nil, groupImplementors...); err != nil {
+				return nil, err
+			}
 		}
-		n, err := query.Only(ctx)
-		if err != nil {
-			return nil, err
-		}
-		return n, nil
+		return query.Only(ctx)
 	default:
 		return nil, fmt.Errorf("cannot resolve noder from table %q: %w", table, errNodeInvalidID)
 	}
@@ -182,7 +180,7 @@ func (c *Client) noders(ctx context.Context, table string, ids []string) ([]Node
 	case database.Table:
 		query := c.Database.Query().
 			Where(database.IDIn(ids...))
-		query, err := query.CollectFields(ctx, "Database")
+		query, err := query.CollectFields(ctx, databaseImplementors...)
 		if err != nil {
 			return nil, err
 		}
@@ -198,7 +196,7 @@ func (c *Client) noders(ctx context.Context, table string, ids []string) ([]Node
 	case group.Table:
 		query := c.Group.Query().
 			Where(group.IDIn(ids...))
-		query, err := query.CollectFields(ctx, "Group")
+		query, err := query.CollectFields(ctx, groupImplementors...)
 		if err != nil {
 			return nil, err
 		}

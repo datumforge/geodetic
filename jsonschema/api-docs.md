@@ -178,6 +178,7 @@ TLS settings for the server for secure connections
 |**cacheTTL**|`integer`|cache results for subsequent requests<br/>|no|
 |**runMigrations**|`boolean`|run migrations on startup<br/>|no|
 |**migrationProvider**|`string`|migration provider to use for running migrations<br/>|no|
+|**enableHistory**|`boolean`|enable history data to be logged to the database<br/>|no|
 
 **Additional Properties:** not allowed  
 <a name="turso"></a>
