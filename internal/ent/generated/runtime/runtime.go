@@ -36,6 +36,10 @@ func init() {
 	database.DefaultUpdatedAt = databaseDescUpdatedAt.Default.(func() time.Time)
 	// database.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
 	database.UpdateDefaultUpdatedAt = databaseDescUpdatedAt.UpdateDefault.(func() time.Time)
+	// databaseDescMappingID is the schema descriptor for mapping_id field.
+	databaseDescMappingID := databaseMixinFields2[1].Descriptor()
+	// database.DefaultMappingID holds the default value on creation for the mapping_id field.
+	database.DefaultMappingID = databaseDescMappingID.Default.(func() string)
 	// databaseDescOrganizationID is the schema descriptor for organization_id field.
 	databaseDescOrganizationID := databaseFields[0].Descriptor()
 	// database.OrganizationIDValidator is a validator for the "organization_id" field. It is called by the builders before save.
@@ -75,6 +79,10 @@ func init() {
 	group.DefaultUpdatedAt = groupDescUpdatedAt.Default.(func() time.Time)
 	// group.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
 	group.UpdateDefaultUpdatedAt = groupDescUpdatedAt.UpdateDefault.(func() time.Time)
+	// groupDescMappingID is the schema descriptor for mapping_id field.
+	groupDescMappingID := groupMixinFields1[1].Descriptor()
+	// group.DefaultMappingID holds the default value on creation for the mapping_id field.
+	group.DefaultMappingID = groupDescMappingID.Default.(func() string)
 	// groupDescName is the schema descriptor for name field.
 	groupDescName := groupFields[0].Descriptor()
 	// group.NameValidator is a validator for the "name" field. It is called by the builders before save.
