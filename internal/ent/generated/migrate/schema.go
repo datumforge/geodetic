@@ -18,6 +18,7 @@ var (
 		{Name: "updated_by", Type: field.TypeString, Nullable: true},
 		{Name: "deleted_at", Type: field.TypeTime, Nullable: true},
 		{Name: "deleted_by", Type: field.TypeString, Nullable: true},
+		{Name: "mapping_id", Type: field.TypeString, Unique: true},
 		{Name: "organization_id", Type: field.TypeString},
 		{Name: "name", Type: field.TypeString},
 		{Name: "geo", Type: field.TypeString, Nullable: true},
@@ -35,7 +36,7 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "databases_groups_databases",
-				Columns:    []*schema.Column{DatabasesColumns[14]},
+				Columns:    []*schema.Column{DatabasesColumns[15]},
 				RefColumns: []*schema.Column{GroupsColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
@@ -44,7 +45,7 @@ var (
 			{
 				Name:    "database_organization_id",
 				Unique:  true,
-				Columns: []*schema.Column{DatabasesColumns[7]},
+				Columns: []*schema.Column{DatabasesColumns[8]},
 				Annotation: &entsql.IndexAnnotation{
 					Where: "deleted_at is NULL",
 				},
@@ -52,7 +53,7 @@ var (
 			{
 				Name:    "database_name",
 				Unique:  true,
-				Columns: []*schema.Column{DatabasesColumns[8]},
+				Columns: []*schema.Column{DatabasesColumns[9]},
 				Annotation: &entsql.IndexAnnotation{
 					Where: "deleted_at is NULL",
 				},
@@ -66,6 +67,7 @@ var (
 		{Name: "updated_at", Type: field.TypeTime, Nullable: true},
 		{Name: "created_by", Type: field.TypeString, Nullable: true},
 		{Name: "updated_by", Type: field.TypeString, Nullable: true},
+		{Name: "mapping_id", Type: field.TypeString, Unique: true},
 		{Name: "deleted_at", Type: field.TypeTime, Nullable: true},
 		{Name: "deleted_by", Type: field.TypeString, Nullable: true},
 		{Name: "name", Type: field.TypeString},
@@ -84,7 +86,7 @@ var (
 			{
 				Name:    "group_name",
 				Unique:  true,
-				Columns: []*schema.Column{GroupsColumns[7]},
+				Columns: []*schema.Column{GroupsColumns[8]},
 				Annotation: &entsql.IndexAnnotation{
 					Where: "deleted_at is NULL",
 				},
