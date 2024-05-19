@@ -16,7 +16,7 @@ Config contains the configuration for the datum server
 |[**sessions**](#sessions)|`object`|||
 |[**ratelimit**](#ratelimit)|`object`|||
 
-**Additional Properties:** not allowed  
+**Additional Properties:** not allowed
 <a name="server"></a>
 ## server: object
 
@@ -42,7 +42,7 @@ Server settings for the echo server
 |[**cacheControl**](#servercachecontrol)|`object`||no|
 |[**mime**](#servermime)|`object`||no|
 
-**Additional Properties:** not allowed  
+**Additional Properties:** not allowed
 <a name="servertls"></a>
 ### server\.tls: object
 
@@ -58,7 +58,7 @@ TLS settings for the server for secure connections
 |**cert\_key**|`string`|CertKey file location for the TLS server<br/>||
 |**auto\_cert**|`boolean`|AutoCert generates the cert with letsencrypt, this does not work on localhost<br/>||
 
-**Additional Properties:** not allowed  
+**Additional Properties:** not allowed
 <a name="servercors"></a>
 ### server\.cors: object
 
@@ -71,7 +71,7 @@ TLS settings for the server for secure connections
 |[**allowOrigins**](#servercorsalloworigins)|`string[]`|||
 |**cookieInsecure**|`boolean`|||
 
-**Additional Properties:** not allowed  
+**Additional Properties:** not allowed
 <a name="servercorsprefixes"></a>
 #### server\.cors\.prefixes: object
 
@@ -85,7 +85,7 @@ TLS settings for the server for secure connections
 
 **Items**
 
-**Item Type:** `string`  
+**Item Type:** `string`
 <a name="serversecure"></a>
 ### server\.secure: object
 
@@ -103,7 +103,7 @@ TLS settings for the server for secure connections
 |**referrerpolicy**|`string`|||
 |**cspreportonly**|`boolean`|||
 
-**Additional Properties:** not allowed  
+**Additional Properties:** not allowed
 <a name="serverredirects"></a>
 ### server\.redirects: object
 
@@ -115,7 +115,7 @@ TLS settings for the server for secure connections
 |[**redirects**](#serverredirectsredirects)|`object`|||
 |**code**|`integer`|||
 
-**Additional Properties:** not allowed  
+**Additional Properties:** not allowed
 <a name="serverredirectsredirects"></a>
 #### server\.redirects\.redirects: object
 
@@ -135,7 +135,7 @@ TLS settings for the server for secure connections
 |[**noCacheHeaders**](#servercachecontrolnocacheheaders)|`object`|||
 |[**etagHeaders**](#servercachecontroletagheaders)|`string[]`|||
 
-**Additional Properties:** not allowed  
+**Additional Properties:** not allowed
 <a name="servercachecontrolnocacheheaders"></a>
 #### server\.cacheControl\.noCacheHeaders: object
 
@@ -149,7 +149,7 @@ TLS settings for the server for secure connections
 
 **Items**
 
-**Item Type:** `string`  
+**Item Type:** `string`
 <a name="servermime"></a>
 ### server\.mime: object
 
@@ -161,7 +161,7 @@ TLS settings for the server for secure connections
 |**mimeTypesFile**|`string`|||
 |**defaultContentType**|`string`|||
 
-**Additional Properties:** not allowed  
+**Additional Properties:** not allowed
 <a name="db"></a>
 ## db: object
 
@@ -178,7 +178,7 @@ TLS settings for the server for secure connections
 |**cacheTTL**|`integer`|cache results for subsequent requests<br/>|no|
 |**runMigrations**|`boolean`|run migrations on startup<br/>|no|
 
-**Additional Properties:** not allowed  
+**Additional Properties:** not allowed
 <a name="turso"></a>
 ## turso: object
 
@@ -190,7 +190,7 @@ TLS settings for the server for secure connections
 |**base\_url**|`string`||yes|
 |**org\_name**|`string`||yes|
 
-**Additional Properties:** not allowed  
+**Additional Properties:** not allowed
 <a name="redis"></a>
 ## redis: object
 
@@ -212,7 +212,7 @@ TLS settings for the server for secure connections
 |**maxIdleConns**|`integer`|||
 |**maxActiveConns**|`integer`|||
 
-**Additional Properties:** not allowed  
+**Additional Properties:** not allowed
 <a name="tracer"></a>
 ## tracer: object
 
@@ -226,7 +226,7 @@ TLS settings for the server for secure connections
 |[**stdout**](#tracerstdout)|`object`|||
 |[**otlp**](#tracerotlp)|`object`|||
 
-**Additional Properties:** not allowed  
+**Additional Properties:** not allowed
 <a name="tracerstdout"></a>
 ### tracer\.stdout: object
 
@@ -237,7 +237,7 @@ TLS settings for the server for secure connections
 |**pretty**|`boolean`|||
 |**disableTimestamp**|`boolean`|||
 
-**Additional Properties:** not allowed  
+**Additional Properties:** not allowed
 <a name="tracerotlp"></a>
 ### tracer\.otlp: object
 
@@ -252,13 +252,13 @@ TLS settings for the server for secure connections
 |**compression**|`string`|||
 |**timeout**|`integer`|||
 
-**Additional Properties:** not allowed  
+**Additional Properties:** not allowed
 <a name="tracerotlpheaders"></a>
 #### tracer\.otlp\.headers: array
 
 **Items**
 
-**Item Type:** `string`  
+**Item Type:** `string`
 <a name="sessions"></a>
 ## sessions: object
 
@@ -269,7 +269,7 @@ TLS settings for the server for secure connections
 |**signingKey**|`string`|||
 |**encryptionKey**|`string`|||
 
-**Additional Properties:** not allowed  
+**Additional Properties:** not allowed
 <a name="ratelimit"></a>
 ## ratelimit: object
 
@@ -282,5 +282,5 @@ TLS settings for the server for secure connections
 |**burst**|`integer`|||
 |**expires**|`integer`|||
 
-**Additional Properties:** not allowed  
+**Additional Properties:** not allowed
 
