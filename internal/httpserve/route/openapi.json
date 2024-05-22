@@ -97,6 +97,23 @@
               "schema": {
                 "type": "object",
                 "properties": {
+                  "created_at": {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  "updated_at": {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  "created_by": {
+                    "type": "string"
+                  },
+                  "updated_by": {
+                    "type": "string"
+                  },
+                  "mapping_id": {
+                    "type": "string"
+                  },
                   "organization_id": {
                     "type": "string"
                   },
@@ -138,6 +155,7 @@
                   }
                 },
                 "required": [
+                  "mapping_id",
                   "organization_id",
                   "name",
                   "dsn",
@@ -279,6 +297,13 @@
               "schema": {
                 "type": "object",
                 "properties": {
+                  "updated_at": {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  "updated_by": {
+                    "type": "string"
+                  },
                   "organization_id": {
                     "type": "string"
                   },
@@ -466,6 +491,23 @@
               "schema": {
                 "type": "object",
                 "properties": {
+                  "created_at": {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  "updated_at": {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  "created_by": {
+                    "type": "string"
+                  },
+                  "updated_by": {
+                    "type": "string"
+                  },
+                  "mapping_id": {
+                    "type": "string"
+                  },
                   "name": {
                     "type": "string"
                   },
@@ -501,6 +543,7 @@
                   }
                 },
                 "required": [
+                  "mapping_id",
                   "name",
                   "primary_location",
                   "region"
@@ -638,6 +681,13 @@
               "schema": {
                 "type": "object",
                 "properties": {
+                  "updated_at": {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  "updated_by": {
+                    "type": "string"
+                  },
                   "name": {
                     "type": "string"
                   },
@@ -797,6 +847,9 @@
           "deleted_by": {
             "type": "string"
           },
+          "mapping_id": {
+            "type": "string"
+          },
           "organization_id": {
             "type": "string"
           },
@@ -839,6 +892,7 @@
         },
         "required": [
           "id",
+          "mapping_id",
           "organization_id",
           "name",
           "dsn",
@@ -866,6 +920,9 @@
             "type": "string"
           },
           "updated_by": {
+            "type": "string"
+          },
+          "mapping_id": {
             "type": "string"
           },
           "deleted_at": {
@@ -911,6 +968,7 @@
         },
         "required": [
           "id",
+          "mapping_id",
           "name",
           "primary_location",
           "region"
