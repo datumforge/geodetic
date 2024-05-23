@@ -32,7 +32,7 @@ func TestGraphTestSuite(t *testing.T) {
 type GraphTestSuite struct {
 	suite.Suite
 	client *client
-	tc     *testutils.TC
+	tf     *testutils.TestFixture
 }
 
 // client contains all the clients the test need to interact with
@@ -47,9 +47,7 @@ type graphClient struct {
 }
 
 func (suite *GraphTestSuite) SetupSuite() {
-	ctx := context.Background()
-
-	suite.tc = entdb.NewTestContainer(ctx)
+	suite.tf = entdb.NewTestFixture()
 }
 
 func (suite *GraphTestSuite) SetupTest() {
@@ -69,7 +67,7 @@ func (suite *GraphTestSuite) SetupTest() {
 	}
 
 	// create database connection
-	db, err := entdb.NewTestClient(ctx, suite.tc, opts)
+	db, err := entdb.NewTestClient(ctx, suite.tf, opts)
 	if err != nil {
 		require.NoError(t, err, "failed opening connection to database")
 	}
@@ -84,17 +82,15 @@ func (suite *GraphTestSuite) SetupTest() {
 }
 
 func (suite *GraphTestSuite) TearDownTest() {
-	if err := suite.client.db.Close(); err != nil {
-		log.Fatalf("failed to close database: %s", err)
+	if suite.client.db != nil {
+		if err := suite.client.db.Close(); err != nil {
+			log.Fatalf("failed to close database: %s", err)
+		}
 	}
 }
 
 func (suite *GraphTestSuite) TearDownSuite() {
-	if suite.tc.Container != nil {
-		if err := suite.tc.Container.Terminate(context.Background()); err != nil {
-			log.Fatalf("failed to terminate container: %s", err)
-		}
-	}
+	testutils.TeardownFixture(suite.tf)
 }
 
 func graphTestClient(t *testing.T, c *ent.Client) geodeticclient.GeodeticClient {
