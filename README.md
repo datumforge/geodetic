@@ -8,7 +8,7 @@
 
 > A geodetic datum is an abstract coordinate system with a reference surface (such as sea level) that serves to provide known locations to begin surveys and create maps
 
-The Geodetic service is what is typically called a DAL (Data Abstraction Layer) - it acts as an intermediary and pointer between [the datum service](https://github.com/datumforge/datum) and where the actual databse is. We've built in initially support for Turso as a third party provider, but plan to use geodetic to facilitate "BYO-database" in the system. This would allow a user / customer of the Datum service to create a database in an external location (e.g. AWS, GCP, Azure), configure their datum organization with that database connection string and credentials which would allow the data being persisted in the Datum organization to reside in the configured data store.
+The Geodetic service is what is typically called a DAL (Data Abstraction Layer) - it acts as an intermediary and pointer between [the datum service](https://github.com/datumforge/datum) and where the actual database is. We've built in initially support for Turso as a third party provider, but plan to use geodetic to facilitate "BYO-database" in the system. This would allow a user / customer of the Datum service to create a database in an external location (e.g. AWS, GCP, Azure), configure their datum organization with that database connection string and credentials which would allow the data being persisted in the Datum organization to reside in the configured data store.
 
 ## Developing
 
