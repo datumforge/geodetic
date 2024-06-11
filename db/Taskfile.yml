@@ -36,7 +36,7 @@ tasks:
   console:
     desc: launches an interactive terminal to the local geodetic db with some tasty options
     cmds:
-      -  sqlite3 -column -header -box ../geodetic.db
+      - sqlite3 -column -header -box ../geodetic.db
 
   newschema:
     desc: generate a new ent schema for geodetic
