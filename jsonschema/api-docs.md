@@ -270,6 +270,7 @@ TLS settings for the server for secure connections
 |----|----|-----------|--------|
 |**signingKey**|`string`|||
 |**encryptionKey**|`string`|||
+|**domain**|`string`|||
 
 **Additional Properties:** not allowed  
 <a name="ratelimit"></a>

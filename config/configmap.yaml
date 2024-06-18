@@ -84,6 +84,7 @@ data:
   GEODETIC_TRACER_OTLP_TIMEOUT: {{ .Values.geodetic.tracer.otlp.timeout | 10s }}
   GEODETIC_SESSIONS_SIGNINGKEY: {{ .Values.geodetic.sessions.signingKey | "my-signing-secret" }}
   GEODETIC_SESSIONS_ENCRYPTIONKEY: {{ .Values.geodetic.sessions.encryptionKey | "encryptionsecret" }}
+  GEODETIC_SESSIONS_DOMAIN: {{ .Values.geodetic.sessions.domain }}
   GEODETIC_RATELIMIT_ENABLED: {{ .Values.geodetic.ratelimit.enabled | false }}
   GEODETIC_RATELIMIT_LIMIT: {{ .Values.geodetic.ratelimit.limit | 10 }}
   GEODETIC_RATELIMIT_BURST: {{ .Values.geodetic.ratelimit.burst | 30 }}
