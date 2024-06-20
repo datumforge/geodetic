@@ -1,5 +1,5 @@
 db:
-    catchTTL: 1000000000
+    cacheTTL: 1000000000
     databaseName: datum
     debug: false
     driverName: libsql
