@@ -3,17 +3,11 @@
 package generated
 
 import (
-	"time"
-
 	"github.com/datumforge/geodetic/pkg/enums"
 )
 
 // CreateDatabaseInput represents a mutation input for creating databases.
 type CreateDatabaseInput struct {
-	CreatedAt      *time.Time
-	UpdatedAt      *time.Time
-	CreatedBy      *string
-	UpdatedBy      *string
 	OrganizationID string
 	Name           string
 	Geo            *string
@@ -26,18 +20,6 @@ type CreateDatabaseInput struct {
 
 // Mutate applies the CreateDatabaseInput on the DatabaseMutation builder.
 func (i *CreateDatabaseInput) Mutate(m *DatabaseMutation) {
-	if v := i.CreatedAt; v != nil {
-		m.SetCreatedAt(*v)
-	}
-	if v := i.UpdatedAt; v != nil {
-		m.SetUpdatedAt(*v)
-	}
-	if v := i.CreatedBy; v != nil {
-		m.SetCreatedBy(*v)
-	}
-	if v := i.UpdatedBy; v != nil {
-		m.SetUpdatedBy(*v)
-	}
 	m.SetOrganizationID(i.OrganizationID)
 	m.SetName(i.Name)
 	if v := i.Geo; v != nil {
@@ -64,10 +46,6 @@ func (c *DatabaseCreate) SetInput(i CreateDatabaseInput) *DatabaseCreate {
 
 // UpdateDatabaseInput represents a mutation input for updating databases.
 type UpdateDatabaseInput struct {
-	ClearUpdatedAt bool
-	UpdatedAt      *time.Time
-	ClearUpdatedBy bool
-	UpdatedBy      *string
 	OrganizationID *string
 	Name           *string
 	ClearGeo       bool
@@ -82,18 +60,6 @@ type UpdateDatabaseInput struct {
 
 // Mutate applies the UpdateDatabaseInput on the DatabaseMutation builder.
 func (i *UpdateDatabaseInput) Mutate(m *DatabaseMutation) {
-	if i.ClearUpdatedAt {
-		m.ClearUpdatedAt()
-	}
-	if v := i.UpdatedAt; v != nil {
-		m.SetUpdatedAt(*v)
-	}
-	if i.ClearUpdatedBy {
-		m.ClearUpdatedBy()
-	}
-	if v := i.UpdatedBy; v != nil {
-		m.SetUpdatedBy(*v)
-	}
 	if v := i.OrganizationID; v != nil {
 		m.SetOrganizationID(*v)
 	}
@@ -140,10 +106,6 @@ func (c *DatabaseUpdateOne) SetInput(i UpdateDatabaseInput) *DatabaseUpdateOne {
 
 // CreateGroupInput represents a mutation input for creating groups.
 type CreateGroupInput struct {
-	CreatedAt       *time.Time
-	UpdatedAt       *time.Time
-	CreatedBy       *string
-	UpdatedBy       *string
 	Name            string
 	Description     *string
 	PrimaryLocation string
@@ -155,18 +117,6 @@ type CreateGroupInput struct {
 
 // Mutate applies the CreateGroupInput on the GroupMutation builder.
 func (i *CreateGroupInput) Mutate(m *GroupMutation) {
-	if v := i.CreatedAt; v != nil {
-		m.SetCreatedAt(*v)
-	}
-	if v := i.UpdatedAt; v != nil {
-		m.SetUpdatedAt(*v)
-	}
-	if v := i.CreatedBy; v != nil {
-		m.SetCreatedBy(*v)
-	}
-	if v := i.UpdatedBy; v != nil {
-		m.SetUpdatedBy(*v)
-	}
 	m.SetName(i.Name)
 	if v := i.Description; v != nil {
 		m.SetDescription(*v)
@@ -194,10 +144,6 @@ func (c *GroupCreate) SetInput(i CreateGroupInput) *GroupCreate {
 
 // UpdateGroupInput represents a mutation input for updating groups.
 type UpdateGroupInput struct {
-	ClearUpdatedAt    bool
-	UpdatedAt         *time.Time
-	ClearUpdatedBy    bool
-	UpdatedBy         *string
 	Name              *string
 	ClearDescription  bool
 	Description       *string
@@ -215,18 +161,6 @@ type UpdateGroupInput struct {
 
 // Mutate applies the UpdateGroupInput on the GroupMutation builder.
 func (i *UpdateGroupInput) Mutate(m *GroupMutation) {
-	if i.ClearUpdatedAt {
-		m.ClearUpdatedAt()
-	}
-	if v := i.UpdatedAt; v != nil {
-		m.SetUpdatedAt(*v)
-	}
-	if i.ClearUpdatedBy {
-		m.ClearUpdatedBy()
-	}
-	if v := i.UpdatedBy; v != nil {
-		m.SetUpdatedBy(*v)
-	}
 	if v := i.Name; v != nil {
 		m.SetName(*v)
 	}
