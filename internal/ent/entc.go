@@ -14,6 +14,7 @@ import (
 	"entgo.io/ent/entc"
 	"entgo.io/ent/entc/gen"
 	"github.com/datumforge/entx"
+	"github.com/datumforge/entx/genhooks"
 	"github.com/datumforge/fgax"
 	"github.com/datumforge/fgax/entfga"
 	"github.com/datumforge/go-turso"
@@ -24,6 +25,7 @@ import (
 
 var (
 	graphSchemaDir = "./schema/"
+	graphQueryDir  = "./query/"
 )
 
 func main() {
@@ -89,13 +91,13 @@ func main() {
 		Target:    "./internal/ent/generated",
 		Templates: entgql.AllTemplates,
 		Hooks: []gen.Hook{
-			entx.GenSchema(graphSchemaDir),
+			genhooks.GenSchema(graphSchemaDir),
+			genhooks.GenQuery(graphQueryDir),
 		},
 		Package: "github.com/datumforge/geodetic/internal/ent/generated",
 		Features: []gen.Feature{
 			gen.FeatureVersionedMigration,
 			gen.FeaturePrivacy,
-			gen.FeatureSnapshot,
 			gen.FeatureEntQL,
 			gen.FeatureNamedEdges,
 			gen.FeatureSchemaConfig,
