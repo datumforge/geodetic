@@ -31,7 +31,7 @@ require (
 	github.com/prometheus/client_golang v1.19.1
 	github.com/ravilushqa/otelgqlgen v0.16.0
 	github.com/redis/go-redis/v9 v9.5.4
-	github.com/samber/lo v1.44.0
+	github.com/samber/lo v1.45.0
 	github.com/spf13/cobra v1.8.1
 	github.com/spf13/pflag v1.0.5
 	github.com/spf13/viper v1.19.0
