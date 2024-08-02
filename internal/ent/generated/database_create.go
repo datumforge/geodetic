@@ -343,7 +343,7 @@ func (dc *DatabaseCreate) check() error {
 			return &ValidationError{Name: "provider", err: fmt.Errorf(`generated: validator failed for field "Database.provider": %w`, err)}
 		}
 	}
-	if _, ok := dc.mutation.GroupID(); !ok {
+	if len(dc.mutation.GroupIDs()) == 0 {
 		return &ValidationError{Name: "group", err: errors.New(`generated: missing required edge "Database.group"`)}
 	}
 	return nil
