@@ -313,7 +313,7 @@ func (du *DatabaseUpdate) check() error {
 			return &ValidationError{Name: "provider", err: fmt.Errorf(`generated: validator failed for field "Database.provider": %w`, err)}
 		}
 	}
-	if _, ok := du.mutation.GroupID(); du.mutation.GroupCleared() && !ok {
+	if du.mutation.GroupCleared() && len(du.mutation.GroupIDs()) > 0 {
 		return errors.New(`generated: clearing a required unique edge "Database.group"`)
 	}
 	return nil
@@ -735,7 +735,7 @@ func (duo *DatabaseUpdateOne) check() error {
 			return &ValidationError{Name: "provider", err: fmt.Errorf(`generated: validator failed for field "Database.provider": %w`, err)}
 		}
 	}
-	if _, ok := duo.mutation.GroupID(); duo.mutation.GroupCleared() && !ok {
+	if duo.mutation.GroupCleared() && len(duo.mutation.GroupIDs()) > 0 {
 		return errors.New(`generated: clearing a required unique edge "Database.group"`)
 	}
 	return nil
