@@ -14,18 +14,30 @@ tasks:
     cmds:
       - "docker compose -f ./docker/docker-compose-redis.yml  -f ./docker/docker-compose.yml -f ./docker/docker-compose-fga.yml -p geodetic up -d"
 
-  datum:down:
+  geodetic:down:
     dir: ..
     desc: brings the geodetic compose environment down
     cmds:
       - "docker compose -p geodetic down"
 
+  postgres:
+    dir: ..
+    desc: brings up the compose environment for postgres development
+    cmds:
+      - "docker compose -f ./docker/docker-compose-pg.yml -p postgres up -d"
+
+  postgres:down:
+    dir: ..
+    desc: brings the postgres compose environment down
+    cmds:
+      - docker compose -p postgres down
+
   all:up:
     dir: ..
-    desc: brings up the full docker compose development environment including geodetic server, fga, and rover
+    desc: brings up the full docker compose development environment including geodetic server, postgres, fga, and rover
     cmds:
       - task: geodetic
-      - task: rover
+      - task: :rover
 
   all:down:
     dir: ..
@@ -70,10 +82,3 @@ tasks:
     cmds:
       - task: fga
       - task: fga:open
-
-  rover:
-    dir: ..
-    desc: launches an interactive browser to navigate the configured graph schema
-    cmds:
-      - 'open "http://localhost:4000"'
-      - rover dev --skip-update-check --skip-update -u http://localhost:1337/query -s schema.graphql -n geodetic --elv2-license=accept

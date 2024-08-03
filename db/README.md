@@ -42,7 +42,7 @@ db:
 
 #### Postgres
 
-1. Postgres is included in `docker/docker-compose-fga.yml` and the same instance can be used for development. The following connection string should work when using `task docker:all:up`
+1. Postgres is included in `docker/docker-compose-pg.yml` and the same instance can be used for development. The following connection string should work when using `task docker:all:up`
 
 ```yaml
 db:
