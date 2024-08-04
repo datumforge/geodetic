@@ -16,7 +16,8 @@ includes:
     taskfile: ./jsonschema
 
 env:
-  ATLAS_DB_URI: "sqlite://file?mode=memory&_fk=1"
+  ATLAS_SQLITE_DB_URI: "sqlite://file?mode=memory&_fk=1"
+  ATLAS_POSTGRES_DB_URI: "postgres:16-alpine"
   TEST_DB_URL: "libsql://file::memory:?cache=shared"
   TEST_DB_CONTAINER_EXPIRY: "2" # in minutes
   TEST_FGA_URL: "localhost:8080"
@@ -129,3 +130,9 @@ tasks:
     cmds:
       - "rm -f geodetic.db"
       - "rm -f geodetic-cli"
+
+  rover:
+    desc: launches an interactive browser to navigate the configured graph schema
+    cmds:
+      - 'open "http://localhost:4000"'
+      - rover dev --skip-update-check --skip-update -u http://localhost:1337/query -s schema.graphql -n geodetic --elv2-license=accept

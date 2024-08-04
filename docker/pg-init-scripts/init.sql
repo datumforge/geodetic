@@ -1,0 +1,7 @@
+CREATE DATABASE openfga;
+
+GRANT ALL PRIVILEGES ON DATABASE openfga TO postgres;
+
+CREATE DATABASE geodetic;
+
+GRANT ALL PRIVILEGES ON DATABASE geodetic TO postgres;
